@@ -180,11 +180,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             "         <div id='blocklyContainer' style='resize:vertical;overflow:auto;height:600px;padding-bottom:10px;border: solid black 1px;width: 100%;position:relative'>" +
             "            <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
             "            <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
-            "         </div>" +
-            "         <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-            "         <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-            "         <p>" + this.strings.reloadProgram + " <input type='file' id='input' onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-            "         <p><input type='button' value='" + this.strings.saveProgram + "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span>");
+            "         </div>");
 
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {

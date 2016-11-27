@@ -524,7 +524,7 @@ window.displayHelper = {
       }
    },
    getAvatar: function(mood) {
-      return beoi.png
+      return "beoi.png";
    },
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
       if (mode != 'blanket') {
