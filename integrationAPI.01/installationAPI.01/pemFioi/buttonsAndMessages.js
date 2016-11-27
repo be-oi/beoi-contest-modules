@@ -524,17 +524,7 @@ window.displayHelper = {
       }
    },
    getAvatar: function(mood) {
-      if (displayHelper.avatarType == "beaver") {
-         return "castor.png";
-      } else {
-         if (mood == "success") {
-            return "laptop_success.png";
-         } else if (mood == "warning") {
-            return "laptop_warning.png";
-         }{
-            return "laptop_error.png";
-         }
-      }
+      return beoi.png
    },
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
       if (mode != 'blanket') {
