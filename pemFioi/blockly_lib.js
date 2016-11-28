@@ -222,7 +222,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
-               media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
+               media: "https://manage-static.be-oi.be/contestAssets/blockly/"
             };
             if (!this.groupByCategory) {
                wsConfig.comments = true;
