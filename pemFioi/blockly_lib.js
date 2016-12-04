@@ -60,6 +60,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             do: "faire",
             else: "sinon",
 
+            previous: "Précédent",
+            next: "Suivant",
             submitProgram: "Valider le programme",
             runProgram: "Exécuter sur ce test",
             stopProgram: "Recommencer",
@@ -225,9 +227,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
               gridButtonsBefore += "<div>" +
-                 "<input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>" +
+                 "<input type='button' value='" + this.strings.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
                  "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
-                 "<input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>" +
+                 "<input type='button' value='" + this.strings.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
                  "</div>";
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
