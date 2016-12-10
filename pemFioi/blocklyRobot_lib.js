@@ -113,7 +113,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          labelAlert: "let op",
          codeAlert: "letOp",
          obstacle: "De robot probeert zich te verplaatsen op een obstakel!" 
-      }
+      },
       de: {
          labelWait: "warten",
          codeWait: "warten",
