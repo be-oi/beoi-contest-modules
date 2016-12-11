@@ -195,7 +195,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    function fillAnimation() {
       for (var i = 0; i < PEMInstallationAPIObject.task.length; i++) {
          var resource = PEMInstallationAPIObject.task[i];
-         if (resource.type == 'javascript' && resource.id == 'animation') {
+         if (resource.type == 'javascript' && resource.id == 'animation' && typeof resource.url !== 'undefined') {
             waiting += 1;
             $.get(resource.url)
                .done(function(scriptContent) {
@@ -249,7 +249,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    }
    fillSamples(FIOITaskMetaData.taskSamples, 'task');
    fillSources(FIOITaskMetaData.taskSources, 'task');
-   fillImages(PEMInstallationAPIObject.task);
+//   fillImages(PEMInstallationAPIObject.task);
    fillSources(FIOITaskMetaData.solutionSources, 'solution');
    fillImages(PEMInstallationAPIObject.solution);
    for (var hintNum in FIOITaskMetaData.hintsSources) {
