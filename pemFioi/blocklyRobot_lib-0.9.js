@@ -1,61 +1,218 @@
 var getContext = function(display, infos, curLevel) {
    var languageStrings = {
       fr: {
-         labelWait: "attendre",
-         codeWait: "attendre",
-         labelRight: "tourner à droite",
-         codeRight: "droite",
-         labelLeft: "tourner à gauche",
-         codeLeft: "gauche",
-         labelForward: "avancer",
-         codeForward: "avancer",
-         labelEast: "avancer vers la droite",
-         codeEast: "droite",
-         labelSouth: "avancer vers le bas",
-         codeSouth: "bas",
-         labelWest: "avancer vers la gauche",
-         codeWest: "gauche",
-         labelNorth: "avancer vers le haut",
-         codeNorth: "haut",
-         labelPaint: "peindre la case",
-         codePaint: "peindreCase",
-         labelGridEdgeInFront: "bord de la grille devant",
-         codeGridEdgeInFront: "bordGrilleDevant",
-         labelObstacleInFront: "obstacle devant",
-         codeObstacleInFront: "obstacleDevant",
-         labelObstacleRight: "obstacle à droite",
-         codeObstacleRight: "obstacleDroite",
-         labelObstacleLeft: "obstacle à gauche",
-         codeObstacleLeft: "obstacleGauche",
-         labelObstacleEast: "obstacle à droite",
-         codeObstacleEast: "obstacleDroite",
-         labelObstacleWest: "obstacle à gauche",
-         codeObstacleWest: "obstacleGauche",
-         labelObstacleNorth: "obstacle en haut",
-         codeObstacleNorth: "obstacleHaut",
-         labelObstacleSouth: "obstacle en bas",
-         codeObstacleSouth: "obstacleBas",
-         labelCellGreen: "case verte",
-         labelCellBrown: "case marron",
-         labelCellMarked: "case marquée",
-         codeCellGreen: "caseVerte",
-         codeCellBrown: "caseMarron",
-         codeCellMarked: "caseMarquee",
-         labelPaintInFront: "peinture devant",
-         codePaintInFront: "peintureDevant",
-         codeColorUnder: "couleurCase",
-         codeNumberUnder: "nombreCase",
-         labelColorUnder: "couleur de la case",
-         labelNumberUnder: "nombre sur la case",
-         labelDir: "direction du robot",
-         codeDir: "direction",
-         labelCol: "colonne du robot",
-         codeCol: "colonne",
-         labelRow: "ligne du robot",
-         codeRow: "ligne",
-         labelAlert: "alerte",
-         codeAlert: "alerte",
-         obstacle: "Le robot essaie de se déplacer sur un obstacle !" 
+         label: {
+            wait: "attendre",
+            right: "tourner à droite",
+            left: "tourner à gauche",
+            forward: "avancer",
+            turnAround: "faire demi-tour",
+            jump: "sauter",
+            east: "avancer vers la droite",
+            south: "avancer vers le bas",
+            west: "avancer vers la gauche",
+            north: "avancer vers le haut",
+            paint: "peindre la case",
+            pickTransportable: "ramasser la bille",
+            dropTransportable: "déposer la bille",
+            onTransportable: "sur une bille",
+            onHole: "sur un trou",
+            transportableShape: "forme de l'objet",
+            transportableColor: "couleur de l'objet",
+            transportableRed:  "l'objet est rouge",
+            transportableBlue: "l'objet est bleu",
+            transportableSquare: "l'objet est carré",
+            greenCell: "sur une case verte",
+            brownCell: "sur une case marron",
+            markedCell: "sur une case marquée",
+            platformInFront: "plateforme devant",
+            platformInFrontAndBelow: "plateforme devant plus bas",
+            platformAbove: "plateforme au dessus",
+            gridEdgeInFront: "bord de la grille devant",
+            obstacleInFront: "obstacle devant",
+            obstacleRight: "obstacle à droite",
+            obstacleLeft: "obstacle à gauche",
+            obstacleEast: "obstacle à droite",
+            obstacleWest: "obstacle à gauche",
+            obstacleNorth: "obstacle en haut",
+            obstacleSouth: "obstacle en bas",
+            paintInFront: "peinture devant",
+            paintNorthWest: "peinture en haut à gauche",
+            paintNorth: "peinture en haut",
+            paintNorthEast: "peinture en haut à droite",
+            colorUnder: "couleur de la case",
+            numberUnder: "nombre sur la case",
+            dir: "direction du robot",
+            col: "colonne du robot",
+            row: "ligne du robot",
+            alert: "alerte",
+            onPill: "sur une pastille",
+
+            number: "nombre total d'objets à transporter",
+            exists: "il existe un objet à transporter ",
+            trans_row: "ligne de l'objet à transporter",
+            trans_col: "colonne d'objet à transporter",
+         },
+         code: {
+            wait: "attendre",
+            right: "tournerDroite",
+            left: "tournerGauche",
+            turnAround: "demiTour",
+            jump: "sauter",
+            forward: "avancer",
+            east: "droite",
+            south: "bas",
+            west: "gauche",
+            north: "haut",
+            paint: "peindre",
+            pickTransportable: "ramasser",
+            dropTransportable: "deposer",
+            onTransportable: "surObjet",
+            onHole: "surTrou",
+            transportableShape: "formeObjet",
+            transportableColor: "couleurObjet",
+            transportableRed: "objetRouge",
+            transportableBlue: "objetBleu",
+            transportableSquare: "objetCarre",
+            greenCell: "caseVerte",
+            brownCell: "caseMarron",
+            markedCell: "caseMarquee",
+            platformInFront: "plateformeDevant",
+            platformInFrontAndBelow: "plateformeDevantPlusBas",
+            platformAbove: "plateformeAuDessus",
+            gridEdgeInFront: "bordGrilleDevant",
+            obstacleInFront: "obstacleDevant",
+            obstacleRight: "obstacleADroite",
+            obstacleLeft: "obstacleAGauche",
+            obstacleEast: "obstacleDroite",
+            obstacleWest: "obstacleGauche",
+            obstacleNorth: "obstacleHaut",
+            obstacleSouth: "obstacleBas",
+            paintInFront: "peintureDevant",
+            paintNorthWest: "peintureHautGauche",
+            paintNorth: "peintureHaut",
+            paintNorthEast: "peintureHautDroite",
+            colorUnder: "couleurCase",
+            numberUnder: "nombreCase",
+            dir: "direction",
+            col: "colonne",
+            row: "ligne",
+            alert: "alerte",
+            onPill: "surPastille",
+
+            number: "nombreTransportables",
+            exists: "existeTransportable",
+            trans_row: "ligneTransportable",
+            trans_col: "colonneTransportable",
+         },
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+      },
+      de: {
+         label: {
+            wait: "warte",
+            right: "drehe nach rechts",
+            left: "drehe nach links",
+            turnAround: "faire demi-tour",
+            jump: "sauter",
+            forward: "gehe vorwärts",
+            east: "gehe nach rechts",
+            south: "gehe nach unten",
+            west: "gehe nach links",
+            north: "gehe nach oben",
+            paint: "bemale das Feld",
+            pickTransportable: "Murmel aufheben",
+            dropTransportable: "Murmel ablegen",
+            onTransportable: "auf einer Murmel",
+            onHole: "auf einem Loch",
+            transportableShape: "forme de l'objet",
+            transportableColor: "couleur de l'objet",
+            transportableRed:  "l'objet est rouge",
+            transportableBlue: "l'objet est bleu",
+            transportableSquare: "l'objet est carré",
+            greenCell: "auf grünem Feld",
+            brownCell: "auf braunem Feld",
+            markedCell: "auf markiertem Feld",
+            platformInFront: "vor Plattform",
+            platformInFrontAndBelow: "vor und über Plattform",
+            platformAbove: "unter Plattform",
+            gridEdgeInFront: "vor Rand des Gitters",
+            obstacleInFront: "vor Hindernis",
+            obstacleRight: "Hindernis rechts",
+            obstacleLeft: "Hindernis links",
+            obstacleEast: "Hindernis rechts",
+            obstacleWest: "Hindernis links",
+            obstacleNorth: "Hindernis oben",
+            obstacleSouth: "Hindernis unten",
+            paintInFront: "vor Farbe",
+            paintNorthWest: "TODO TRANSLATE",
+            paintNorth: "TODO TRANSLATE",
+            paintNorthEast: "TODO TRANSLATE",
+            colorUnder: "auf Farbe",
+            numberUnder: "Nummer des Feldes",
+            dir: "Richtung des Roboters",
+            col: "Spalte des Roboters",
+            row: "Zeile des Roboters",
+            alert: "gib aus:",
+            onPill: "auf einem Bonbon",
+
+            number: "nombre total d'objets à transporter",
+            exists: "il existe un objet à transporter ",
+            trans_row: "ligne de l'objet à transporter",
+            trans_col: "colonne d'objet à transporter",
+         },
+         code: {
+            wait: "warte",
+            right: "dreheRechts",
+            left: "dreheLinks",
+            turnAround: "demiTour",
+            jump: "sauter",
+            forward: "geheVorwaerts",
+            east: "droite",
+            south: "bas",
+            west: "gauche",
+            north: "haut",
+            paint: "bemaleFeld",
+            pickTransportable: "ramasserTransportable",
+            dropTransportable: "deposerTransportable",
+            onTransportable: "surTransportable",
+            onHole: "surTrou",
+            transportableShape: "formeObjet",
+            transportableColor: "couleurObjet",
+            transportableRed: "objetRouge",
+            transportableBlue: "objetBleu",
+            transportableSquare: "objetCarre",
+            greenCell: "caseVerte",
+            brownCell: "caseMarron",
+            markedCell: "caseMarquee",
+            platformInFront: "plateformeDevant",
+            platformInFrontAndBelow: "plateformeDevantPlusBas",
+            platformAbove: "plateformeAuDessus",
+            gridEdgeInFront: "vorGitterrand",
+            obstacleInFront: "vorHindernis",
+            obstacleRight: "obstacleDroite",
+            obstacleLeft: "obstacleGauche",
+            obstacleEast: "obstacleDroite",
+            obstacleWest: "obstacleGauche",
+            obstacleNorth: "obstacleHaut",
+            obstacleSouth: "obstacleBas",
+            paintInFront: "vorFarbe",
+            paintNorthWest: "TODO TRANSLATE",
+            paintNorth: "TODO TRANSLATE",
+            paintNorthEast: "TODO TRANSLATE",
+            colorUnder: "couleurCase",
+            numberUnder: "nombreCase",
+            dir: "Richtung",
+            col: "Spalte",
+            row: "Zeile",
+            alert: "gib_aus",
+            onPill: "surPastille",
+
+            number: "nombreTransportables",
+            exists: "existeTransportable",
+            trans_row: "ligneTransportable",
+            trans_col: "colonneTransportable",
+         },
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       }
    };
    var strings = languageStrings[stringsLanguage];
@@ -68,7 +225,8 @@ var getContext = function(display, infos, curLevel) {
    var context = {
       display: display,
       infos: infos,
-      robot: {}
+      robot: {},
+      strings: strings,
    };
 
    context.changeDelay = function(newDelay) {
@@ -387,9 +545,28 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, items.length > 0);
    };
 
-   context.robot.paintGrayInFront = function(callback) {
+   context.robot.paintInFront = function(callback) {
       var coords = getCoordsInFront(0);
-      paint(coords.row, coords.col, "paintGray", callback);
+      var items = context.getItems(coords.row, coords.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorthWest = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col - 1, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorth = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorthEast = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col + 1, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
    };
 
    context.robot.colorUnder = function(callback) {
@@ -634,6 +811,7 @@ var getContext = function(display, infos, curLevel) {
       context.success = false;
       context.curRobot = 0;
       context.nbTransportedItems = 0;
+      context.nbCollectedItems = 0;
       if (context.display) {
          context.resetDisplay();
       } else {
@@ -648,7 +826,7 @@ var getContext = function(display, infos, curLevel) {
       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
       $("#errors").html("");
       resetBoard();
-      context.blocklyHelper.updateSize();
+//      context.blocklyHelper.updateSize();
       resetItems();
       context.updateScale();
    };
@@ -671,6 +849,7 @@ var getContext = function(display, infos, curLevel) {
             // handler: optional handler function. Otherwise the function context.group.someName will be used
             // blocklyJson: optional Blockly JSON objects
             // blocklyInit: optional function for Blockly.Blocks[name].init
+            //   if not defined, it will be defined to call 'this.jsonInit(blocklyJson);
             // blocklyXml: optional Blockly xml string
             // codeGenerators: optional object:
             //   { Python: function that generates Python code
@@ -683,8 +862,8 @@ var getContext = function(display, infos, curLevel) {
     */
    
    context.customBlocks = {
-      robot: [
-         {  category: "actions",
+      robot: {
+         actions: {
             blocks: [  
                { name: "paint" },
                { name: "paintGrey" },
@@ -700,10 +879,10 @@ var getContext = function(display, infos, curLevel) {
                { name: "wait" },
                { name: "pickTransportable" },
                { name: "dropTransportable" },
-               { name: "dropTransportable" },
+               { name: "dropTransportable" }
             ]
          },
-         {  category: "sensors",
+         sensors: {
             blocks: [
                { name: "onTransportable",    yieldsValue: true },
                { name: "onHole",             yieldsValue: true },
@@ -726,6 +905,9 @@ var getContext = function(display, infos, curLevel) {
                { name: "obstacleSouth",      yieldsValue: true },
                
                { name: "paintInFront",       yieldsValue: true },
+               { name: "paintNorth",         yieldsValue: true },
+               { name: "paintNorthWest",     yieldsValue: true },
+               { name: "paintNorthEast",     yieldsValue: true },
                { name: "colorUnder",         yieldsValue: true },
                { name: "numberUnder",        yieldsValue: true },
                { name: "gridEdgeInFront",    yieldsValue: true },
@@ -735,23 +917,25 @@ var getContext = function(display, infos, curLevel) {
                { name: "dir",                yieldsValue: true },
                { name: "col",                yieldsValue: true },
                { name: "row",                yieldsValue: true },
-               { name: "onPill",             yieldsValue: true },
+               { name: "onPill",             yieldsValue: true }
             ]
-         },
-      ],
-      transport: [
-         {
-            category: "sensors",
+         }
+      },
+      transport: {
+         sensors: {
             blocks: [
                { name: "number", yieldsValue: true,                     handler: context.transportable_number },
                { name: "exists", yieldsValue: true,   params: [null],   handler: context.transportable_exists },
-               { name: "row",    yieldsValue: true,   params: [null],   handler: context.transportable_row },
-               { name: "col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
+               { name: "trans_row",    yieldsValue: true,   params: [null],   handler: context.transportable_row },
+               { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
             ]
-         },
-      ]
-      debug: [{ category: "debug",
-                blocks: [{ name: "alert", handler: context.debug_alert }] }]
+         }
+      },
+      debug: {
+         debug: {
+             blocks: [{ name: "alert", params: [null], handler: context.debug_alert }]
+         }
+      }
    };
 
    var isOutsideGrid = function(row, col) {
@@ -911,8 +1095,31 @@ var getContext = function(display, infos, curLevel) {
       item.dir = newDir;
       item.row = newRow;
       item.col = newCol;
+
+
+      var collectibles = context.getItems(newRow, newCol, {isCollectible: true});
+      var collected = [];
+      while (collectibles.length > 0) {
+         var collectible = collectibles[0];
+         collected.push(collectible);
+         context.items.splice(collectible.index, 1);
+         collectibles.splice(0, 1);
+         context.nbCollectedItems++;
+      }
+
+      function removeItemsElements(items) {
+         for (var iItem = 0; iItem < items.length; iItem++) {
+             items[iItem].element.remove();
+         }
+      }
+
       if (context.display) {
          var attr;
+         if (collected.length > 0) {
+            context.delayFactory.createTimeout("removeItems" + iRobot + "_" + Math.random(), function() {
+               removeItemsElements(collected);
+            }, infos.actionDelay);
+         }
          if (animate) {
             attr = itemAttributes(item);
             context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
@@ -960,14 +1167,14 @@ var getContext = function(display, infos, curLevel) {
    var checkTileAllowed = function(row, col) {
       if (isOutsideGrid(row, col) || (context.tiles[row][col] == 0)) {
          if (infos.ignoreInvalidMoves) {
-            return fasle;
+            return false;
          }
          throw("Le robot sort de la grille !");
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
          if (infos.ignoreInvalidMoves) {
-            return fasle;
+            return false;
          }
          throw(strings.obstacle);
       }

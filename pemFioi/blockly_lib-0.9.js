@@ -1,17 +1,23 @@
 var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+    var sPageURL = decodeURIComponent(window.location.search.substring(1));
+    var sURLVariables = sPageURL.split('&');
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
+    for (var i = 0; i < sURLVariables.length; i++) {
+        var sParameterName = sURLVariables[i].split('=');
         if (sParameterName[0] === sParam) {
             return sParameterName[1] === undefined ? true : sParameterName[1];
         }
     }
 };
+
+var arrayContains = function(array, needle) {
+   for (var index in array) {
+      if (needle == array[index]) {
+         return true;
+      }
+   }
+   return false;
+}
 
 var highlightPause = false;
 
@@ -32,14 +38,14 @@ var languageStrings = {
          debug: "Débuggage",
          colour: "Couleurs",
          dicts: "Dictionnaires",
-         inputs: "Entrées",
+         input: "Entrées",
          lists: "Listes",
          logic: "Logique",
          loops: "Boucles",
          math: "Maths",
          text: "Texte",
          variables: "Variables",
-         functions: "Fonctions",
+         functions: "Fonctions"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
@@ -47,6 +53,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Plus petit des deux nombres",
       greatestOfTwoNumbers: "Plus grand des deux nombres",
       programOfRobot: "Programme du robot",
+      flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
@@ -64,7 +71,8 @@ var languageStrings = {
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
-      limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés."
+      limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
+      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés."
    },
    en: {
       categories: {
@@ -73,14 +81,14 @@ var languageStrings = {
          debug: "Debug",
          colour: "Colors",
          dicts: "Dictionnaries",
-         inputs: "Inputs",
+         input: "Input",
          lists: "Lists",
          logic: "Logic",
          loops: "Loops",
          math: "Math",
          text: "Text",
          variables: "Variables",
-         functions: "Functions",
+         functions: "Functions"
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
@@ -88,6 +96,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Smallest of the two numbers",
       greatestOfTwoNumbers: "Greatest of the two numbers",
       programOfRobot: "Robot's program",
+      flagClicked: "When %1 clicked",
       tooManyIterations: "Too many iterations before an action!",
       submitProgram: "Validate this program",
       runProgram: "Run this program",
@@ -105,7 +114,8 @@ var languageStrings = {
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       reloadProgram: "Reload:",
       saveProgram: "Save",
-      limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available."
+      limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available."
    },
    de: {
       categories: {
@@ -114,14 +124,14 @@ var languageStrings = {
          debug: "Debug",
          colour: "Farben",
          dicts: "Diktionär",
-         inputs: "Eingaben",
+         input: "Eingabe",
          lists: "Listen",
          logic: "Logik",
          loops: "Schleifen",
          math: "Mathe",
          text: "Texte",
          variables: "Variablen",
-         functions: "Funktionen",
+         functions: "Funktionen"
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -129,6 +139,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
+      flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
@@ -146,9 +157,22 @@ var languageStrings = {
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
-      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar."
+      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available." // TODO :: translate
    }
 }
+
+// Blockly to Scratch translations
+var blocklyToScratch = {
+    singleBlocks: {
+        'controls_if': 'control_if',
+        'controls_if_else': 'control_if_else',
+        'controls_repeat': 'control_repeat',
+        'controls_repeat_ext': 'control_repeat',
+        'logic_negate': 'operator_not'
+    }
+}
+
 
 // from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
 // where they got it from the stackoverflow-code itself ("formatUnicorn")
@@ -159,8 +183,9 @@ if (!String.prototype.format) {
          return str;
       var args = typeof arguments[0],
           args = (("string" == args || "number" == args) ? arguments : arguments[0]);
-      for (arg in args)
+      for (var arg in args) {
          str = str.replace(RegExp("\\{" + arg + "\\}", "gi"), args[arg]);
+      }
       return str;
    }
 }
@@ -168,6 +193,7 @@ if (!String.prototype.format) {
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    return {
+      scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       textFile: null,
       extended: false,
       programs: [],
@@ -175,21 +201,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       player: 0,
       workspace: null,
       prevWidth: 0,
-      groupByCategory: true,
-      includedAll: true,
-      includedCategories : [],
-      includedBlocks: [],
-      availableVariables: [],
+      trashInToolbox: false,
       languageStrings: languageStrings,
       startingBlock: true,
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+
       loadHtml: function(nbTestCases) {
-         var strMaxBlocks = "";
-         if (maxBlocks != undefined) {
-            strMaxBlocks = this.strings.limitBlocks.format({
-               maxBlocks: maxBlocks,
-               remainingBlocks: "<span class='blocklyCapacity' style='display:inline-block;width:24px;text-align:right'>XXX</span>"
-            });
-         }
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
                                       "    <p>" + this.strings.selectLanguage +
@@ -201,10 +218,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                         "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
                                       "    </p>" +
                                       "  </div>" +
-                                      "  <div style='clear:both;'>" + strMaxBlocks + "</div>" +
-                                      "  <div id='blocklyContainer' style='resize:vertical; overflow:auto; height:600px; padding-bottom:10px; " +
-                                        "border: solid black 1px; width: 100%; position:relative;'>" +
-                                      "    <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
+                                      "  <div id='blocklyCapacity' style='clear:both;'></div>" +
+                                      "  <div id='blocklyContainer'>" +
+                                      "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
                                       "  </div>" +
                                       "  <div id='saveOrLoad'> "+
@@ -221,14 +237,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (nbTestCases > 1) {
             gridButtonsBefore += "<div>\n" +
                                  "  <input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
-                                 "  <span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>\n" +
+                                 "  <span id='testCaseName'>Test 1</span>\n" +
                                  "  <input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
                                  "</div>\n";
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
          
          
-         var gridButtonsAfter = this.strings.speed +
+         var gridButtonsAfter = this.strings.speed + " " +
                                 "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>\n" + 
                                 "  <option value='200'>" + this.strings.slowSpeed + "</option>\n" + 
                                 "  <option value='50'>" + this.strings.mediumSpeed + "</option>\n" +
@@ -240,12 +256,18 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (nbTestCases > 1) {
             gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
          }
-         gridButtonsAfter += "<input type='button' value='" + this.strings.submitProgram + "' onclick='task.displayedSubTask.submit()' /><br/>" +
-                             "<div id='errors' style='color:red;padding-top:10px;'></div>";
+         gridButtonsAfter += "<button onclick='task.displayedSubTask.submit()'>"
+                             + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
+                             + this.strings.submitProgram
+                             + "</button><br/>"
+                             + "<div id='errors' style='width: 400px;'></div>";
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
       load: function(language, display, nbTestCases, options) {
+         if(this.scratchMode) {
+            this.fixScratch();
+         }
          if (language == undefined) {
             language = "fr";
          }
@@ -258,27 +280,45 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
-               media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
+               media: this.mediaUrl
             };
-            if (!this.groupByCategory) {
-               wsConfig.comments = true;
-               wsConfig.scrollbars = true;
-               wsConfig.trashcan = true;
-            }
+            wsConfig.comments = true;
+            wsConfig.scrollbars = true;
+            wsConfig.trashcan = true;
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
             }
             if (options.readOnly) {
                wsConfig.readOnly = true;
             }
+            if (this.scratchMode) {
+               wsConfig.zoom = { startScale: 0.75 };
+            }
             this.addExtraBlocks();
+            if(this.trashInToolbox) {
+               Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
+            }
             this.workspace = Blockly.inject(options.divId, wsConfig);
-            Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
+
+            var toolboxNode = $('#toolboxXml');
+            if (toolboxNode.length != 0) {
+               toolboxNode.html(xml);
+            }
+            
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
                window.focus();
-               $('.blocklyCapacity').html(that.workspace.remainingCapacity());
+               Blockly.svgResize(that.workspace);
+
+               var remaining = that.workspace.remainingCapacity();
+               optLimitBlocks = {
+                  maxBlocks: maxBlocks,
+                  remainingBlocks: Math.abs(remaining)
+                  };
+               var strLimitBlocks = remaining < 0 ? that.strings.limitBlocksOver : that.strings.limitBlocks;
+               $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
+               $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
             }
             this.workspace.addChangeListener(onchange);
             onchange();
@@ -292,13 +332,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
             if(!options.noRobot) {
-               var xml;
-               if (this.startingBlock) {
-                  xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-               }
-               else {
-                  xml = '<xml></xml>';
-               }
+               var xml = this.getDefaultBlocklyContent();
 
                Blockly.Events.recordUndo = false;
                Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
@@ -323,49 +357,28 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
       },
 
-      initXML: function() {
-         var categories = ["actions", "sensors", "debug"];
-         for (var iCategory = 0; iCategory < categories.length; iCategory++) {
-            var categoryStr = "";
-            for (var objectName in this.generators) {
-               for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
-                  var generator = this.generators[objectName][iGen];
-                  if (generator.category == categories[iCategory]) {
-                     categoryStr += "<block type='" + objectName + "_" + generator.labelEn + "__'></block>";
-                  }
-               }
+      getDefaultBlocklyContent: function () {
+         if (this.startingBlock) {
+            if(this.scratchMode) {
+               return '<xml><block type="robot_start" deletable="false" movable="false" x="10" y="20"></block></xml>';
+            } else {
+               return '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
             }
-            $("#blockly_" + categories[iCategory]).html(categoryStr);
+         }
+         else {
+            return '<xml></xml>';
          }
       },
 
-      createSelection: function(id, start, end) {
-         var field = document.getElementById(id)
-         if (field.createTextRange) {
-            var selRange = field.createTextRange();
-            selRange.collapse(true);
-            selRange.moveStart('character', start);
-            selRange.moveEnd('character', end);
-            selRange.select();
-         } else if (field.setSelectionRange) {
-            field.setSelectionRange(start, end);
-         } else if (field.selectionStart) {
-            field.selectionStart = start;
-            field.selectionEnd = end;
+      checkRobotStart: function () {
+         if(!this.startingBlock || !this.workspace) { return; }
+         var blocks = this.workspace.getTopBlocks(true);
+         for(b=0; b<blocks.length; b++) {
+            if(blocks[b].type == 'robot_start') { return;}
          }
-         field.focus();
-      },
 
-      showStep: function(interpreter, id) {
-         if (interpreter.stateStack[0]) {
-           var node = interpreter.stateStack[0].node;
-           var start = node.start;
-           var end = node.end;
-         } else {
-           var start = 0;
-           var end = 0;
-         }
-         this.createSelection(id, start, end);
+         var xml = Blockly.Xml.textToDom(this.getDefaultBlocklyContent())
+         Blockly.Xml.domToWorkspace(xml, this.workspace);
       },
 
       setPlayer: function(newPlayer) {
@@ -433,7 +446,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var b = 0; b < blocks.length; b++) {
             var block = blocks[b];
             var blockCode = languageObj.blockToCode(block);
-            if (["procedures_defnoreturn", "procedures_defreturn"].indexOf(block.type) > -1) {
+            if (arrayContains(["procedures_defnoreturn", "procedures_defreturn"], block.type)) {
                // For function blocks, the code is stored in languageObj.definitions_
             } else {
                if (block.type == "robot_start" || !this.startingBlock) {
@@ -452,22 +465,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
 
       savePrograms: function() {
+         this.checkRobotStart();
+
          this.programs[this.player].javascript = $("#program").val();
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
             this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.player].blocklyJS = this.getCode("javascript");
-            this.programs[this.player].blocklyPython = this.getCode("python");
+            //this.programs[this.player].blocklyPython = this.getCode("python");
          }
       },
 
       loadPrograms: function() {
-         $("#program").val(this.programs[this.player].javascript);
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
+         $("#program").val(this.programs[this.player].javascript);
       },
 
       changeLanguage: function() {
@@ -555,10 +570,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             panelWidth = $("#program").width() + 20;
          }
          if (panelWidth != this.prevWidth) {
-            $("#taskIntro").css("width", panelWidth);
-            $("#grid").css("left", panelWidth + 20 + "px");
             if (this.languages[this.player] == "blockly") {
-               Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+               if (this.trashInToolbox) {
+                  Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+               }
                Blockly.svgResize(this.workspace);
             }
          }
@@ -600,8 +615,17 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (typeof block.handler == "undefined") {
             block.handler = context[objectName][block.name];
          }
+
+
+         if (typeof block.handler == "undefined") {
+            block.handler = (function(oName, bName) {
+               return function() { console.error("Error: No handler given. No function context." + oName + "." + bName + "() found!" ); }
+            })(objectName, block.name);
+         }
       },
-      completeBlockJson: function(block, objectName, categoryName) {
+      completeBlockJson: function(block, objectName, categoryName, context) {
+         // Needs context object solely for the language strings. Maybe change that …
+         
          if (typeof block.blocklyJson == "undefined") {
             block.blocklyJson =  {};
          }
@@ -618,10 +642,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              !(block.noConnectors)) {
             if (block.yieldsValue) {
                block.blocklyJson.output = null;
+               if(this.scratchMode) {
+                   block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   block.blocklyJson.colour = Blockly.Colours.sensing.primary;
+                   block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
+                   block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+               }
             }
             else {
                block.blocklyJson.previousStatement = null;
                block.blocklyJson.nextStatement = null;
+               if(this.scratchMode) {
+                   block.blocklyJson.colour = Blockly.Colours.motion.primary;
+                   block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+                   block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+               }
             }
          }
 
@@ -630,7 +665,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              typeof block.params != "undefined" &&
              block.params.length > 0) {
             block.blocklyJson.args0 = [];
-            for (var iParam in block.params) {
+            for (var iParam = 0; iParam < block.params.length; iParam++) {
                var param = {
                   type: "input_value",
                   name: "PARAM_" + iParam
@@ -645,7 +680,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
-            block.blocklyJson.message0 = strings.label[block.name];
+            block.blocklyJson.message0 = context.strings.label[block.name];
+
+            if (typeof block.blocklyJson.message0 == "undefined") {
+               block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
+            }
             
             if (typeof block.blocklyJson.args0 != "undefined") {
                var iParam = 0;
@@ -661,51 +700,96 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // Tooltip & HelpUrl should always exist, so lets just add empty ones in case they don't exist
          if (typeof block.blocklyJson.tooltip == "undefined") { block.blocklyJson.tooltip = ""; }
          if (typeof block.blocklyJson.helpUrl == "undefined") { block.blocklyJson.helpUrl = ""; } // TODO: Or maybe not?
+
+         // TODO: Load default colours + custom styles
+         if (typeof block.blocklyJson.colour == "undefined") {
+            if(this.scratchMode) {
+               block.blocklyJson.colour = Blockly.Colours.motion.primary;
+               block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+               block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+            } else {
+               block.blocklyJson.colour = 210;
+            }
+         }
       }, 
       completeBlockXml: function(block) {
          if (typeof block.blocklyXml == "undefined" || block.blocklyXml == "") {
             block.blocklyXml = "<block type='" + block.name + "'></block>";
          }
       },
-      completeCodeGenerators: function(block, objectName) {
-
-
- 
-      },
       completeCodeGenerators: function(blockInfo, objectName) {
          if (typeof blockInfo.codeGenerators == "undefined") {
             blockInfo.codeGenerators = {};
          }
+
+         // for closure:
+         var args0 = blockInfo.blocklyJson.args0;
+         var code = this.mainContext.strings.code[blockInfo.name];
+         var output = blockInfo.blocklyJson.output;
          
-         for (language in {JavaScript: null, Python: null}) {
-            if (typeof blockInfo.codeGenerators[language] == "undefined") {
+         for (var language in {JavaScript: null, Python: null}) {
+            if (typeof blockInfo.codeGenerators[language] == "undefined") {               
                blockInfo.codeGenerators[language] = function(block) {
-                  var params = ""; // TODO: Change
-                  for (var iParam = 0; iParam < nbParams; iParam++) {
-                     if (iParam != 0) {
-                        params += ", ";
+                  var params = "";               
+
+                  /* There are three kinds of input: value_input, statement_input and dummy_input,
+                     We should definitely consider value_input here and not consider dummy_input here.
+
+                     I don't know how statement_input is handled best, so I'll ignore it first -- Robert
+                   */
+                  var iParam = 0;
+                  for (var iArgs0 in args0) {
+                     if (args0[iArgs0].type == "input_value") {
+                        if (iParam) {
+                           params += ", ";
+                        }
+                        params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                        iParam += 1;
                      }
-                     params += Blockly[language].valueToCode(block, 'NAME_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
                   }
-                  if (type == 0) { // TODO: Change
+
+                  if (typeof output == "undefined") {                     
+                     return code + "(" + params + ");\n";
+                  }
+                  else {
+                     return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+                  }
+                  
+                  /*if (type == 0) { // TODO: Change
                      return code + "(" + params + ");\n";
                   } else if (type == 1){
                      return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
-                  }
+                  }*/
                }
             }
          }
       },
       applyCodeGenerators: function(block) {
-         for (language in block.codeGenerators) {
+         for (var language in block.codeGenerators) {
             Blockly[language][block.name] = block.codeGenerators[language];
          }
       },
 
-
+      createBlock: function(block) {
+         if (typeof block.blocklyInit == "undefined") {
+            var blocklyjson = block.blocklyJson;
+            Blockly.Blocks[block.name] = {
+               init: function() {
+                  this.jsonInit(blocklyjson);
+               }
+            };
+         }
+         else if (typeof block.blocklyInit == "function") {
+            Blockly.Blocks[block.name] = {
+               init: block.blocklyInit()
+            };
+         }
+         else {
+            console.err(block.name + ".blocklyInit is defined but not a function");
+         }
+      },
       
-
-      createBlock: function(label, code, type, nbParams) {
+      /*createBlock: function(label, code, type, nbParams) {
          Blockly.Blocks[label] = {
            init: function() {
              this.appendDummyInput()
@@ -726,7 +810,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              this.setHelpUrl('');
            }
          };
-      },
+      },*/
 
       /* createGeneratorsAndBlocks: function(generators) { 
          for (var objectName in generators) {
@@ -741,25 +825,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },*/
 
       createGeneratorsAndBlocks: function() {
-         var customGenerators = this.blocklyHelper.mainContext.customBlocks;
+         var customGenerators = this.mainContext.customBlocks;
          for (var objectName in customGenerators) {
-            for (var iCategory in customGenerators[objectName]) {
-               var category =  customGenerators[objectName][iCategory];
-               for (var iBlock in category.blocks) {
+            for (var categoryName in customGenerators[objectName]) {
+               var category =  customGenerators[objectName][categoryName];
+               for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
                   var block = category.blocks[iBlock];
 
-                  /* TODO: Allow library writers to provide there own JS/Python code instead of just a handler */
-                  completeBlockHandler(block, objectName, context);
-                  completeBlockJson(block, objectName, category.category); /* category.category is category name */
-                  completeBlockXml(block);
-                  completeCodeGenerators(block, objectName);
-                  applyCodeGenerators(block);
+                  /* TODO: Allow library writers to provide their own JS/Python code instead of just a handler */
+                  this.completeBlockHandler(block, objectName, this.mainContext);
+                  this.completeBlockJson(block, objectName, category.category, this.mainContext); /* category.category is category name */
+                  this.completeBlockXml(block);
+                  this.completeCodeGenerators(block, objectName);
+                  this.applyCodeGenerators(block);
+                  this.createBlock(block);
                }
-               var generator = generators[objectName][iGen];
-               var label = objectName + "_" + generator.labelEn + "__";
-               var code = generator.codeFr;
-               this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
-               this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
+               // TODO: Anything of this still needs to be done?
+               //this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
+               //this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
             }
          }
       },
@@ -796,10 +879,32 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          return strCode;
       },
 
+      
+      getDefaultColours: function() {
+         return {
+            categories: {
+               logic: 210,
+               loops: 120,
+               math: 230,
+               text: 160,
+               lists: 260,
+               colour: 20,
+               variables: 330,
+               functions: 290,
+               _default: 65,
+            },
+            blocks: {},
+         };
+      },
+      
+
       getStdBlocks: function() {
-         return [
-            {
-               category: "input",
+         return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
+      },
+
+      getStdBlocklyBlocks: function() {
+         return {
+            input: {
                blocks: [
                   { 
                      name: "input_num", 
@@ -819,8 +924,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "logic",
+            logic: {
                blocks: [
                   {
                      name: "controls_if",
@@ -828,7 +932,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   { 
                      name: "controls_if_else",
-                     blocklyXml: "<block type='controls_if_else'></block>"
+                     blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>"
                   },
                   { 
                      name: "logic_compare", 
@@ -848,20 +952,20 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "loops",
+            loops: {
                blocks: [
                   { 
                      name: "controls_repeat", 
-                     blocklyXml: "<block type='controls_repeat'></block>"
+                     blocklyXml: "<block type='controls_repeat'>" +
+                                 "</block>"
                   },
                   { 
                      name: "controls_repeat_ext", 
                      blocklyXml: "<block type='controls_repeat_ext'>" +
                                  "  <value name='TIMES'>" +
-                                 "    <block type='math_number'>" +
+                                 "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>10</field>" +
-                                 "    </block>" +
+                                 "    </shadow>" +
                                  "  </value>" +
                                  "</block>"
                   },
@@ -900,8 +1004,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "math",
+            math: {
                blocks: [
                   { 
                      name: "math_number", 
@@ -909,93 +1012,35 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   {
                      name: "math_arithmetic", 
-                     blocklyXml: "<block type='math_arithmetic'>" +
-                                 "  <value name='A'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>1</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "  <value name='B'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>1</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_arithmetic'></block>"
                   },
                   {
                      name: "math_number_property", 
-                     blocklyXml: "<block type='math_number_property'>" +
-                                 "  <value name='NUMBER_TO_CHECK'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>0</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_number_property'></block>"
                   },
                   {
                      name: "math_change", 
-                     blocklyXml: "<block type='math_change'>" +
-                                 "  <value name='DELTA'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>1</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_change'></block>"
                   },
                   {
                      name: "math_round", 
-                     blocklyXml: "<block type='math_round'>" +
-                                 "  <value name='NUM'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>3.1</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_round'></block>"
                   },
                   {
                      name: "math_extra_single", 
-                     blocklyXml: "<block type='math_extra_single'>" +
-                                 "  <value name='NUM'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>3.1</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_extra_single'></block>"
                   },
                   {
                      name: "math_extra_double", 
-                     blocklyXml: "<block type='math_extra_double'>" +
-                                 "  <value name='A'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='A'>2</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "  <value name='B'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='B'>2</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_extra_double'></block>"
                   },
                   {
                      name: "math_modulo", 
-                     blocklyXml: "<block type='math_modulo'>" +
-                                 "  <value name='DIVIDEND'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>64</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "  <value name='DIVISOR'>" +
-                                 "    <shadow type='math_number'>" +
-                                 "      <field name='NUM'>10</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
+                     blocklyXml: "<block type='math_modulo'></block>"
                   }
                ]
             },
-            {
-               category: "text",
+            text: {
                blocks: [
                   {
                      name: "text", 
@@ -1106,8 +1151,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "lists",
+            lists: {
                blocks: [
                   {
                      name: "lists_create_with_empty", 
@@ -1197,8 +1241,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                ]
             },
-            {
-               category: "colour",
+            colour: {
                blocks: [
                   {
                      name: "colour_picker", 
@@ -1250,8 +1293,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "dicts",
+            dicts: {
                blocks: [
                   { 
                      name: "dict_get_literal", 
@@ -1267,113 +1309,178 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             },
-            {
-               category: "variables",
+            variables: {
                custom: "VARIABLE",
                blocks: []
             },
-            {
-               category: "functions",
+            functions: {
                custom: "PROCEDURE",
                blocks: []
             }
-         ];
+         };
+      },
+
+      getStdScratchBlocks: function() {
+         // TODO :: make the list of standard scratch blocks
+         return {
+            control: {
+               blocks: [
+                  {
+                     name: "control_if",
+                     blocklyXml: "<block type='control_if'></block>"
+                  },
+                  { 
+                     name: "control_if_else",
+                     blocklyXml: "<block type='control_if_else'></block>"
+                  },
+                  { 
+                     name: "control_repeat", 
+                     blocklyXml: "<block type='control_repeat'>" +
+                                 "  <value name='TIMES'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>10</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+               ],
+            },
+            operator: {
+               blocks: [
+                  {
+                     name: "operator_not",
+                     blocklyXml: "<block type='operator_not'></block>"
+                  }
+               ]
+            }
+         };
+      },
+
+      getBlockXmlInfo: function(generatorStruct, blockName) {
+         for (var categoryName in generatorStruct) {
+            var blocks = generatorStruct[categoryName].blocks;
+            for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+               var block = blocks[iBlock];
+               if (block.name == blockName) {
+                  return {
+                     category: categoryName,
+                     xml: block.blocklyXml,
+                  };
+               }
+            }
+         }
+
+         console.error("Block not found: " + blockName);
+         return null;
+      },
+
+      addBlocksAndCategories: function(blockNames, blocksDefinition, categoriesInfos) {
+         var colours = this.getDefaultColours();
+         for (var iBlock = 0; iBlock < blockNames.length; iBlock++) {
+            var blockName = blockNames[iBlock];
+            var blockXmlInfo = this.getBlockXmlInfo(blocksDefinition, blockName);
+            var categoryName = blockXmlInfo.category;
+
+            if (!(categoryName in categoriesInfos)) {
+               categoriesInfos[categoryName] = {
+                  blocksXml: [],
+                  colour: colours.blocks[blockName]
+               };
+            }            
+            categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+         }
       },
 
       getToolboxXml: function() {
-         var blocksByCategory = {
+         var categoriesInfos = {};
+         var colours = this.getDefaultColours();
+
+         for (var blockType in this.includeBlocks.generatedBlocks) {
+            this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
          }
-         for (var objectName in this.generators) {
-            for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
-               var generator = this.generators[objectName][iGen];
-               if (blocksByCategory[generator.category] == undefined) {
-                  blocksByCategory[generator.category] = [];
-               }
-               blocksByCategory[generator.category].push(objectName + "_" + generator.labelEn + "__");
-            }
-         }
-         xml = "";
-         for (var category in blocksByCategory) {
-            if (this.groupByCategory) {
-               xml += "<category name='" + this.strings[category] + "' colour='210'>";
-            }
-            var blocks = blocksByCategory[category];
-            for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-               xml += "<block type='" + blocks[iBlock] + "'></block>";
-            }
-            if (this.groupByCategory) {
-               xml += "</category>";
-            }
-         }
+
          var stdBlocks = this.getStdBlocks();
-         for (var iCategory = 0; iCategory < stdBlocks.length; iCategory++) {
-            var category = stdBlocks[iCategory];
-            var catXml = "";
-            if (this.groupByCategory) {
-               catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
+
+         if (this.includeBlocks.standardBlocks.includeAll) {
+            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "functions"];
+         }
+         var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories;
+         for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
+            var categoryName = wholeCategories[iCategory];
+            if (!(categoryName in categoriesInfos)) {
+               categoriesInfos[categoryName] = {
+                  blocksXml: [],
+               };
             }
-            var isIncluded = false;
-            if (category.custom != undefined) {
-               catXml += " custom='" + category.custom + "'";
-               if (this.includedAll || ($.inArray(category.category, this.includedCategories) != -1)) {
-                  isIncluded = true;
-               }
-            }
-            catXml += ">";
-            for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
-               var block = category.blocks[iBlock];
-               if (this.includedAll ||
-                   ($.inArray(category.category, this.includedCategories) != -1) ||
-                   ($.inArray(block.name, this.includedBlocks) != -1)) {
-                  if (!block.excludedByDefault || ($.inArray(block.name, this.includedBlocks) != -1)) {
-                     catXml += block.xml;
-                     isIncluded = true;
-                  }
-               }
-            }
-            if (this.groupByCategory) {
-               catXml += "</category>";
-            }
-            if (isIncluded) {
-               xml += catXml;
+            var blocks = stdBlocks[categoryName].blocks;
+            for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+               categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
             }
          }
+
+         this.addBlocksAndCategories(this.includeBlocks.standardBlocks.singleBlocks, stdBlocks, categoriesInfos);
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
-         if (this.availableVariables.length > 0 ||
-               ($.inArray('variables_get', this.includedBlocks) != -1) ||
-               ($.inArray('variables_set', this.includedBlocks) != -1)) {
-            if (this.groupByCategory) {
-               xml += "<category name='" + this.strings.variables + "' colour='330'>";
-            }
+         if (((this.includeBlocks.variables != undefined) && (this.includeBlocks.variables.length > 0 ))||
+               (this.includeBlocks.variables_get != undefined) ||
+               (this.includeBlocks.variables_set != undefined)) {
+            var blocksXml = [];
 
             // block for each availableVariable
-            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-               xml += "<block type='variables_get' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
+            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
+               blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
             }
             // generic modifyable block
-            if ($.inArray('variables_get', this.includedBlocks) != -1) {
-               xml += "<block type='variables_get'></block>"
+            if (this.includeBlocks.variables_get != undefined) {
+               blocksXml.push("<block type='variables_get'></block>");
             }
 
             // same for setting variables
-            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-               xml += "<block type='variables_set' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
+            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
+               blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
             }
-            if ($.inArray('variables_set', this.includedBlocks) != -1) {
-               xml += "<block type='variables_set'></block>"
+            if (this.includeBlocks.variables_set != undefined) {
+               blocksXml.push("<block type='variables_set'></block>");
             }
-
-            if (this.groupByCategory) {
-               xml += "</category>";
+            categoriesInfos["variables"] = {
+               blocksXml: blocksXml,
+               colour: 330
             }
          }
-         return xml;
+
+         var xmlString = "";         
+         for (var categoryName in categoriesInfos) {
+            var categoryInfo = categoriesInfos[categoryName];
+            if (this.includeBlocks.groupByCategory) {
+               var colour = categoryInfo.colour;
+               if (typeof(colour) == "undefined") {
+                  colour = colours.categories[categoryName]
+                  if (typeof(colour) == "undefined") {
+                     colour = colours.categories._default;
+                  }
+               }               
+               xmlString += "<category "
+                        + " name='" + this.strings.categories[categoryName] + "'"
+                        + " colour='" + colour + "'"
+                        + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
+                        + ">";
+            }
+            var blocks = categoryInfo.blocksXml;
+            for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+               xmlString += blocks[iBlock];
+            }
+            if (this.includeBlocks.groupByCategory) {
+               xmlString += "</category>";
+            }
+         }
+         return xmlString;
       },
       
+
       addExtraBlocks: function() {
          var that = this;
+
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -1469,26 +1576,53 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
 
 
-         var old = Blockly.Blocks.controls_if.init; 
-         Blockly.Blocks.controls_if.init = function() {
-            old.call(this);  
-            this.setMutator(undefined)
-         };
+         if(this.scratchMode) {
+            Blockly.Blocks['robot_start'] = {
+              init: function() {
+                this.jsonInit({
+                  "id": "event_whenflagclicked",
+                  "message0": that.strings.flagClicked,
+                  "args0": [
+                    {
+                      "type": "field_image",
+                      "src": Blockly.mainWorkspace.options.pathToMedia + "icons/event_whenflagclicked.svg",
+                      "width": 24,
+                      "height": 24,
+                      "alt": "flag",
+                      "flip_rtl": true
+                    }
+                  ],
+                  "inputsInline": true,
+                  "nextStatement": null,
+                  "category": Blockly.Categories.event,
+                  "colour": Blockly.Colours.event.primary,
+                  "colourSecondary": Blockly.Colours.event.secondary,
+                  "colourTertiary": Blockly.Colours.event.tertiary
+                });
+              }
+            };
 
+         } else {
+            var old = Blockly.Blocks.controls_if.init; 
+            Blockly.Blocks.controls_if.init = function() {
+               old.call(this);  
+               this.setMutator(undefined)
+            };
 
-         Blockly.Blocks['robot_start'] = {
-           init: function() {
-             this.appendDummyInput()
-                 .appendField(that.strings.programOfRobot);
-             this.setNextStatement(true);
-             this.setColour(210);
-             this.setTooltip('');
-             this.deletable_ = false;
-             this.editable_ = false;
-             this.movable_ = false;
-         //    this.setHelpUrl('http://www.example.com/');
-           }
-         };
+            Blockly.Blocks['robot_start'] = {
+              init: function() {
+                this.appendDummyInput()
+                    .appendField(that.strings.programOfRobot);
+                this.setNextStatement(true);
+                this.setColour(210);
+                this.setTooltip('');
+                this.deletable_ = false;
+                this.editable_ = false;
+                this.movable_ = false;
+            //    this.setHelpUrl('http://www.example.com/');
+              }
+            };
+         }
 
          Blockly.JavaScript['robot_start'] = function(block) {
            return "";
@@ -1497,6 +1631,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          Blockly.Python['robot_start'] = function(block) {
            return "";
          };
+      },
+
+      fixScratch: function() {
+         // Store the maxBlocks information somehwere, as Scratch ignores it
+         Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
+
+         // Translate requested Blocks from Blockly to Scratch blocks
+         // TODO :: full translation
+         var newSingleBlocks = [];
+         for (var iBlock = 0;  iBlock < this.includeBlocks.standardBlocks.singleBlocks.length; iBlock++) {
+            var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
+            if(blocklyToScratch.singleBlocks[blockName]) {
+                newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName]);
+            } else {
+                newSingleBlocks.push(blockName);
+            }
+         }
+         this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
       },
 
       run: function() {
@@ -1515,7 +1667,22 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          } else {
             Blockly.JavaScript.STATEMENT_PREFIX = '';
          }
+         var topBlocks = this.workspace.getTopBlocks(true);
+         var robotStartHasChildren = false;
+         for(var b=0; b<blocks.length; b++) {
+            var block = blocks[b];
+            if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
+               robotStartHasChildren = true;
+               break;
+            } // There can be multiple robot_start blocks sometimes
+         }
+         if(!robotStartHasChildren) {
+            $('#errors').html('Le programme est vide ! Connectez des blocs.');
+            return;
+         }
+
          this.savePrograms();
+
          var codes = [];
          for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
             var language = this.languages[iRobot];
@@ -1525,8 +1692,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
          that.highlightPause = false;
-         that.workspace.traceOn(true);
-         that.workspace.highlightBlock(null);
+         if(this.scratchMode) {
+            if(that.workspace.remainingCapacity() < 0) {
+               $('#errors').html('Trop de blocs utilisés !');
+               return;
+            }
+         } else {
+            that.workspace.traceOn(true);
+            that.workspace.highlightBlock(null);
+         }
          this.mainContext.runner.runCodes(codes);
       },
 
@@ -1535,6 +1709,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       }
    }
 }
+
 
 function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
@@ -1569,16 +1744,32 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.initInterpreter = function(interpreter, scope) {
-         for (var objectName in context.generators) {
+         for (var objectName in context.customBlocks) {
+            for (var iCategory in context.customBlocks[objectName]) {
+               for (var iBlock in context.customBlocks[objectName][iCategory].blocks) {
+                  var blockInfo = context.customBlocks[objectName][iCategory].blocks[iBlock];
+                  var code = context.strings.code[blockInfo.name];
+
+                  if (typeof(code) == "undefined")
+                     code = blockInfo.name;
+                  
+                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(blockInfo.handler));
+               }
+            }            
+         }
+         
+         
+         /*for (var objectName in context.generators) {
             for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
                var generator = context.generators[objectName][iGen];
                interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
             }
-         }
+         }*/
          interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
 
          function highlightBlock(id) {
-            if (context.display) {
+            if (context.display && !context.blocklyHelper.scratchMode) {
+               context.blocklyHelper.workspace.traceOn(true);
                context.blocklyHelper.workspace.highlightBlock(id);
                highlightPause = true;
             }
@@ -1602,7 +1793,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         var maxIter = 20000;
+         var maxIter = 40000;
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
@@ -1687,12 +1878,128 @@ function initBlocklyRunner(context, messageCallback) {
 }
 
 
-var initBlocklySubTask = function(subTask) {
-   subTask.blocklyHelper = getBlocklyHelper(subTask.gridInfos.maxInstructions);
-   subTask.answer = null;
-   subTask.state = {};
-   subTask.iTestCase = 0;
 
+// Merges arrays by values
+// (Flat-Copy only)
+function mergeIntoArray(into, other) {
+   for (var iOther in other) {
+      var intoContains = false;
+
+      for (var iInto in into) {
+         if (other[iOther] == into[iInto]) {
+            intoContains = true;
+         }
+      }
+
+      if (!intoContains) {
+         into.push(other[iOther]);
+      }
+   }
+}
+
+// Merges objects into each other similar to $.extend, but
+// merges Arrays differently (see above)
+// (Deep-Copy only)
+function mergeIntoObject(into, other) {
+   for (var property in other) {
+      if (other[property] instanceof Array) {
+         if (!(into[property] instanceof Array)) {
+            into[property] = [];
+         }
+         mergeIntoArray(into[property], other[property]);
+      }
+      if (other[property] instanceof Object) {
+         if (!(into[property] instanceof Object)) {
+            into[property] = {};
+         }
+         mergeIntoObject(into[property], other[property]);
+      }
+      into[property] = other[property];
+   }
+}
+
+/*
+{ shared: { field1: X }, easy: { field2: Y } } becomes { field1: X, field2: Y } if the current level is easy
+{ shared: [X, Y], easy: [Z] }  becomes [X, Y, Z] if the current level is easy
+{ easy: X, medium: Y, hard: Z}  becomes X if the current level is easy
+*/
+
+function testLevelSpecific() {
+   var tests = [
+      {
+         in: { field1: "X", field2: "Y" },
+         out: { field1: "X", field2: "Y" }
+      },
+      {
+            in: { easy: "X", medium: "Y", hard: "Z"},
+            out: "X"
+      },
+      {
+          in: { shared: { field1: "X" }, easy: { field2: "Y" } },
+          out: { field1: "X", field2: "Y" }
+      },
+      {
+            in: { shared: ["X", "Y"], easy: ["Z"] },
+            out: ["X", "Y", "Z"]
+      }
+   ];
+   for (var iTest = 0; iTest < tests.length; iTest++) {
+      var res = extractLevelSpecific(tests[iTest].in, "easy");
+      if (JSON.stringify(res) != JSON.stringify(tests[iTest].out)) { // TODO better way to compare two objects
+         console.error("Test " + iTest + " failed: returned " + JSON.stringify(res));
+      }
+   }
+}
+
+function extractLevelSpecific(item, level) {
+   if ((typeof item != "object") || Array.isArray(item)) {
+      return item;
+   }
+   if (item.shared === undefined) {
+      if (item[level] === undefined) {
+         var newItem = {};
+         for (var prop in item) {
+            newItem[prop] = extractLevelSpecific(item[prop], level);
+         }
+         return newItem;
+      }
+      return extractLevelSpecific(item[level], level);
+   }
+   if (Array.isArray(item.shared)) {
+      var newItem = [];
+      for (var iElem = 0; iElem < item.shared.length; iElem++) {
+         newItem.push(extractLevelSpecific(item.shared[iElem], level));
+      }
+      if (item[level] != undefined) {
+         if (!Array.isArray(item[level])) {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var iElem = 0; iElem < item[level].length; iElem++) {
+            newItem.push(extractLevelSpecific(item[level][iElem], level));
+         }
+      }
+      return newItem;
+   }
+   if (typeof item.shared == "object") {
+      var newItem = {};
+      for (var prop in item.shared) {
+         newItem[prop] = extractLevelSpecific(item.shared[prop], level);
+      }
+      if (item[level] != undefined) {
+         if (typeof item[level] != "object") {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var prop in item[level]) {
+            newItem[prop] = extractLevelSpecific(item[level][prop], level);
+         }
+      }
+      return newItem;
+   }
+   console.error("Invalid type for shared property");
+}
+
+
+var initBlocklySubTask = function(subTask) {
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
@@ -1702,6 +2009,13 @@ var initBlocklySubTask = function(subTask) {
 
 
    subTask.loadLevel = function(curLevel) {
+      subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
+
+      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
+      subTask.answer = null;
+      subTask.state = {};
+      subTask.iTestCase = 0;
+
       this.level = curLevel;
 
       // TODO: fix bebras platform to make this unnecessary
@@ -1709,7 +2023,7 @@ var initBlocklySubTask = function(subTask) {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
-      $('body').css('width', '100%').css('max-width', '1200px').css('margin', 'auto');
+      $('body').css("width", "100%").addClass('blockly');
       window.focus();
 
       this.iTestCase = 0;
@@ -1717,11 +2031,11 @@ var initBlocklySubTask = function(subTask) {
       if (this.display) {
          var gridHtml = "<center>";
          gridHtml += "<div id='gridButtonsBefore'></div>";
-         gridHtml += "<div id='grid' style='width:400px;height:200px;padding:10px'></div>";
+         gridHtml += "<div id='grid'></div>";
          gridHtml += "<div id='gridButtonsAfter'></div>";
          gridHtml += "</center>";
          $("#gridContainer").html(gridHtml)
-         if (this.gridInfos.hideSaveOrLoad) {
+         if (subTask.levelGridInfos.hideSaveOrLoad) {
             // TODO: do without a timeout
             setTimeout(function() {
             $("#saveOrLoad").hide();
@@ -1729,19 +2043,7 @@ var initBlocklySubTask = function(subTask) {
          }
       }
 
-      var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks", "availableVariables"];
-      for (var iProp = 0; iProp < props.length; iProp++) {
-         var prop = props[iProp];
-         if (subTask.gridInfos[prop] != undefined) {
-            var taskProp = subTask.gridInfos[prop];
-            if ((typeof taskProp == "object") && (taskProp["easy"] != undefined)) {
-               taskProp = taskProp[curLevel];
-            }
-            subTask.blocklyHelper[prop] = taskProp;
-         }
-      }
-
-      this.context = getContext(this.display, this.gridInfos, curLevel);
+      this.context = getContext(this.display, subTask.levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
@@ -1753,7 +2055,8 @@ var initBlocklySubTask = function(subTask) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      this.blocklyHelper.generators = this.context.generators;
+      this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
+      
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
       subTask.changeTest(0);
@@ -1874,13 +2177,7 @@ var initBlocklySubTask = function(subTask) {
    };
 
    subTask.getDefaultAnswerObject = function() {
-      var defaultBlockly;
-      if (this.blocklyHelper.startingBlock) {
-         defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block></xml>';
-      }
-      else {
-         defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
-      }
+      var defaultBlockly = this.blocklyHelper.getDefaultBlocklyContent();
       return [{javascript:"", blockly: defaultBlockly, blocklyJS: ""}];
    };
 
@@ -1898,7 +2195,7 @@ var initBlocklySubTask = function(subTask) {
       var codes = [subTask.blocklyHelper.getFullCode(code)];
       subTask.iTestCase = 0;
       initBlocklyRunner(subTask.context, function(message, success) {
-         subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
+         subTask.testCaseResults[subTask.iTestCase] = subTask.levelGridInfos.computeGrade(subTask.context, message);
          subTask.iTestCase++;
          if (subTask.iTestCase < subTask.nbTestCases) {
             initContextForLevel(subTask.iTestCase);
@@ -1927,9 +2224,15 @@ var initBlocklySubTask = function(subTask) {
 
 // We need to be able to clean all events
 
-if (EventTarget.prototype.addEventListenerBase == undefined) {
-   EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
-   EventTarget.prototype.addEventListener = function(type, listener)
+if (Node && Node.prototype.addEventListenerBase == undefined) {
+   // IE11 doesn't have EventTarget
+   if(typeof EventTarget === 'undefined') {
+      var targetPrototype = Node.prototype;
+   } else {
+      var targetPrototype = EventTarget.prototype;
+   }
+   targetPrototype.addEventListenerBase = targetPrototype.addEventListener;
+   targetPrototype.addEventListener = function(type, listener)
    {
        if(!this.EventList) { this.EventList = []; }
        this.addEventListenerBase.apply(this, arguments);
@@ -1942,8 +2245,8 @@ if (EventTarget.prototype.addEventListenerBase == undefined) {
        list.push(listener);
    };
 
-   EventTarget.prototype.removeEventListenerBase = EventTarget.prototype.removeEventListener;
-   EventTarget.prototype.removeEventListener = function(type, listener)
+   targetPrototype.removeEventListenerBase = targetPrototype.removeEventListener;
+   targetPrototype.removeEventListener = function(type, listener)
    {
        if(!this.EventList) { this.EventList = []; }
        if(listener instanceof Function) { this.removeEventListenerBase.apply(this, arguments); }
