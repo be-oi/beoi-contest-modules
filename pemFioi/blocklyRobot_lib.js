@@ -127,7 +127,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          codeEast: "rechts",
          labelSouth: "nach unten gehen",
          codeSouth: "unten",
-         labelWest: "nach unten gehen",
+         labelWest: "nach links gehen",
          codeWest: "links",
          labelNorth: "nach oben gehen",
          codeNorth: "oben",
