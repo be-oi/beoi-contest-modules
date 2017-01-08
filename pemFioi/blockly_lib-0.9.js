@@ -55,6 +55,8 @@ var languageStrings = {
       programOfRobot: "Programme du robot",
       flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
+      previous: "Précédent",
+      next: "Suivant",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
       stopProgram: "Recommencer",
@@ -141,6 +143,8 @@ var languageStrings = {
       programOfRobot: "Programm des Roboters",
       flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
+      previous: "Zurück",
+      next: "Weiter",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
       stopProgram: "Stop",
@@ -159,7 +163,50 @@ var languageStrings = {
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available." // TODO :: translate
-   }
+   },
+   nl: {
+      categories: {
+        actions: "Acties",
+        sensors: "Sensoren",
+        debug: "Debuggen",
+        logic: "Logica",
+        loops: "Loops",
+        math: "Wiskunde",
+        text: "Tekst",
+        variables: "Variabelen",
+        functions: "Functies",
+      },
+      invalidContent: "Ongeldige inhoud",
+      unknownFileType: "Bestandstype onbekend",
+      download: "downloaden",
+      smallestOfTwoNumbers: "Kleinste van twee getallen",
+      greatestOfTwoNumbers: "Grootste van twee getallen",
+      programOfRobot: "Programma van de robot",
+      tooManyIterations: "Jouw programma heeft teveel tijd nodig om te eindigen!",
+      if: "als",
+      do: "doe",
+      else: "anders",
+      previous: "Vorige",
+      next: "Volgende",
+      submitProgram: "Valideer het programma",
+      runProgram: "Uitvoeren op deze test",
+      stopProgram: "Stop en Reset",
+      speed: "Snelheid:",
+      slowSpeed: "Traag",
+      mediumSpeed: "Gemiddeld",
+      fastSpeed: "Snel",
+      ludicrousSpeed: "Razendsnel",
+      selectLanguage: "Taal:",
+      blocklyLanguage: "Blockly",
+      javascriptLanguage: "Javascript",
+      importFromBlockly: "Genereer vanuit blockly",
+      saveOrLoadProgram: "Bewaar of herlaad jouw programma:",
+      avoidReloadingOtherTask: "Let op: herlaad niet het programma van een andere vraag!",
+      reloadProgram: "Herladen:",
+      saveProgram: "Bewaren",
+      limitBlocks1: " blokken resterend van ",
+      limitBlocks2: " in totaal."
+   },
 }
 
 // Blockly to Scratch translations
@@ -204,7 +251,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       trashInToolbox: false,
       languageStrings: languageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "https://manage-static.be-oi.be/contestAssets/blockly/",
 
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
@@ -222,24 +269,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "  <div id='blocklyContainer'>" +
                                       "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
-                                      "  </div>" +
-                                      "  <div id='saveOrLoad'> "+
-                                      "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-                                      "    <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-                                      "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
-                                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-                                      "    <p><input type='button' value='" + this.strings.saveProgram +
-                                        "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span></p>" +
-                                      "</div>"
+                                      "  </div>"
          );
         
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
-            gridButtonsBefore += "<div>\n" +
-                                 "  <input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
-                                 "  <span id='testCaseName'>Test 1</span>\n" +
-                                 "  <input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
-                                 "</div>\n";
+            gridButtonsBefore += "<div>" +
+               "<input type='button' value='" + this.strings.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
+               "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
+               "<input type='button' value='" + this.strings.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
+               "</div>";
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
          
