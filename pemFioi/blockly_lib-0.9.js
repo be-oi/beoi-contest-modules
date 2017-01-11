@@ -131,7 +131,7 @@ var languageStrings = {
          logic: "Logik",
          loops: "Schleifen",
          math: "Mathe",
-         text: "Texte",
+         text: "Text",
          variables: "Variablen",
          functions: "Funktionen"
       },
@@ -141,7 +141,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
-      flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
+      flagClicked: "Wenn %1 geklickt wurde",
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
       previous: "Zurück",
       next: "Weiter",
@@ -162,7 +162,7 @@ var languageStrings = {
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
-      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available." // TODO :: translate
+      limitBlocksOver: "{remainingBlocks} Blöcke zuviel benutzt von maximal {maxBlocks} möglichen Blöcken."
    },
    nl: {
       categories: {
