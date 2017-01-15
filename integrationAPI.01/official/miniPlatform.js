@@ -44,6 +44,16 @@
          'yourScore': "Dein Punktestand:",
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
       },
+      nl: {
+         'task': 'Vraag',
+         'submission': 'Submission',
+         'solution': 'Solution',
+         'editor': 'Edit',
+         'hints': 'Hints',
+         'showSolution': 'Show solution',
+         'yourScore': "Your score:",
+         'canReadSolution': "You can now read the solution at the bottom of this page."
+      }
    };
    
 function inIframe() {
