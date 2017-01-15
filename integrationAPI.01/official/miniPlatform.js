@@ -46,13 +46,13 @@
       },
       nl: {
          'task': 'Vraag',
-         'submission': 'Submission',
-         'solution': 'Solution',
-         'editor': 'Edit',
+         'submission': 'Indiening',
+         'solution': 'Oplossing',
+         'editor': 'Bewerken',
          'hints': 'Hints',
-         'showSolution': 'Show solution',
-         'yourScore': "Your score:",
-         'canReadSolution': "You can now read the solution at the bottom of this page."
+         'showSolution': 'Toon de oplossing',
+         'yourScore': "Jouw score:",
+         'canReadSolution': "Je kan de oplossing nu zien onderaan deze pagina."
       }
    };
    
