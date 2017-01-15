@@ -1,3 +1,5 @@
+"use strict";
+
 var getUrlParameter = function getUrlParameter(sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1));
     var sURLVariables = sPageURL.split('&');
@@ -74,7 +76,9 @@ var languageStrings = {
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
-      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés."
+      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
+      previousTestcase: "Précédent", 
+      nextTestcase: "Suivant",
    },
    en: {
       categories: {
@@ -117,7 +121,9 @@ var languageStrings = {
       reloadProgram: "Reload:",
       saveProgram: "Save",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
-      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available."
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
+      previousTestcase: "Previous", 
+      nextTestcase: "Next",
    },
    de: {
       categories: {
@@ -133,7 +139,10 @@ var languageStrings = {
          math: "Mathe",
          text: "Text",
          variables: "Variablen",
-         functions: "Funktionen"
+         functions: "Funktionen",
+         read: "Einlesen",
+         print: "Ausgeben",
+         turtle: "Turtle",
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -162,7 +171,9 @@ var languageStrings = {
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
-      limitBlocksOver: "{remainingBlocks} Blöcke zuviel benutzt von maximal {maxBlocks} möglichen Blöcken."
+      limitBlocksOver: "{remainingBlocks} Blöcke zuviel benutzt von maximal {maxBlocks} möglichen Blöcken.",
+      previousTestcase: "Vorheriger", 
+      nextTestcase: "Nächster",
    },
    nl: {
       categories: {
@@ -207,8 +218,10 @@ var languageStrings = {
       reloadProgram: "Herladen:",
       saveProgram: "Bewaren",
       limitBlocks: "{remainingBlocks} blokken resterend van {maxBlocks} in totaal.",
-      limitBlocksOver: "{remainingBlocks} blokken teveel gebruikt na de maximale {maxBlocks}."   
-   },
+      limitBlocksOver: "{remainingBlocks} blokken teveel gebruikt na de maximale {maxBlocks}.",
+      previousTestcase: "Vorige", 
+      nextTestcase: "Volgende",
+   }
 }
 
 // Blockly to Scratch translations
@@ -276,11 +289,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
         
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
-            gridButtonsBefore += "<div>" +
-               "<input type='button' value='" + this.strings.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
-               "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
-               "<input type='button' value='" + this.strings.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
-               "</div>";
+            gridButtonsBefore += "<div>\n" +
+                                 "  <input type='button' value='" + this.strings.previousTestcase + "' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
+                                 "  <span id='testCaseName'>Test 1</span>\n" +
+                                 "  <input type='button' value='" + this.strings.nextTestcase + "' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
+                                 "</div>\n";
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
          
@@ -353,7 +366,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                Blockly.svgResize(that.workspace);
 
                var remaining = that.workspace.remainingCapacity();
-               optLimitBlocks = {
+               var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
                   };
@@ -393,7 +406,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                $(".blocklyWidgetDiv").remove();
                $(".blocklyTooltipDiv").remove();
                document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-               delete Blockly;
+               //delete Blockly;
             }
          }
       },
@@ -414,7 +427,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       checkRobotStart: function () {
          if(!this.startingBlock || !this.workspace) { return; }
          var blocks = this.workspace.getTopBlocks(true);
-         for(b=0; b<blocks.length; b++) {
+         for(var b=0; b<blocks.length; b++) {
             if(blocks[b].type == 'robot_start') { return;}
          }
 
@@ -472,7 +485,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         blocks = codeWorkspace.getTopBlocks(true);
+         var blocks = codeWorkspace.getTopBlocks(true);
          var languageObj = null;
          if (language == "javascript") {
             languageObj = Blockly.JavaScript;
@@ -1443,11 +1456,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var stdBlocks = this.getStdBlocks();
 
          if (this.includeBlocks.standardBlocks.includeAll) {
-            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "functions"];
+            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories;
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
+            if (categoryName == 'variables') {
+               if(!this.includeBlocks.variables) { this.includeBlocks.variables = []; }
+               this.includeBlocks.variables.push('*');
+               continue;
+            }
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: [],
@@ -1463,27 +1481,62 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
-         if (((this.includeBlocks.variables != undefined) && (this.includeBlocks.variables.length > 0 ))||
-               (this.includeBlocks.variables_get != undefined) ||
-               (this.includeBlocks.variables_set != undefined)) {
+         if (typeof this.includeBlocks.variables !== 'undefined') {
             var blocksXml = [];
+            var includedVariablesAll = false;
+            var includedVariables = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : ['*'];
+            var includedVariableBlocks = {};
+            if (typeof this.includeBlocks.variablesOnlyBlocks === 'undefined') {
+               includedVariableBlocks = {get: true, set: true, incr: true};
+            } else {
+               for (var iBlock=0; iBlock < this.includeBlocks.variablesOnlyBlocks.length; iBlock++) {
+                  includedVariableBlocks[this.includeBlocks.variablesOnlyBlocks[iBlock]] = true;
+               }
+            }
 
-            // block for each availableVariable
-            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
-               blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
+            if(includedVariableBlocks.get) {
+               // block for each availableVariable
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+               }
+               // generic modifyable block
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='variables_get'></block>");
+               }
             }
-            // generic modifyable block
-            if (this.includeBlocks.variables_get != undefined) {
-               blocksXml.push("<block type='variables_get'></block>");
+ 
+            if(includedVariableBlocks.set) {
+               // same for setting variables
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+               }
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='variables_set'></block>");
+               }
             }
 
-            // same for setting variables
-            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
-               blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
+            if(includedVariableBlocks.incr) {
+               // same for setting variables
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='math_change' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
+               }
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='math_change'><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
+               }
             }
-            if (this.includeBlocks.variables_set != undefined) {
-               blocksXml.push("<block type='variables_set'></block>");
-            }
+
             categoriesInfos["variables"] = {
                blocksXml: blocksXml,
                colour: 330
@@ -1710,8 +1763,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          var topBlocks = this.workspace.getTopBlocks(true);
          var robotStartHasChildren = false;
-         for(var b=0; b<blocks.length; b++) {
-            var block = blocks[b];
+         for(var b=0; b<topBlocks.length; b++) {
+            var block = topBlocks[b];
             if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
                robotStartHasChildren = true;
                break;
@@ -2315,5 +2368,5 @@ function removeBlockly() {
    $(".blocklyWidgetDiv").remove();
    $(".blocklyTooltipDiv").remove();
    document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-   delete Blockly;
+   // delete Blockly;
 }

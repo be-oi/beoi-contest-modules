@@ -521,7 +521,7 @@ var getContext = function(display, infos, curLevel) {
       paint(item.row, item.col, "paintGray", callback);
    };
 
-   context.robot. wait = function(callback) {
+   context.robot.wait = function(callback) {
       context.waitDelay(callback);
    };
 
