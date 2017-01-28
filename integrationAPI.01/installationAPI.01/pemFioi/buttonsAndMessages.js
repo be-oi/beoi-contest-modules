@@ -209,7 +209,7 @@ window.displayHelper = {
          scoreStays: "Dein Punktestand bleibt gleich:",
          score: "Punktestand:",
          noPointsForLevel: "Du hast in dieser Serie noch keine Punkte erreicht.",
-         outOf: "auf",
+         outOf: " von ",
          tryToDoBetterOrChangeTask: "Versuch es besser zu machen oder gehe zur nächsten Frage.",
          tryToDoBetterOrMoveToNextLevel: "Versuch es besser zu machen oder gehe zu einer schwereren Serie.",
          bestPossibleScoreCongrats: "Dies ist der bestmögliche Punktestand für dieses Thema; Gratulation!",
