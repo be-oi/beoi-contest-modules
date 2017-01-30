@@ -254,10 +254,10 @@ window.displayHelper = {
       nl: {
          version: "Versie",
          levelVersionName_easy: "gemakkelijke versie",
-            levelVersionName_medium: "gemiddelde versie",
+         levelVersionName_medium: "gemiddelde versie",
          levelVersionName_hard: "moeilijke versie",
          levelVersionName_easy_stars: "versie met 2 sterren",
-            levelVersionName_medium_stars: "versie met 3 sterren",
+         levelVersionName_medium_stars: "versie met 3 sterren",
          levelVersionName_hard_stars: "versie met 4 sterren",
          levelName_easy: "Gemakkelijk",
          levelName_medium: "Gemiddeld",
@@ -305,8 +305,8 @@ window.displayHelper = {
          reloadIt: "het herladen",
          saveThisNewAnswer: "Bewaar dit nieuwe antwoord",
 
-            gradingInProgress: "Bezig met evalueren",
-            scoreIs: "Jouw score is:",
+         gradingInProgress: "Bezig met evalueren",
+         scoreIs: "Jouw score is:",
          point: "punt",
          points: "punten",
          // The following messages are used when viewing tasks after contest is over
@@ -314,9 +314,9 @@ window.displayHelper = {
          scoreWouldBecome: "Met dit antwoord zou dit jouw score zijn:",
          reloadValidAnswer: "Herlaad het gevalideerde antwoord.",
          contestOverAnswerNotSaved: "De wedstrijd is afgelopen: jouw antwoord is niet bewaard.",
-            scoreWouldStay: "Met dit antwoord, zou jouw score hetzelfde zijn gebleven:",
-            answerNotSavedContestOver: "De wedstrijd is reeds afgelopen, je antwoord werd niet bewaard. Je kan {0}.",
-            reloadSubmittedAnswer: "het antwoord herlanden dat je hebt ingediend",
+         scoreWouldStay: "Met dit antwoord, zou jouw score hetzelfde zijn gebleven:",
+         answerNotSavedContestOver: "De wedstrijd is reeds afgelopen, je antwoord werd niet bewaard. Je kan {0}.",
+         reloadSubmittedAnswer: "het antwoord herlanden dat je hebt ingediend",
          difficultyWarning: "<strong>Let op</strong>: deze versie oplossen vraagt tijd.<br/>Je kan waarschijnlijk sneller de versies met 2 of 3 sterren van andere vragen oplossen."
       },
       ar: {
