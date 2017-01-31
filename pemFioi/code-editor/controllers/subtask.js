@@ -257,7 +257,7 @@ function SubTaskController(_subTask) {
       subTask.changeTest(result.iTestCase - subTask.iTestCase);
       initContextForLevel(result.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests : ";
+      subTask.context.messagePrefixSuccess = "All tests : ";
       subTask.logicController.run();
     });
   };
@@ -382,7 +382,7 @@ function SubTaskController(_subTask) {
     subTask.testCaseResults = [];
     initContextForLevel(subTask.iTestCase);
     subTask.context.linkBack = true;
-    subTask.context.messagePrefixSuccess = "Tous les tests : ";
+    subTask.context.messagePrefixSuccess = "All tests : ";
 
     subTask.context.runner.runCodes(codes);
   };
