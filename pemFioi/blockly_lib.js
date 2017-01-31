@@ -84,7 +84,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Recharger :",
             saveProgram: "Enregistrer",
             limitBlocks1: " blocs restants sur ",
-            limitBlocks2: " autorisés."
+            limitBlocks2: " autorisés.",
+            allTests: "Tous les tests : "
          },
          en: {
             actions: "Actions",
@@ -129,7 +130,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Reload:",
             saveProgram: "Save",
             limitBlocks1: " blocks remaining out of ",
-            limitBlocks2: " available."
+            limitBlocks2: " available.",
+            allTests: "All tests : "
          },
          de: {
             actions: "Aktionen",
@@ -174,7 +176,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Laden:",
             saveProgram: "Speichern",
             limitBlocks1: " Blöcke von ",
-            limitBlocks2: " noch verfügbar."
+            limitBlocks2: " noch verfügbar.",
+            allTests: "Alle Tests : "
          },
          nl: {
             actions: "Acties",
@@ -215,7 +218,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Herladen:",
             saveProgram: "Bewaren",
             limitBlocks1: " blokken resterend van ",
-            limitBlocks2: " in totaal."
+            limitBlocks2: " in totaal.",
+            allTests: "Alle tests: "
          },
       },
       loadHtml: function(nbTestCases) {
@@ -1790,7 +1794,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = "Tous les tests : ";
+         subTask.context.messagePrefixSuccess = this.strings.allTests;
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -1881,7 +1885,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests : ";
+      subTask.context.messagePrefixSuccess = this.strings.allTests;
       subTask.context.runner.runCodes(codes);
    };
 }

@@ -77,6 +77,7 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       previousTestcase: "Précédent", 
       nextTestcase: "Suivant",
+      allTests: "Tous les tests : ",
    },
    en: {
       categories: {
@@ -122,6 +123,7 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       previousTestcase: "Previous", 
       nextTestcase: "Next",
+      allTests: "All tests : ",
    },
    de: {
       categories: {
@@ -172,6 +174,7 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} Blöcke zuviel benutzt von maximal {maxBlocks} möglichen Blöcken.",
       previousTestcase: "Vorheriger", 
       nextTestcase: "Nächster",
+      allTests: "Alle Tests : ",
    },
    nl: {
       categories: {
@@ -219,6 +222,7 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blokken teveel gebruikt na de maximale {maxBlocks}.",
       previousTestcase: "Vorige", 
       nextTestcase: "Volgende",
+      allTests: "Alle tests: ",	  
    }
 }
 
@@ -2332,7 +2336,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = "Tous les tests : ";
+         subTask.context.messagePrefixSuccess = this.strings.allTests;
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -2423,7 +2427,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests : ";
+      subTask.context.messagePrefixSuccess = this.strings.allTests;
       subTask.context.runner.runCodes(codes);
    };
 }
