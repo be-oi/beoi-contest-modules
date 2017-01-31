@@ -1794,7 +1794,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = this.strings.allTests;
+         subTask.context.messagePrefixSuccess = "Tous les tests / Alle Tests : ";
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -1885,7 +1885,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = this.strings.allTests;
+      subTask.context.messagePrefixSuccess = "Tous les tests / Alle Tests : ";
       subTask.context.runner.runCodes(codes);
    };
 }
