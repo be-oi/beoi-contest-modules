@@ -218,7 +218,7 @@ window.displayHelper = {
          scoreStays2: "Dein Punktestand bleibt gleich.",
          reloadBestAnswer: "Lade deine beste Antwort neu.",
          validate: "bestätigen",
-         restart: "neu beginnen",
+         restart: "neuf beginnen",
          harderLevelSolved: "Achtung: du hast schon eine schwerere Serie gelöst. Du kannst in dieser Serie keine zusätzlichen Punkte mehr erhalten.",
          showLevelAnyway: "Trotzdem sehen",
          scoreObtained: "Erhaltener Punktestand:",
