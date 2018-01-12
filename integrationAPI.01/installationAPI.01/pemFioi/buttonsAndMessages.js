@@ -23,6 +23,7 @@ window.displayHelper = {
    taskSelector: '#task',
    hideValidateButton: false,
    hideRestartButton: false,
+   confirmRestartAll: true,
    showScore: false,
    refreshMessages: true,
    stoppedShowingResult: false,
@@ -113,7 +114,8 @@ window.displayHelper = {
          scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
          answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
          reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
-         difficultyWarning: "<strong>Attention :</strong> résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
+         difficultyWarning: "<strong>Attention :</strong> résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       en: {
          version: "Version",
@@ -181,7 +183,8 @@ window.displayHelper = {
          scoreWouldStay: "With this answer, your score would stay the same:",
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "reload the validated answer",
-         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
+         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       de: {
          version: "Serie",
@@ -242,14 +245,15 @@ window.displayHelper = {
          point: "Punkt",
          points: "Punkte",
          // The following messages are used when viewing tasks after contest is over
-         contestOverScoreStays: "Der Wettbewerb ist beendet, deine Antwort wurde nicht gespeichert und dein Punktestand bleibt:",
-         scoreWouldBecome: "Mit dieser Antwort, dein Punktestand wäre:",
-         reloadValidAnswer: "Lade die gültige Antwort neu.",
-         contestOverAnswerNotSaved: "Der Wettbewerb wurde beendet: deine Antwort wurde nicht gespeichert.",
-         scoreWouldStay: "Mit dieser Antwort, dein Punktestand bliebe gleich:",
-         answerNotSavedContestOver: "Der Wettbewerb ist beendet, deine Antwort wurde nicht gespeichert. Du kannst {0}.",
-         reloadSubmittedAnswer: "lade deine übertragene Antwort neu",
-         difficultyWarning: "<strong>Achtung</strong>: diese Serie zu lösen kann viel Zeit benötigen.<br/>Du kannst schneller ein Thema einer 2 oder 3 Sternserie lösen."
+         contestOverScoreStays: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht und deine Punktestand bleibt:",
+         scoreWouldBecome: "Mit dieser Antwort wäre dein Punktestand:",
+         reloadValidAnswer: "Die gültige Antwort neu laden.",
+         contestOverAnswerNotSaved: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht.",
+         scoreWouldStay: "Mit dieser Antwort bliebe dein Punktestand gleich:",
+         answerNotSavedContestOver: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht. Du kannst {0}.",
+         reloadSubmittedAnswer: "Lade die Lösung, die du eingereicht hast",
+         difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       nl: {
          version: "Versie",
@@ -317,7 +321,8 @@ window.displayHelper = {
          scoreWouldStay: "Met dit antwoord, zou jouw score hetzelfde zijn gebleven:",
          answerNotSavedContestOver: "De wedstrijd is reeds afgelopen, je antwoord werd niet bewaard. Je kan {0}.",
          reloadSubmittedAnswer: "het antwoord herlanden dat je hebt ingediend",
-         difficultyWarning: "<strong>Let op</strong>: deze versie oplossen vraagt tijd.<br/>Je kan waarschijnlijk sneller de versies met 2 of 3 sterren van andere vragen oplossen."
+         difficultyWarning: "<strong>Let op</strong>: deze versie oplossen vraagt tijd.<br/>Je kan waarschijnlijk sneller de versies met 2 of 3 sterren van andere vragen oplossen.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard." /* to be translated */
       },
       ar: {
          version: "المستوى",
@@ -385,8 +390,147 @@ window.displayHelper = {
          scoreWouldStay: "بهذه الإجابة سوف يظل مجموع نقاطك كما هو",
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "اعد تحميل الإجابة المحققة",
-         difficultyWarning: "تنبيه: حل هذه النسخة سوف يستغرق وقت كثير. الإفضل أن تبدأ في حل مسائل أخرى"
-      }
+         difficultyWarning: "تنبيه: حل هذه النسخة سوف يستغرق وقت كثير. الإفضل أن تبدأ في حل مسائل أخرى",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+      },
+      es: {
+         version: "Versión",
+         levelVersionName_easy: "versión fácil",
+         levelVersionName_medium: "versión moderada",
+         levelVersionName_hard: "versión difícil",
+         levelVersionName_easy_stars: "versión de 2 estrellas",
+         levelVersionName_medium_stars: "versión de 3 estrellas",
+         levelVersionName_hard_stars: "versión de 4 estrellas",
+         levelName_easy: "Fácil",
+         levelName_medium: "Moderado",
+         levelName_hard: "Difícil",
+         warningTimeout: "<p>Atención, ya lleva {0} minutos en esta pregunta.</p><p>Le recomendamos cambiar de tema haciendo click sobre el botón de arriba a la derecha.</p>",
+         alright: "De acuerdo",
+         moveOn: "Pasar a la siguiente",
+         solvedMoveOn: "Ha resuelto completamente esta pregunta. Pase a otra pregunta.",
+         confirmRestart: "¿Está seguro que desea volver a iniciar esta versión?",
+         yes: "Sí",
+         no: "No",
+         tryHardLevel: "Le recomendamos intentar la versión de 4 estrellas.",
+         tryMediumLevel: "Le recomendamos intentar la versión de 3 estrellas.",
+         tryNextTask: "Nous vous proposons de passer au sujet suivant. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
+         yourScoreIsNow: "Su puntuación es ahora :",
+         worseScoreStays: "Esto no está tan bien como antes; su puntuación se mantiene en :",
+         scoreStays: "Su puntuación se mantiene igual :",
+         score: "Puntuación :",
+         noPointsForLevel: "Aún no ha recibido puntos en esta versión.",
+         outOf: " de ",
+         tryToDoBetterOrChangeTask: "Intente nuevamente para obtener una mejor puntuación, o pase a la siguiente pregunta.",
+         tryToDoBetterOrMoveToNextLevel: "Intente nuevamente para obtener una mejor puntuación, o pase una versión más difícil.",
+         bestPossibleScoreCongrats: "Este es la mejor puntuación posible en este tema, ¡felicitaciones!",
+         forMorePointsMoveToNextLevel: "Para obtener más puntos, pase a una versión más difícil.",
+         youDidBetterBefore: "Realizó un mejor trabajo antes.",
+         scoreStays2: "Su puntuación se mantiene igual.",
+         reloadBestAnswer: "Recargar su mejor respuesta.",
+         validate: "Validar",
+         restart: "Reiniciar",
+         harderLevelSolved: "Atención: ya ha resuelto una versión más difícil. No puede ganar puntos extra con esta versión.",
+         showLevelAnyway: "Mostrar el nivel de igual manera",
+         scoreObtained: "Puntuación obtenida:",
+         hardVersionTakesTime: "Resolver una {0} puede tomar mucho tiempo; le aconsejamos priorizar resolver las preguntas en {1} para ganar puntos rápidamente.",
+         illKeepThatInMind: "Lo tendré en mente",
+         harderLevelAvailable: "Note que para esta pregunta, puede resolver directamente una versión más difícil que esta.",
+         lockedLevel: "Esta versión está bloqueada. Resuelva la version anterior para verla.",
+         gradeThisAnswer: "Evaluar esta respuesta",
+
+         // The following messages are used for tasks with no feedback
+         saveAnswer: "Guardar su respuesta",
+         answerSavedModifyOrCancelIt: "Su respuesta fue guardada. Puede modificarla, o bien {0} y reiniciar.",
+         cancelIt: "cancelarla",
+         warningDifferentAnswerSaved: "Atención: una respuesta diferente ha sido guardada.",
+         youMay: "Usted puede {0}.",
+         reloadIt: "recargarla",
+         saveThisNewAnswer: "Guardar esta nueva respuesta",
+
+         gradingInProgress: "Evaluación en curso",
+         scoreIs: "Su puntuación es:",
+         point: "punto",
+         points: "puntos",
+         // The following messages are used when viewing tasks after contest is over
+         contestOverScoreStays: "El concurso está terminando, su respuesta no ha sido guardada y su puntuación se mantiene en:",
+         scoreWouldBecome: "Con esta respuesta, su puntuación será :",
+         reloadValidAnswer: "Volver a cargar la respuesta válida.",
+         contestOverAnswerNotSaved: "El concurso ha terminado: su respuesta no fue guardada.",
+         scoreWouldStay: "Con esta respuesta, su puntuación será la misma:",
+         answerNotSavedContestOver: "El concurso está terminando y su respuesta no ha sido guardada. Usted puede {0}.",
+         reloadSubmittedAnswer: "recargar la respuesta que ha enviado",
+         difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+      },
+      sl: {
+         version: "Stopnja",
+         levelVersionName_easy: "enostavna stopnja",
+         levelVersionName_medium: "srednja stopnja",
+         levelVersionName_hard: "težka stopnja",
+         levelVersionName_easy_stars: "stopnja 2 zvezdici",
+         levelVersionName_medium_stars: "stopnja 3 zvezdice",
+         levelVersionName_hard_stars: "stopnja 4 zvezdice",
+         levelName_easy: "Enostavno",
+         levelName_medium: "Srednje",
+         levelName_hard: "Težko",
+         warningTimeout: "<p>Opozorilo: Odkar rešuješ to nalogo, je minilo že več kot {0} minut.</p><p>Najbolje, da izbereš drugo nalogo, tako da klikneš gumb v zgornjem desnem kotu.</p>",
+         alright: "V redu",
+         moveOn: "Nadaljuj",
+         solvedMoveOn: "Ta naloga je dokončana, nadaljuj z naslednjo nalogo.",
+         confirmRestart: "Ali res želiš znova začeti to stopnjo?",
+         yes: "Da",
+         no: "Ne",
+         tryHardLevel: "Predlagamo, da poizkusiš stopnjo s 4 zvezdicami.",
+         tryMediumLevel: "Predlagamo, da poizkusiš stopnjo s 3 zvezdicami.",
+         tryNextTask: "Prdlagamo, da poizkusiš naslednjo nalogo. Če bo ostalo dovolj časa, se vrni in poizkusi naslednjo stopnjo te naloge.",
+         yourScoreIsNow: "Tvoj rezultat je:",
+         worseScoreStays: "Rešitev ni tako dobra, kot prejšnja. Tvoj rezultat ostaja:",
+         scoreStays: "Tvoj rezultat ostaja enak:",
+         score: "Rezultat:",
+         noPointsForLevel: "Na tej stopnji nisi dobil(-a) še nobene točke.",
+         outOf: " od ",
+         tryToDoBetterOrChangeTask: "Poskusi nalogo rešiti še bolje ali se premakni na naslednjo nalogo.",
+         tryToDoBetterOrMoveToNextLevel: "Poskusi nalogo rešiti še bolje ali se premakni na težjo stopnjo.",
+         bestPossibleScoreCongrats: "Čestitamo, to je najboljši možni rezultat te naloge!",
+         forMorePointsMoveToNextLevel: "Če želiš dobiti še več točk, se premakni na težjo stopnjo te naloge.",
+         youDidBetterBefore: "Rešitev je boljša od prejšnje.",
+         scoreStays2: "Tvoj rezultat ostaja enak.",
+         reloadBestAnswer: "Znova naloži najboljšo rešitev.",
+         validate: "Preveri",
+         restart: "Začni znova",
+         harderLevelSolved: "Opozorilo: Rešil(-a) si že težjo stopnjo te naloge. S to stopnjo ne boš dobil(-a) dodatnih točk.",
+         showLevelAnyway: "Vseeno mi pokaži stopnjo.",
+         scoreObtained: "Dobljeni rezultat:",
+         hardVersionTakesTime: "Reševanje {0} lahko traja veliko časa. Razmisli o reševanju {1}, da boš hitro dobil(-a) točke.",
+         illKeepThatInMind: "Razmislil(-a) bom.",
+         harderLevelAvailable: "Ne pozabi, da lahko to nalogo rešuješ na težji stopnji kot je ta.",
+         lockedLevel: "Ta stopnja je zaklenjena! Za pikaz moraš najprej rešiti prejšnjo stopnjo!",
+         gradeThisAnswer: "Oceni ta odgovor",
+
+         // The following messages are used for tasks with no feedback
+         saveAnswer: "Shrani ta odgovor",
+         answerSavedModifyOrCancelIt: "Tvoj odgovor je bil shranjen. Lahko ga spremeniš ali {0} in začneš znova.",
+         cancelIt: "prekličeš",
+         warningDifferentAnswerSaved: "Opozorilo: Prej je bil shranjen drugačen odgovor.",
+         youMay: "Lahko ga {0}.",
+         reloadIt: "naložiš znova",
+         saveThisNewAnswer: "Shrani ta nov odgovor",
+
+         gradingInProgress: "Ocenjevanje poteka",
+         scoreIs: "Tvoj rezultat je:",
+         point: "točka",
+         points: "točk",
+         // The following messages are used when viewing tasks after contest is over
+         contestOverScoreStays: "Ker je tekmovanja konec, tvoj novi odgovor ni bil shranjen in rezultat bo ostal:",
+         scoreWouldBecome: "S to rešitvijo bi bil tvoj rezultat:",
+         reloadValidAnswer: "Znova naloži preverjeno rešitev.",
+         contestOverAnswerNotSaved: "Ker je tekmovanja konec, tvoj novi odgovor ni bil shranjen.",
+         scoreWouldStay: "S to rešitvijo bi tvoj rezultat ostal enak:",
+         answerNotSavedContestOver: "Ker je tekmovanja konec, tvoj novi odgovor ni bil shranjen. Lahko {0}.",
+         reloadSubmittedAnswer: "znova naložiš preverjeno rešitev",
+         difficultyWarning: "<strong>Opozorilo:</strong> Reševanje te stopnje lahko traja veliko časa. <br/>Hitreje lahko rešiš stopnje z 2 ali s 3 zvezdicami drugih nalog.",
+         enemyWarning: "<strong>Opozorilo:</strong> Pri tej nalogi ti bo računalnik preprečil naključno rešitev."
+      },
    },
    initLanguage: function() {
       if (window.stringsLanguage == undefined) {
@@ -408,6 +552,7 @@ window.displayHelper = {
          self.savedAnswer = '';
 
          $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
+         $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
@@ -663,36 +808,75 @@ window.displayHelper = {
    getAvatar: function(mood) {
       return "beoi.png";
    },
-   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
-      if (mode != 'blanket') {
+   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
+      if ($('#popupMessage').length == 0) {
+         $('#task').after('<div id="popupMessage"></div>');
+      }
+      if (mode == 'blanket' || mode == 'input') {
+         $('#popupMessage').addClass('floatingMessage');
+      } else {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
-      } else {
-         $('#popupMessage').addClass('floatingMessage');
       }
 
-      if (!yesButtonText) {
-         yesButtonText = this.strings.alright;
-      }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
-      var buttonYes = mode == 'lock' ? '' : '<button class="buttonYes">' + (yesButtonText || this.strings.alright) + '</button>';
+      if(mode == 'lock') {
+         var buttonYes = '';
+      } else if (mode == 'input') {
+         var buttonYes = '<button class="buttonYes">' + (yesButtonText || this.strings.validate) + '</button>';
+      } else {
+         var buttonYes = '<button class="buttonYes">' + (yesButtonText || this.strings.alright) + '</button>';
+      }
       var buttonNo = '';
       if (noButtonText != undefined) {
          buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + noButtonText + '</button>';
       }
-      $('#popupMessage').html('<div class="container">' +
+      var popupHtml = '<div class="container">' +
          '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
-         '<div class="message">' + message + '</div>' + buttonYes + buttonNo + '</div>').show();
-      $('#popupMessage .buttonYes').click(function() {
+         '<div class="message">' + message + '</div>';
+      if(mode == 'input') {
+         popupHtml += '<input id="popupInput" type="text" value="' + (defaultText ? defaultText : '') + '"></input>';
+      }
+      popupHtml += buttonYes + buttonNo + '</div>';
+      $('#popupMessage').html(popupHtml).show();
+      if(mode == 'input') {
+         $('#popupInput').focus();
+      }
+
+      var validateFunc = function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
          if (agreeFunc) {
-            agreeFunc();
+            if(mode == 'input') {
+                agreeFunc($('#popupInput').val());
+            } else {
+                agreeFunc();
+            }
          }
+      };
+
+      var validateFuncNo = function() {
+         $('#popupMessage').hide();
+         $('#displayHelperAnswering, #taskContent').show();
+         displayHelper.popupMessageShown = false;
+         if (disagreeFunc) {
+            if(mode == 'input') {
+                disagreeFunc($('#popupInput').val());
+            } else {
+                disagreeFunc();
+            }
+         }
+      };
+
+      $('#popupMessage .buttonYes').click(validateFunc);
+      $('#popupMessage .buttonNo').click(validateFuncNo);
+      $('#popupInput').keypress(function (e) {
+         if(e.which === 13) { validateFunc(); }
       });
+
       $('#popupMessage .buttonNo').click(function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
@@ -764,26 +948,27 @@ window.displayHelper = {
     * Internal functions *
     **********************/
    restartAll: function() {
-      var that = this;
-      function confirmRestartAll() {
-         that.stopShowingResult();
-         if (!that.hasLevels) {
-            // TODO is this the desired behavior for no levels?
-            task.reloadAnswer('', function() {});
-         } else {
-            task.getAnswer(function(strAnswer) {
-               var answer = $.parseJSON(strAnswer);
-               var defaultAnswer = task.getDefaultAnswerObject();
-               var level = displayHelper.taskLevel;
-               answer[level] = defaultAnswer[level];
-               task.reloadAnswer(JSON.stringify(answer), function() {});
-            });
-         }
+      if(this.confirmRestartAll) {
+         this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, this.restartAllNoConfirm, this.strings.no);
       }
-      if (this.hasLevels) {
-         this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, confirmRestartAll, this.strings.no);
+      else {
+         this.restartAllNoConfirm();
+      }
+   },
+
+   restartAllNoConfirm: function() {
+      displayHelper.stopShowingResult();
+      if (!displayHelper.hasLevels) {
+         // TODO is this the desired behavior for no levels?
+         task.reloadAnswer('', function() {});
       } else {
-         confirmRestartAll();
+         task.getAnswer(function(strAnswer) {
+            var answer = $.parseJSON(strAnswer);
+            var defaultAnswer = task.getDefaultAnswerObject();
+            var level = displayHelper.taskLevel;
+            answer[level] = defaultAnswer[level];
+            task.reloadAnswer(JSON.stringify(answer), function() {});
+         });
       }
    },
 
@@ -836,6 +1021,8 @@ window.displayHelper = {
          this.updateScoreOneLevel(strAnswer, this.taskLevel, function() {
             if (self.hasLevels) {
                self.showValidatePopup(self.taskLevel);
+            } else {
+               self.showValidatePopup();
             }
             callback();
          });
@@ -926,7 +1113,13 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       var buttonText = this.strings.alright;
       var avatarMood = "error";
-      if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+      if ((gradedLevel == undefined) && (this.graderScore >= this.taskParams.maxScore - 0.001)) {
+         avatarMood = "success";
+         buttonText = this.strings.moveOn;
+         fullMessage += "<br/><br/>";
+         actionNext = "nextTask";
+         fullMessage += this.strings.solvedMoveOn;
+      } else if (maxScores && (gradedLevel !== undefined) && this.graderScore >= maxScores[gradedLevel] - 0.001) {
          avatarMood = "success";
          buttonText = this.strings.moveOn;
          fullMessage += "<br/><br/>";
@@ -1046,7 +1239,7 @@ window.displayHelper = {
       scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
-          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez la réponse validée.</a>';
+         scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' +  this.strings.reloadValidAnswer + '</a>';
       }
       return scoreDiffMsg;
    },
@@ -1239,7 +1432,7 @@ window.displayHelper = {
       window.task.getHeight(function(height) {
          if (height != self.lastSentHeight) {
             self.lastSentHeight = height;
-            window.platform.updateHeight(height, function(){});
+            window.platform.updateDisplay({height: height}, function(){});
          }
       });
    },

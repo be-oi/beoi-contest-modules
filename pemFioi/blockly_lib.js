@@ -1121,7 +1121,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   {
                      name: "lists_append", 
                      xml: "<block type='lists_append'></block>"
-                  },
+                  }
                ]
             },
             {
@@ -1319,7 +1319,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              var OPERATORS =
                  [
                   [Blockly.Msg.MATH_SINGLE_OP_ABSOLUTE, 'ABS'],
-                  ['-', 'NEG'],
+                  ['-', 'NEG']
              ];
              this.setHelpUrl(Blockly.Msg.MATH_SINGLE_HELPURL);
              this.setColour(Blockly.Blocks.math.HUE);
@@ -1353,7 +1353,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              var OPERATORS =
                  [
                   ['min', 'MIN'],
-                  ['max', 'MAX'],
+                  ['max', 'MAX']
              ];
              this.setColour(Blockly.Blocks.math.HUE);
              this.setInputsInline(true);

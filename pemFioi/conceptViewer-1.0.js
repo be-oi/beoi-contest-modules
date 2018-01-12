@@ -3,19 +3,34 @@ var conceptViewer = {
   loaded: false,
   shownConcept: null,
 
-  load: function () {
+  load: function (lang) {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
+
+    // TODO :: allow changing list of languages
+    var allLangs = [
+      {id: 'blockly', lbl: 'Blockly'},
+      {id: 'scratch', lbl: 'Scratch'},
+      {id: 'python', lbl: 'Python'}
+      ];
+    var langOptions = '';
+    for(var i=0; i<allLangs.length; i++) {
+      langOptions += '<option value="' + allLangs[i].id + '"';
+      if((!lang && i == 0) || allLangs[i].id == lang) {
+        langOptions += ' selected';
+      }
+      langOptions += '>' + allLangs[i].lbl + '</option>';
+    }
+
     $('body').append(''
       + '<div id="conceptViewer" style="display: none;">'
       + '  <div class="content">'
       + '    <div class="exit" onclick="conceptViewer.hide();">x</div>'
       + '    <div class="navigation">'
       + '      <div class="navigationLanguage">'
-      + '        Langage de programmation&nbsp;:'
+      + '        Langage&nbsp;:'
       + '        <select class="languageSelect" onchange="conceptViewer.languageChanged();">'
-      + '          <option value="blockly">Blockly</option>' // TODO :: allow changing list of languages
-      + '          <option value="python">Python</option>'
+      + langOptions
       + '        </select>'
       + '      </div>'
       + '      <hr />'
@@ -70,29 +85,29 @@ var conceptViewer = {
 
   loadConcepts: function (newConcepts) {
     // Load new concept information
-    if(!this.loaded) { this.load(); }
+    this.load();
     this.concepts = newConcepts;
     this.loadNavigation();
   },
 
-  show: function (initConcept=true) {
+  show: function (initConcept) {
     // Display the conceptViewer
-    if(!this.loaded) { this.load(); }
+    this.load();
     $('#conceptViewer').fadeIn(500);
 
-    if (this.shownConcept && initConcept) {
+    if (this.shownConcept && (initConcept || typeof initConcept == 'undefined')) {
       this.showConcept(this.shownConcept);
     }
   },
 
   hide: function () {
     // Hide the conceptViewer
-    if(!this.loaded) { this.load(); }
+    this.load();
     $('#conceptViewer').fadeOut(500);
     $('#conceptViewer .viewerContent').attr('src', '');
   },
 
-  showConcept: function (concept, show=true) {
+  showConcept: function (concept, show) {
     // Show a specific concept
     // Either a concept object can be given, either a concept ID can be given
     // directly
@@ -111,7 +126,7 @@ var conceptViewer = {
     }
     if (conceptUrl) {
       this.shownConcept = conceptId;
-      if(show) { this.show(false); }
+      if(show || typeof show == 'undefined') { this.show(false); }
 
       var language = $('#conceptViewer .languageSelect').val();
       var urlSplit = conceptUrl.split('#');
@@ -147,7 +162,15 @@ var conceptViewer = {
 }
 
 // TODO :: temporary values for now
-var baseUrl = 'https://static-items.algorea.org/files/checkouts/c1212c2f48bf3944a7a9ad2c48a33206/ProgrammingYoung/Help/index.html';
+
+// Specific configuration to go through the domain itself if there's a 'p=1'
+// argument or we are on concours2.castor-informatique.fr
+var baseUrl = window.location.protocol + '//'
+    + ((window.location.search.indexOf('p=1') > -1
+        || window.location.hostname == 'concours2.castor-informatique.fr')
+       ? window.location.host : 'static4.castor-informatique.fr')
+    + '/help/index.html';
+
 
 var testConcepts = [
     {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
@@ -155,6 +178,12 @@ var testConcepts = [
     {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
     {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend'},
     {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
+    {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if'},
+    {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else'},
+    {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil'},
+    {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
+    {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
+    {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
     {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
     {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
     ];

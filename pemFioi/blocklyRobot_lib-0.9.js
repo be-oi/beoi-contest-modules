@@ -8,6 +8,7 @@ var getContext = function(display, infos, curLevel) {
             forward: "avancer",
             turnAround: "faire demi-tour",
             jump: "sauter",
+            down: "descendre",
             east: "avancer vers la droite",
             south: "avancer vers le bas",
             west: "avancer vers la gauche",
@@ -16,6 +17,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser la bille",
             dropTransportable: "déposer la bille",
             onTransportable: "sur une bille",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "sur un trou",
             transportableShape: "forme de l'objet",
             transportableColor: "couleur de l'objet",
@@ -25,10 +32,16 @@ var getContext = function(display, infos, curLevel) {
             greenCell: "sur une case verte",
             brownCell: "sur une case marron",
             markedCell: "sur une case marquée",
+            addPlatformAbove: "construire une plateforme au dessus",
+            addPlatformInFront: "construire une plateforme devant",
             platformInFront: "plateforme devant",
             platformInFrontAndBelow: "plateforme devant plus bas",
             platformAbove: "plateforme au dessus",
             gridEdgeInFront: "bord de la grille devant",
+            gridEdgeAbove: "bord de la grille au dessus",
+            gridEdgeBelow: "bord de la grille en dessous",
+            gridEdgeEast: "bord de la grille à droite",
+            gridEdgeWest: "bord de la grille à gauche",
             obstacleInFront: "obstacle devant",
             obstacleRight: "obstacle à droite",
             obstacleLeft: "obstacle à gauche",
@@ -37,11 +50,13 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "obstacle en haut",
             obstacleSouth: "obstacle en bas",
             paintInFront: "peinture devant",
+            paintOnCell: "peinture sur la case",
             paintNorthWest: "peinture en haut à gauche",
             paintNorth: "peinture en haut",
             paintNorthEast: "peinture en haut à droite",
             colorUnder: "couleur de la case",
             numberUnder: "nombre sur la case",
+            writeNumber: "mettre le nombre de la case à",
             dir: "direction du robot",
             col: "colonne du robot",
             row: "ligne du robot",
@@ -51,7 +66,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "attendre",
@@ -59,6 +74,7 @@ var getContext = function(display, infos, curLevel) {
             left: "tournerGauche",
             turnAround: "demiTour",
             jump: "sauter",
+            down: "descendre",
             forward: "avancer",
             east: "droite",
             south: "bas",
@@ -68,6 +84,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser",
             dropTransportable: "deposer",
             onTransportable: "surObjet",
+            onRoundObject: "surRond",
+            onSquareObject: "surCarre",
+            onTriangleObject: "surTriangle",
+            onDottedObject: "surObjetPoints",
+            onFullObject: "surObjetPlein",
+            onStripedObject: "surObjetRaye",
             onHole: "surTrou",
             transportableShape: "formeObjet",
             transportableColor: "couleurObjet",
@@ -78,9 +100,15 @@ var getContext = function(display, infos, curLevel) {
             brownCell: "caseMarron",
             markedCell: "caseMarquee",
             platformInFront: "plateformeDevant",
+            addPlatformAbove: "construirePlateformeAuDessus",
+            addPlatformInFront: "construirePlateformeDevant",
             platformInFrontAndBelow: "plateformeDevantPlusBas",
             platformAbove: "plateformeAuDessus",
             gridEdgeInFront: "bordGrilleDevant",
+            gridEdgeEast: "bordGrilleDroite",
+            gridEdgeWest: "bordGrilleGauche",
+            gridEdgeAbove: "bordGrilleAuDessus",
+            gridEdgeBelow: "bordGrilleEnDessous",
             obstacleInFront: "obstacleDevant",
             obstacleRight: "obstacleADroite",
             obstacleLeft: "obstacleAGauche",
@@ -89,11 +117,13 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "obstacleHaut",
             obstacleSouth: "obstacleBas",
             paintInFront: "peintureDevant",
+            paintOnCell: "peintureSurCase",
             paintNorthWest: "peintureHautGauche",
             paintNorth: "peintureHaut",
             paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
+            writeNumber: "ecrireNombre",
             dir: "direction",
             col: "colonne",
             row: "ligne",
@@ -103,9 +133,49 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
-         obstacle: "Le robot essaie de se déplacer sur un obstacle !"
+         description: {
+                platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
+                obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
+                onHole: "surTrou() : le robot est-il sur un trou ?",
+                onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+                onRoundObject: "surRond() : le robot est-il sur un objet rond ?",
+                onSquareObject: "surCarre() : le robot est-il sur un objet carré ?",
+                onTriangleObject: "surTriangle() : le robot est-il sur un objet triangle ?",
+                onDottedObject: "surObjetPoints() : le robot est-il sur un objet rempli de points ?",
+                onFullObject: "surObjetPlein() : le robot est-il sur un objet plein ?",
+                onStripedObject: "surObjetRaye() : le robot est-il sur un objet rayé ?",
+                paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
+                gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
+                gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
+                gridEdgeWest: "bordGrilleDroite() : le bord de la grille est-il juste à droite du robot ?",
+                gridEdgeAbove: "bordGrilleAuDessus() : le bord de la grille est-il juste au dessus du robot ?",
+                gridEdgeBelow: "bordGrilleEnDessous() : le bord de la grille est-il juste en dessous du robot ?",
+                platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
+                numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
+                col: "colonne() : colonne du robot",
+                row: "ligne() : ligne du robot",
+                paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
+                paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
+                paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
+                writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
+         },
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
       nl: {
          label: {
@@ -244,6 +314,19 @@ var getContext = function(display, infos, curLevel) {
             platformAbove: "Plattform oben",
             gridEdgeInFront: "Gitterrand voraus",
             obstacleInFront: "Hindernis voraus",
+            down: "descendre", /* to be translated */
+            onRoundObject: "sur un objet rond", /* to be translated */
+            onSquareObject: "sur un objet carré", /* to be translated */
+            onTriangleObject: "sur un objet triangle", /* to be translated */
+            onDottedObject: "sur un objet rempli de points", /* to be translated */
+            onFullObject: "sur un objet plein", /* to be translated */
+            onStripedObject: "sur un objet rayé", /* to be translated */
+            addPlatformAbove: "construire une plateforme au dessus", /* to be translated */
+            addPlatformInFront: "construire une plateforme devant", /* to be translated */
+            gridEdgeEast: "bord de la grille à droite", /* to be translated */
+            gridEdgeWest: "bord de la grille à gauche", /* to be translated */
+            gridEdgeAbove: "bord de la grille au dessus", /* to be translated */
+            gridEdgeBelow: "bord de la grille en dessous", /* to be translated */
             obstacleRight: "Hindernis rechts",
             obstacleLeft: "Hindernis links",
             obstacleEast: "Hindernis rechts",
@@ -251,11 +334,13 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "Hindernis oben",
             obstacleSouth: "Hindernis unten",
             paintInFront: "Farbe voraus",
+            paintOnCell: "peinture sur la case", /* to be translated */
             paintNorthWest: "Farbe oben links",
             paintNorth: "Farbe oben",
             paintNorthEast: "Farbe oben rechts",
             colorUnder: "Farbe des Feldes",
             numberUnder: "Nummer des Feldes",
+            writeNumber: "Write a number",
             dir: "Richtung des Roboters",
             col: "Spalte des Roboters",
             row: "Zeile des Roboters",
@@ -273,6 +358,7 @@ var getContext = function(display, infos, curLevel) {
             left: "dreheLinks",
             turnAround: "umkehren",
             jump: "springen",
+            down: "descendre", /* to be translated */
             forward: "geheVorwaerts",
             east: "rechts",
             south: "unten",
@@ -282,6 +368,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "aufheben",
             dropTransportable: "absetzen",
             onTransportable: "aufDemObjekt",
+            onRoundObject: "sur un objet rond", /* to be translated */
+            onSquareObject: "sur un objet carré", /* to be translated */
+            onTriangleObject: "sur un objet triangle", /* to be translated */
+            onDottedObject: "sur un objet rempli de points", /* to be translated */
+            onFullObject: "sur un objet plein", /* to be translated */
+            onStripedObject: "sur un objet rayé", /* to be translated */
             onHole: "aufLoch",
             transportableShape: "formObjekt",
             transportableColor: "farbeObjekt",
@@ -291,10 +383,16 @@ var getContext = function(display, infos, curLevel) {
             greenCell: "zelleGruen",
             brownCell: "zelleBraun",
             markedCell: "zelleAusgewaehlt",
+            addPlatformAbove: "addPlatformAbove", /* to be translated */
+            addPlatformInFront: "construirePlatformDevant", /* to be translated */
             platformInFront: "plateformeDevant",
             platformInFrontAndBelow: "plattformeVorausTiefer",
             platformAbove: "plattformOben",
             gridEdgeInFront: "vorGitterrand",
+            gridEdgeEast: "bordGrilleDroite",
+            gridEdgeWest: "bordGrilleGauche",
+            gridEdgeAbove: "bordGrilleAuDessus",
+            gridEdgeBelow: "bordGrilleEnDessous",
             obstacleInFront: "vorHindernis",
             obstacleRight: "hindernisRechts",
             obstacleLeft: "hindernisLinks",
@@ -303,37 +401,261 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "hindernisOben",
             obstacleSouth: "hindernisUnten",
             paintInFront: "vorneFarbe",
+            paintOnCell: "peintureSurCase",  /* to be translated */
             paintNorthWest: "farbeObenLinks",
             paintNorth: "farbeOben",
             paintNorthEast: "farbeObenRechts",
             colorUnder: "farbeFeld",
             numberUnder: "nummerFeld",
+            writeNumber: "TODO TRANSLATE",  /* to be translated */
             dir: "Richtung",
             col: "Spalte",
             row: "Zeile",
             alert: "Alarm",
             onPill: "aufStapel",
-
             number: "anzahlObjekte",
             exists: "existiertObjekt",
             trans_row: "zeileObjekt",
             trans_col: "spalteObjekt",
          },
+         description: {
+         },
          obstacle: "Der Roboter versucht sich auf einem Hindernis zu bewegen!",
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
+      },
+      es: {
+         label: {
+            wait: "espere",
+            right: "girar a la derecha",
+            left: "girar a la izquierda",
+            forward: "avanzar",
+            turnAround: "dar media vuelta",
+            jump: "saltar",
+            down: "descender",
+            east: "avanzar hacia la derecha",
+            south: "avanzar hacia abajo",
+            west: "avanzar hacia la izquierda",
+            north: "avanzar hacia arriba",
+            paint: "pintar la casilla",
+            pickTransportable: "recoger la bola",
+            dropTransportable: "dejar caer la bola",
+            onTransportable: "sobre una bola",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
+            onHole: "sobre un agujero",
+            transportableShape: "forma del objeto",
+            transportableColor: "color del objeto",
+            transportableRed:  "el objeto es rojo",
+            transportableBlue: "el objeto es azul",
+            transportableSquare: "el objeto es cuadrado",
+            greenCell: "sobre una casilla verde",
+            brownCell: "sobre una casilla café",
+            markedCell: "sobre una casilla marcada",
+            addPlatformAbove: "construir una plataforma por encima",
+            addPlatformInFront: "construir una plataforma por adelante",
+            platformInFront: "plataforma adelante",
+            platformInFrontAndBelow: "plataforma adelante y abajo",
+            platformAbove: "plataforma por encima",
+            gridEdgeInFront: "borde de la cuadrícula adelante",
+            gridEdgeAbove: "borde de la cuadrícula arriba",
+            gridEdgeBelow: "borde de la cuadrícula abajo",
+            gridEdgeEast: "borde de la cuadrícula a la derecha",
+            gridEdgeWest: "borde de la cuadrícula a la izquierda",
+            obstacleInFront: "obstáculo adelante",
+            obstacleRight: "obstáculo a la derecha",
+            obstacleLeft: "obstáculo a la izquierda",
+            obstacleEast: "obstáculo a la derecha",
+            obstacleWest: "obstáculo a la izquierda",
+            obstacleNorth: "obstáculo arriba",
+            obstacleSouth: "obstáculo abajo",
+            paintInFront: "casilla pintada al frente",
+            paintOnCell: "en casilla pintada",
+            paintNorthWest: "casilla pintada arriba a la izquierda",
+            paintNorth: "casilla pintada arriba",
+            paintNorthEast: "casilla pintada arriba a la derecha",
+            colorUnder: "color de la casilla",
+            numberUnder: "número en la casilla",
+            writeNumber: "escribir el número de la casilla en",
+            dir: "dirección del robot",
+            col: "columna del robot",
+            row: "fila del robot",
+            alert: "alerta",
+            onPill: "sobre una pastilla",
+
+            number: "número total de objetos a transportar",
+            exists: "existe un objeto a transportar ",
+            trans_row: "fila del objeto a transportar",
+            trans_col: "columna del objeto a transportar"
+         },
+         code: {
+            wait: "esperar",
+            right: "girarDerecha",
+            left: "girarIzquierda",
+            turnAround: "mediaVuelta",
+            jump: "saltar",
+            down: "descender",
+            forward: "avanzar",
+            east: "derecha",
+            south: "abajo",
+            west: "izquierda",
+            north: "arriba",
+            paint: "pintar",
+            pickTransportable: "recoger",
+            dropTransportable: "soltar",
+            onTransportable: "sobreObjeto",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
+            onHole: "sobreAgujero",
+            transportableShape: "formaObjeto",
+            transportableColor: "colorObjeto",
+            transportableRed: "objetoRojo",
+            transportableBlue: "objetoAzul",
+            transportableSquare: "objetoCuadrado",
+            greenCell: "casillaVerde",
+            brownCell: "casillaCafé",
+            markedCell: "casillaMarcada",
+            platformInFront: "plataformaAdelante",
+            addPlatformAbove: "construirPlataformaArriba",
+            addPlatformInFront: "construirPlataformaAdelante",
+            platformInFrontAndBelow: "plateformeDevantPlusBas",
+            platformAbove: "plataformaArriba",
+            gridEdgeInFront: "bordeCuadriculaAdelante",
+            gridEdgeEast: "bordeCuadriculaDerecha",
+            gridEdgeWest: "bordeCuadriculaIzquierda",
+            gridEdgeAbove: "bordeCuadriculaArriba",
+            gridEdgeBelow: "bordeCuadriculaAbajo",
+            obstacleInFront: "obstaculoAdelante",
+            obstacleRight: "obstaculoDerecha",
+            obstacleLeft: "obstaculoIzquierda",
+            obstacleEast: "obstaculoDerecha",
+            obstacleWest: "obstaculoIzquierda",
+            obstacleNorth: "obstaculoArriba",
+            obstacleSouth: "obstaculoAbajo",
+            paintInFront: "pintadoAdelante",
+            paintOnCell: "pinturaEnCasilla",
+            paintNorthWest: "pinturaArribaIzquierda",
+            paintNorth: "pinturaArriba",
+            paintNorthEast: "pinturaArribaDerecha",
+            colorUnder: "colorCasilla",
+            numberUnder: "numeroCasilla",
+            writeNumber: "escribirNumero",
+            dir: "direccion",
+            col: "columna",
+            row: "fila",
+            alert: "alerta",
+            onPill: "sobrePastilla",
+
+            number: "numeroTransportables",
+            exists: "existeTransportable",
+            trans_row: "filaTransportable",
+            trans_col: "columnaTransportable"
+         },
+         description: {
+                platformAbove: "plataformaArriba() : ¿hay una plataforma arriba del robot?",
+                obstacleInFront: "obstáculoAdelante() : ¿hay un obstáculo adelante del robot?",
+                onHole: "sobreAgujero() : ¿se encuentra el robot sobre un agujero?",
+                onTransportable: "sobreObjeto() : ¿se encuentra el robot sobre un objeto que puede recoger?",
+                paintOnCell: "pinturaEnCasilla() : ¿está pintada la casilla en la que está el robot?",
+                gridEdgeInFront: "bordeCuadriculaAdelante() : ¿está el borde de la cuadrícula justo adelante del robot?",
+                gridEdgeEast: "bordeCuadriculaDerecha() : ¿está el borde de la cuadrícula justo a la izquierda del robot?",
+                gridEdgeWest: "bordeCuadriculaIzquierda() : ¿está el borde de la cuadrícula justo a la izquierda del robot?",
+                gridEdgeAbove: "bordeCuadriculaArriba() : ¿está el borde de la cuadrícula justo arriba del robot?",
+                gridEdgeBelow: "bordeCuadriculaAbajo() : ¿está el borde de la cuadrícula justo abajo del robot?",
+                platformInFront: "plataformaAdelante() : ¿hay una plataforma adelante del robot?",
+                numberUnder: "numeroCasilla() : número escrito sobre la casilla del robot",
+                col: "columna() : columna del robot",
+                row: "fila() : fila del robot",
+                paintNorth: "pintadoAdelante() : ¿se encuentra pintada la casilla de adelante?",
+                paintNorthWest: "pintadoArribaDerecha() : ¿se encuentra pintada la casilla de arriba a la derecha?",
+                paintNorthEast: "pintadoArribaIzquierda() : ¿se encuentra pintada la casilla de arriba a la izquierda?"
+         },
+         obstacle: "¡El robot intenta moverse sobre un obstáculo!",
+         exit_grid: "¡El robot salió de la cuadrícula!",
+         nothingToPickUp: "No hay algo para recoger",
+         alreadyTransportingObject: "El robot ya transporta un objeto",
+         jumpOutsideGrid: "¡El robot intenta saltar fuera de la cuadrícula!",
+         jumpObstacleBlocking: "El robot intenta saltar pero hay un obstáculo que lo bloquea",
+         jumpNoPlatform: "¡El robot intenta saltar pero no hay una plataforma arriba!",
+         downOutsideGrid: "¡El robot intenta descender fuera de la cuadrícula!",
+         downNoPlatform: "¡El robot intenta descender pero no hay plataforma abajo!",
+         falls: "El robot cae al vacío",
+         willFallAndCrash: "¡El robot va a caer y chocar!",
+         dropWithoutItem: "El robot intenta soltar un objeto, pero no carga nada.",
+         droppedAllItems: "¡Bien hecho! ¡Ha soltado todos los objetos!",
+         obstacleOnCell: "Hay un obstáculo en esta casilla",
+         platformOnCell: "Ya hay una plataforma sobre esta casilla"
       }
    };
+
+   function replaceStringsRec(source, dest) {
+      if ((typeof source != "object") || (typeof dest != "object")) {
+         return;
+      }
+      for (var key1 in source) {
+         if (dest[key1] != undefined) {
+            if (typeof dest[key1] == "object") {
+               replaceStringsRec(source[key1], dest[key1]);
+            } else {
+               dest[key1] = source[key1];
+            }
+         }
+      }
+   }
+
    var strings = languageStrings[stringsLanguage];
-   
+   if (infos.languageStrings != undefined) {
+      if (infos.languageStrings.blocklyRobot_lib != undefined) {
+         var infosStrings = infos.languageStrings.blocklyRobot_lib;
+         replaceStringsRec(infosStrings, strings);
+      }
+   }
+
    var cells = [];
-   var texts = [];
+   var colsLabels = [];
+   var rowsLabels = [];
    var scale = 1;
    var paper;
+
+   if (infos.leftMargin === undefined) {
+      infos.leftMargin = 0;
+   }
+   if (infos.topMargin === undefined) {
+      if (infos.showLabels) {
+         infos.topMargin = 0;
+      } else {
+         infos.topMargin = infos.cellSide / 2;
+      }
+   }
+   if (infos.showLabels) {      infos.leftMargin += infos.cellSide;
+      infos.topMargin += infos.cellSide;
+   }
 
    var context = {
       display: display,
       infos: infos,
       robot: {},
-      strings: strings,
+      strings: strings
    };
 
    context.changeDelay = function(newDelay) {
@@ -346,7 +668,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.callCallback = function(callback, value) { // Default implementation
       context.runner.noDelay(callback, value);
-   }
+   };
 
    context.nbRobots = 1;
 
@@ -381,11 +703,11 @@ var getContext = function(display, infos, curLevel) {
       }
       if (isOutsideGrid(row + 1, coords.col)) {
          context.lost = true;
-         throw("Le robot se jette dans le vide !");
+         throw(strings.falls);
       }
       if (row - coords.row > 2) {
          context.lost = true;
-         throw("Le robot va tomber de haut et s'écraser !");
+         throw(strings.willFallAndCrash);
       }
       coords.row = row;
       context.nbMoves++;
@@ -402,15 +724,41 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       if (isOutsideGrid(item.row - 2, item.col)) {
          context.lost = true;
-         throw("Le robot essaie de sauter en dehors de la grille !");
+         throw(strings.jumpOutsideGrid);
+      }
+      var obstacle = context.getItems(item.row - 2, item.col, {category: "obstacle"});
+      if (obstacle.length > 0) {
+         context.lost = true;
+         throw(strings.jumpObstacleBlocking);
       }
       var platforms = context.getItems(item.row - 1, item.col, {category: "platform"});
       if (platforms.length == 0) {
          context.lost = true;
-         throw("Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !");
+         throw(strings.jumpNoPlatform);
       }
       context.nbMoves++;
       moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
+
+   context.robot.down = function(callback) {
+      if (!infos.hasGravity) {
+         throw("Error: can't go down without gravity");
+      }
+      if (context.lost) {
+         return;
+      }
+      var item = context.getRobotItem(context.curRobot);
+      if (isOutsideGrid(item.row + 2, item.col)) {
+         context.lost = true;
+         throw(strings.downOutsideGrid);
+      }
+      var platforms = context.getItems(item.row + 3, item.col, {category: "platform"});
+      if (platforms.length == 0) {
+         context.lost = true;
+         throw(strings.downNoPlatform);
+      }
+      context.nbMoves++;
+      moveRobot(item.row + 2, item.col, item.dir, callback);
    };
 
    context.robot.turnAround = function(callback) {
@@ -432,7 +780,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var platforms = context.getItems(robot.row + 1, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformInFrontAndBelow = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -445,25 +793,48 @@ var getContext = function(display, infos, curLevel) {
       var row = item.row + 3;
       var platforms = context.getItems(row, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
-         
+   };
+
    context.robot.gridEdgeInFront = function(callback) {
       var coords = getCoordsInFront(0);
-      var gridEdgeInFront = false;
-      if (isOutsideGrid(coords.row, coords.col)) {
-         gridEdgeInFront = true;
-      } else if (context.tiles[coords.row][coords.col] == 0) {
-         gridEdgeInFront = true;
+      gridEdgeCoord(coords.row, coords.col, callback);
+   };
+
+   function gridEdgeCoord(row, col, callback) {
+      var gridEdge = false;
+      if (isOutsideGrid(row, col)) {
+         gridEdge = true;
+      } else if (context.tiles[row][col] == 0) {
+         gridEdge = true;
       }
-      context.runner.noDelay(callback, gridEdgeInFront);
+      context.runner.noDelay(callback, gridEdge);
    }
 
+   context.robot.gridEdgeAbove = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row - 1, robot.col, callback);
+   };
+
+   context.robot.gridEdgeBelow = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row + 1, robot.col, callback);
+   };
+
+   context.robot.gridEdgeEast = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row, robot.col + 1, callback);
+   };
+
+   context.robot.gridEdgeWest = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row, robot.col - 1, callback);
+   };
 
    function destroyItem(row, col, category) {
       var foundItem = -1;
@@ -480,6 +851,53 @@ var getContext = function(display, infos, curLevel) {
          }
          context.items.splice(foundItem, 1);
       }
+   }
+
+   function createItem(newItem) {
+      var robot = context.getRobotItem(context.curRobot);
+      if (isOutsideGrid(newItem.row, newItem.col)) {
+         throw("La case est en dehors de la grille");
+      }
+      var addItem = function() {
+         resetItem(newItem);
+         if (context.display) {
+            resetItemsZOrder(newItem.row, newItem.col);
+            if ((robot.col != newItem.col) || (robot.row != newItem.row)) {
+               resetItemsZOrder(robot.row, robot.col);
+            }
+         }
+      };
+      if ((infos.actionDelay > 0) && (context.display)) {
+         context.delayFactory.createTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
+            addItem();
+         }, infos.actionDelay / 2);
+      } else {
+         addItem();
+      }
+   }
+
+   function addPlatform(row, col, callback) {
+      var platforms = context.getItems(row, col, {category: "platform"});
+      if (platforms.length > 0) {
+         throw(strings.platformOnCell);
+      }
+      var obstacles = context.getItems(row, col, {isObstacle: true});
+      if (obstacles.length > 0) {
+         throw(strings.obstacleOnCell);
+      }
+      createItem({row: row, col: col, type: "platform"});
+      context.waitDelay(callback);
+   }
+
+   context.robot.addPlatformInFront = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var coords = getCoordsInFront(robot.dir);
+      addPlatform(coords.row + 1, coords.col, callback);
+   };
+
+   context.robot.addPlatformAbove = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      addPlatform(robot.row - 1, robot.col, callback);
    };
 
    function paint(row, col, paintType, callback) {
@@ -494,19 +912,7 @@ var getContext = function(display, infos, curLevel) {
          paintItems.splice(0, 1);
       }
       if (paintItems.length == 0) {
-         var addItem = function() {
-            resetItem(newItem);
-            if (context.display) {
-               resetItemsZOrder(row, col);
-            }
-         };
-         if ((infos.actionDelay > 0) && (context.display)) {
-            context.delayFactory.createTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
-               addItem();
-            }, infos.actionDelay / 2);
-         } else {
-            addItem();
-         }
+         createItem(newItem);
       }
       context.waitDelay(callback);
    }
@@ -559,6 +965,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col + 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col + 1, 0, callback);
       }
    };
@@ -571,6 +978,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col - 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col - 1, 2, callback);
       }
    };
@@ -583,6 +991,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row - 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row - 1, item.col, 3, callback);
       }
    };
@@ -595,6 +1004,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row + 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row + 1, item.col, 1, callback);
       }
    };
@@ -658,6 +1068,12 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, items.length > 0);
    };
 
+   context.robot.paintOnCell = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row, robot.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
    context.robot.paintNorthWest = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var items = context.getItems(robot.row - 1, robot.col - 1, {isPaint: true});
@@ -696,15 +1112,18 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.robot.gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront(0);
-      var gridEdgeInFront = false;
-      if (isOutsideGrid(coords.row, coords.col)) {
-         gridEdgeInFront = true;
-      } else if (context.tiles[coords.row][coords.col] == 0) {
-         gridEdgeInFront = true;
+   context.robot.writeNumber = function(value, callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length == 0) {
+         context.callCallback(callback);
+      } else {
+         itemsUnder[0].type = value;
+         if (context.display) {
+            redisplayItem(itemsUnder[0]);
+         }
+         context.callCallback(callback);
       }
-      context.callCallback(callback, gridEdgeInFront);
    };
 
    context.robot.col = function(callback) {
@@ -720,7 +1139,7 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, item.row + 1);
    };
-   
+
    var findTransportable = function(id) {
       var transportables = context.getItems(undefined, undefined, {isTransportable: true});
       for (var iItem = 1; iItem < transportables.length; iItem++) {
@@ -730,12 +1149,12 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       return null;
-   }
+   };
 
    context.transportable_exists = function(id, callback) {
       var transportable = findTransportable(id);
       context.runner.noDelay(callback, transportable != null);
-   }
+   };
 
    context.transportable_col = function(id, callback) {
       var transportable = findTransportable(id);
@@ -744,7 +1163,7 @@ var getContext = function(display, infos, curLevel) {
          res = transportable.col + 1;
       }
       context.callCallback(callback, res);
-   }
+   };
 
    context.transportable_row = function(id, callback) {
       var transportable = findTransportable(id);
@@ -764,6 +1183,42 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
       context.callCallback(callback, (transportables.length != 0));
+   };
+
+   context.robot.onRoundObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isRound: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onSquareObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isSquare: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onTriangleObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isTriangle: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onFullObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isFull: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onDottedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isDotted: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onStripedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isStriped: true});
+      context.callCallback(callback, (objects.length != 0));
    };
 
    context.robot.onHole = function(callback) {
@@ -823,7 +1278,7 @@ var getContext = function(display, infos, curLevel) {
          return itemType[property];
       }
       return "";
-   }
+   };
 
    context.robot.transportableShape = function(callback) {
       var result = getTransportableProperty("shape");
@@ -834,7 +1289,7 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
       if (transportables.length == 0) {
-         throw("Rien à ramasser");
+         throw(strings.nothingToPickUp);
       }
       /*
       if (transportables[0].rank != context.nbTransportedItems + 1) {
@@ -842,7 +1297,7 @@ var getContext = function(display, infos, curLevel) {
       }
       */
       if (context.nbTransportedItems > 0) {
-         throw("Le robot transporte déjà un objet");
+         throw(strings.alreadyTransportingObject);
       }
       var transportable = transportables[0];
       context.items.splice(transportable.index, 1);
@@ -865,7 +1320,7 @@ var getContext = function(display, infos, curLevel) {
    context.robot.dropTransportable = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       if (context.transportedItem == undefined) {
-         throw("Le robot essaie de déposer un objet mais n'en transporte pas.");
+         throw(strings.dropWithoutItem);
       }
       /*
       if (context.tiles[robot.row][robot.col] != 2) { // TODO : replace
@@ -876,7 +1331,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbTransportedItems = 0;
       if (context.nbDroppedItems == context.nbTransportableItems - 1) {
          context.success = true;
-         throw("Bravo, vous avez déposé toutes les objets !");
+         throw(strings.droppedAllItems);
       }
       context.waitDelay(function() {
          context.items.push(context.transportedItem);
@@ -888,8 +1343,8 @@ var getContext = function(display, infos, curLevel) {
          context.transportedItem = undefined;
          callback();
       });
-   }
-   
+   };
+
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -921,6 +1376,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbCollectedItems = 0;
       if (context.display) {
          context.resetDisplay();
+         $("#nbMoves").html(context.nbMoves);
       } else {
          resetItems();
       }
@@ -967,16 +1423,17 @@ var getContext = function(display, infos, curLevel) {
       [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
-   
+
    context.customBlocks = {
       robot: {
          actions: {
-            blocks: [  
+            blocks: [
                { name: "paint" },
                { name: "paintGrey" },
                { name: "forward" },
                { name: "turnAround" },
                { name: "jump" },
+               { name: "down" },
                { name: "right" },
                { name: "left" },
                { name: "east" },
@@ -986,23 +1443,32 @@ var getContext = function(display, infos, curLevel) {
                { name: "wait" },
                { name: "pickTransportable" },
                { name: "dropTransportable" },
-               { name: "dropTransportable" }
+               { name: "dropTransportable" },
+               { name: "writeNumber", params: [null] },
+               { name: "addPlatformAbove",   yieldsValue: false },
+               { name: "addPlatformInFront",   yieldsValue: false }
             ]
          },
          sensors: {
             blocks: [
                { name: "onTransportable",    yieldsValue: true },
+               { name: "onRoundObject",      yieldsValue: true },
+               { name: "onSquareObject",     yieldsValue: true },
+               { name: "onTriangleObject",   yieldsValue: true },
+               { name: "onDottedObject",     yieldsValue: true },
+               { name: "onStripedObject",    yieldsValue: true },
+               { name: "onFullObject",       yieldsValue: true },
                { name: "onHole",             yieldsValue: true },
                { name: "transportableShape", yieldsValue: true },
                { name: "transportableColor", yieldsValue: true },
                { name: "transportableRed",   yieldsValue: true },
                { name: "transportableBlue",  yieldsValue: true },
                { name: "transportableSquare", yieldsValue: true },
-               
+
                { name: "greenCell",          yieldsValue: true },
                { name: "brownCell",          yieldsValue: true },
                { name: "markedCell",         yieldsValue: true },
-               
+
                { name: "obstacleInFront",    yieldsValue: true },
                { name: "obstacleRight",      yieldsValue: true },
                { name: "obstacleLeft",       yieldsValue: true },
@@ -1010,14 +1476,19 @@ var getContext = function(display, infos, curLevel) {
                { name: "obstacleWest",       yieldsValue: true },
                { name: "obstacleNorth",      yieldsValue: true },
                { name: "obstacleSouth",      yieldsValue: true },
-               
+
                { name: "paintInFront",       yieldsValue: true },
+               { name: "paintOnCell",        yieldsValue: true },
                { name: "paintNorth",         yieldsValue: true },
                { name: "paintNorthWest",     yieldsValue: true },
                { name: "paintNorthEast",     yieldsValue: true },
                { name: "colorUnder",         yieldsValue: true },
                { name: "numberUnder",        yieldsValue: true },
                { name: "gridEdgeInFront",    yieldsValue: true },
+               { name: "gridEdgeEast",       yieldsValue: true },
+               { name: "gridEdgeWest",       yieldsValue: true },
+               { name: "gridEdgeAbove",      yieldsValue: true },
+               { name: "gridEdgeBelow",      yieldsValue: true },
                { name: "platformInFront",    yieldsValue: true },
                { name: "platformInFrontAndBelow", yieldsValue: true },
                { name: "platformAbove",      yieldsValue: true },
@@ -1080,16 +1551,23 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, result);
    };
 
+   // positions and dimensions will be set later by updateScale
    var resetBoard = function() {
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          cells[iRow] = [];
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
-            var x = infos.cellSide * iCol * scale;
-            var y = infos.cellSide * iRow * scale;
             var itemTypeNum = context.tiles[iRow][iCol];
             if (itemTypeNum > 0) {
-               cells[iRow][iCol] = paper.rect(x, y, infos.cellSide * scale, infos.cellSide * scale);
+               cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
             }
+         }
+      }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
       }
    };
@@ -1144,7 +1622,7 @@ var getContext = function(display, infos, curLevel) {
                resetItem({
                   row: iRow,
                   col: iCol,
-                  type: itemTypeByNum[itemTypeNum],
+                  type: itemTypeByNum[itemTypeNum]
                });
             }
          }
@@ -1180,9 +1658,14 @@ var getContext = function(display, infos, curLevel) {
       if (item.element != null) {
          item.element.remove();
       }
-      var x = infos.cellSide * item.col * scale;
-      var y = infos.cellSide * item.row * scale;
-      item.element = paper.image(infos.itemTypes[item.type].img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row + infos.topMargin) * scale;
+      var itemType = infos.itemTypes[item.type];
+      if (itemType.img) {
+         item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      } else if (itemType.value !== undefined) {
+         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, itemType.value).attr({"font-size": item.side * scale / 2});
+      }
       item.element.attr(itemAttributes(item));
       resetItemsZOrder(item.row, item.col);
    };
@@ -1240,6 +1723,7 @@ var getContext = function(display, infos, curLevel) {
                item.element.attr(attr);
             }
          }
+         $("#nbMoves").html(context.nbMoves);
       }
       context.waitDelay(callback);
    };
@@ -1276,7 +1760,7 @@ var getContext = function(display, infos, curLevel) {
          if (infos.ignoreInvalidMoves) {
             return false;
          }
-         throw("Le robot sort de la grille !");
+         throw(strings.exit_grid);
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
@@ -1289,15 +1773,20 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var itemAttributes = function(item) {
-      var x = infos.cellSide * scale * item.col + item.offsetX * scale;
-      var y = (infos.cellSide * item.row - (item.side - infos.cellSide)) * scale + item.offsetY * scale;
+      var itemType = infos.itemTypes[item.type];
+      var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
       var xClip = x;
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
          var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale); 
+         x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
+      if (!itemType.img) {
+         x += item.side * scale / 2;
+         y += item.side * scale / 2;
+      }
       return { x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
    };
 
@@ -1310,30 +1799,41 @@ var getContext = function(display, infos, curLevel) {
       }
       var newCellSide;
       if (context.nbCols && context.nbRows) {
-         newCellSide = Math.min($("#grid").width() / context.nbCols, $("#grid").height() / context.nbRows);
+         var marginAsCols = infos.leftMargin / infos.cellSide;
+         var marginAsRows = infos.topMargin / infos.cellSide;
+         newCellSide = Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows));
       } else {
          newCellSide = 0;
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize(infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             if (cells[iRow][iCol] != undefined) {
-               var x = infos.cellSide * iCol * scale;
-               var y = infos.cellSide * iRow * scale;
+               var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
+               var y = (infos.cellSide * iRow + infos.topMargin) * scale;
                cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
             }
          }
       }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            var x = (infos.leftMargin - infos.cellSide / 2) * scale;
+            var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
+            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
+            var y = (infos.topMargin - infos.cellSide / 2) * scale;
+            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+      }
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
+         redisplayItem(item);
          item.element.attr(itemAttributes(item));
-      }
-      if (texts[0] && texts[1]) {
-         texts[0].attr({x: infos.cellSide * 4.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
-         texts[1].attr({x: infos.cellSide * 7.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
       }
    };
 
    return context;
-}
+};
