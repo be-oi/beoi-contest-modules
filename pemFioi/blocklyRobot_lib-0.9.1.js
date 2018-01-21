@@ -66,7 +66,10 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter"
+            trans_col: "colonne d'objet à transporter",
+
+            decrement: "retirer 1 au nombre sur la case",
+            numberIsZero: "robot sur un 0"
          },
          code: {
             wait: "attendre",
@@ -133,7 +136,10 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable"
+            trans_col: "colonneTransportable",
+
+            decrement: "decrement",
+            numberIsZero: "numberIsZero"
          },
          messages: {
             nothingToPickUp: "Rien à ramasser",
@@ -176,7 +182,8 @@ var getContext = function(display, infos, curLevel) {
             paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
             paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
             paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
-            writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
+            writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot",
+            decrement: "decrement(): soustrait 1 à la valeur actuelle de la case du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programme du robot",
@@ -500,7 +507,10 @@ var getContext = function(display, infos, curLevel) {
             number: "numberOfObjects",
             exists: "existObject",
             trans_row: "objectRow",
-            trans_col: "objectColumn"
+            trans_col: "objectColumn",
+
+            decrement: "decrement",
+            numberIsZero: "numberIsZero"
          },
          messages: {
             nothingToPickUp: "Rien à ramasser",
@@ -1266,18 +1276,55 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.robot.writeNumber = function(value, callback) {
+   context.robot.numberIsZero = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
       if (itemsUnder.length == 0) {
-         context.callCallback(callback);
+         context.callCallback(callback, 0);
       } else {
-         itemsUnder[0].type = value;
-         if (context.display) {
-            redisplayItem(itemsUnder[0]);
-         }
-         context.callCallback(callback);
+         context.callCallback(callback, infos.itemTypes[itemsUnder[0].type].value == 0 ? 1 : 0);
       }
+   };
+
+   context.robot.writeNumber = function(value, callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length > 0) {
+         if(Number.isInteger(value)) {
+            Object.keys(infos.itemTypes).forEach(function(key) {
+                  if (infos.itemTypes.hasOwnProperty(key) && infos.itemTypes[key].value == value) {
+                     itemsUnder[0].type = key;
+                     if (context.display) {
+                           redisplayItem(itemsUnder[0]);
+                     }
+                  }
+               });
+         } else {
+            itemsUnder[0].type = value;
+            if (context.display) {
+               redisplayItem(itemsUnder[0]);
+            }
+  
+         }
+      }
+      context.callCallback(callback);
+   };
+
+   context.robot.decrement = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length > 0 && infos.itemTypes[itemsUnder[0].type].value > 0) {
+         var newValue = infos.itemTypes[itemsUnder[0].type].value - 1;
+         Object.keys(infos.itemTypes).forEach(function(key) {
+            if (infos.itemTypes.hasOwnProperty(key) && infos.itemTypes[key].value == newValue) {
+               itemsUnder[0].type = key;
+               if (context.display) {
+                     redisplayItem(itemsUnder[0]);
+               }
+            }
+         });
+      }
+      context.callCallback(callback);
    };
 
    context.robot.col = function(callback) {
@@ -1590,6 +1637,7 @@ var getContext = function(display, infos, curLevel) {
             { name: "pickTransportable" },
             { name: "dropTransportable" },
             { name: "writeNumber", params: [null] },
+            { name: "decrement" },
             { name: "addPlatformAbove",   yieldsValue: false },
             { name: "addPlatformInFront",   yieldsValue: false }
          ],
@@ -1627,6 +1675,7 @@ var getContext = function(display, infos, curLevel) {
             { name: "paintNorthEast",     yieldsValue: true },
             { name: "colorUnder",         yieldsValue: true },
             { name: "numberUnder",        yieldsValue: true },
+            { name: "numberIsZero",       yieldsValue: true },
             { name: "gridEdgeInFront",    yieldsValue: true },
             { name: "gridEdgeEast",       yieldsValue: true },
             { name: "gridEdgeWest",       yieldsValue: true },
