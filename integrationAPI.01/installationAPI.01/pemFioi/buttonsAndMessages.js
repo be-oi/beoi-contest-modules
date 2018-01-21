@@ -32,7 +32,7 @@ window.displayHelper = {
    thresholdEasy: 60,
    thresholdMedium: 120,
    timeoutMinutes: 5,
-   avatarType: "beaver",
+   avatarType: "beoi",
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default

@@ -97,6 +97,16 @@
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
             </div>'
+      },
+      beoi: {
+        'header' : '\
+            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
+            <table style="width:770px;margin: 10px auto;">\
+            <td><img src="../../modules/img/beoi.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+            <td><span style="font-size:32px;">beOI</span></td>\
+            <td><a href="http://www.be-oi.be/" style="display:inline-block;text-align:right;">beOI contest</a></td>\
+            </table>\
+        </div>'
       }
    };
 
