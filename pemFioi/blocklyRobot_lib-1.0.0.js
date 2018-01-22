@@ -47,7 +47,7 @@ var getContext = function(display, infos, curLevel) {
                onNumber: "sur un nombre",
                onWritable: "sur un tableau",
                writeNumber: "écrire le nombre",
-               readNumber: "lire le nombre",
+               readNumber: "nombre sur la case",
                pushObject: "pousser l'objet",
                pushableInFront: "poussable devant"
             },
@@ -83,7 +83,7 @@ var getContext = function(display, infos, curLevel) {
                onNumber: "surNombre",
                onWritable: "surTableau",
                writeNumber: "ecrireNombre",
-               readNumber: "lireNombre",
+               readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
                pushableInFront: "poussableDevant"
             },
@@ -272,14 +272,14 @@ var getContext = function(display, infos, curLevel) {
                   pushObject: "pousser la caisse",
                   onContainer: "sur une case marquée",
                   pushableInFront: "caisse devant",
-                  obstacleInFront: "mur devant",
+                  obstacleInFront: "obstacle devant",
                   readNumber: "nombre sur la case"
                },
                code: {
                   pushObject: "pousserCaisse",
                   onContainer: "surCaseMarquee",
                   pushableInFront: "caisseDevant",
-                  obstacleInFront: "murDevant",
+                  obstacleInFront: "obstacleDevant",
                   readNumber: "nombreSurCase"
                },   
                messages: {
@@ -571,7 +571,8 @@ var getContext = function(display, infos, curLevel) {
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             cone: { num: 3, img: "cone.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
             contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 },
-            fixed_cone: { num: 5, img: "cone.png", side: 60, isObstacle: true, zOrder: 1 }
+            fixed_cone: { num: 5, img: "cone.png", side: 60, isObstacle: true, zOrder: 1 },
+            number: { num: 6, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -788,7 +789,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       for(var param in contextParams[name]) {
-         if(infos.param === undefined) {
+         if(infos[param] === undefined) {
             infos[param] = contextParams[name][param];
          }
       }
@@ -1750,9 +1751,13 @@ var getContext = function(display, infos, curLevel) {
       context.bag.push(withdrawable);
       
       if(context.display) {
-         context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
+         if (infos.actionDelay > 0) {
+            context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
+               withdrawable.element.remove();
+            }, infos.actionDelay);
+         } else {
             withdrawable.element.remove();
-         }, infos.actionDelay);
+         }
       }
    };
    
@@ -1774,7 +1779,7 @@ var getContext = function(display, infos, curLevel) {
          object.row = item.row;
          object.col = item.col;
          var itemsOn = context.getItemsOn(item.row, item.col);
-         var maxi = 0;
+         var maxi = object.zOrder;
          for(var item in itemsOn) {
             if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
                maxi = itemsOn[item].zOrder;
