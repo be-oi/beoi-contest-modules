@@ -383,7 +383,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
       startingBlock: true, 
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "https://manage-static.be-oi.be/contestAssets/blockly/",
 
       glowingBlock: null,
 
