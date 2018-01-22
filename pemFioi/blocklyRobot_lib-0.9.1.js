@@ -1749,6 +1749,8 @@ var getContext = function(display, infos, curLevel) {
             if (itemTypeNum > 0) {
                cells[iRow][iCol] = paper.rect(0,0,10,10);
             }
+            if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
+               cells[iRow][iCol].attr({'fill': infos.backgroundColor});
          }
       }
       if (infos.showLabels) {
