@@ -41,19 +41,19 @@ var docLanguageStrings = {
   de: {
     lang: 'Deutsch',
 
-    title: 'quickAlgo libraries documentation',
+    title: 'Dokumentation der quickAlgo Libraries',
     library: 'Library:',
-    language: 'Language:',
-    blocklyTitle: 'Documentation for generic Blockly blocks',
-    scratchTitle: 'Documentation for generic Scratch blocks',
-    libTitle: 'Documentation for library',
+    language: 'Sprache:',
+    blocklyTitle: 'Dokumentation der  generischen Blockly-Blocks',
+    scratchTitle: 'Dokumentation der generischen Scratch-Blocks',
+    libTitle: 'Dokumentation der Library',
 
-    category: 'Category “{}”',
-    subcategory: 'Subcategory “{}”',
-    blocklyColumns: ["Display", "Internal name", "Comment"],
-    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
-    nameUndefined: 'undefined!',
-    action: 'Action',
+    category: 'Kategorie “{}”',
+    subcategory: 'Unterkategorie “{}”',
+    blocklyColumns: ["Anzeige", "Interner Name", "Kommentar"],
+    columns: ["Blockname", "Python-Name", "Interner Name", "Typ", "Argumente", "Beschreibung", "Kommentar"],
+    nameUndefined: 'nicht definiert!',
+    action: 'Aktion',
     sensor: 'Sensor'
   },
   es: {

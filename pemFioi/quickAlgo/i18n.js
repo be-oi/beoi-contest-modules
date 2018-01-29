@@ -170,7 +170,7 @@ var localLanguageStrings = {
          logic: "Logik",
          loops: "Schleifen",
          control: "Contrôles",
-         operator: "Opérateurs",
+         operator: "Operatoren",
          math: "Mathe",
          texts: "Text",
          variables: "Variablen",
@@ -195,7 +195,7 @@ var localLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Von vorne anfangen", // TODO :: translate and next 5
+      stopProgramDesc: "Von vorne anfangen",
       stepProgramDesc: "Schritt für Schritt",
       slowSpeedDesc: "Für diesen Test ausführen",
       mediumSpeedDesc: "Mittlere Geschwindigkeit",
@@ -205,22 +205,22 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Generiere von Blockly-Blöcken",
-      loadExample: "Insert example", // TODO :: translate
-      saveOrLoadButton: "Load / save", // TODO :: translate
+      loadExample: "Lade Beispiel",
+      saveOrLoadButton: "Laden / Speichern",
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
-      limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
-      limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
-      limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
+      limitBlocksOver: "{remainingBlocks} Bausteine über dem Limit von {maxBlocks} verbraucht.",
+      limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
+      limitElementsOver: "{remainingBlocks} Bausteine über dem Limit von {maxBlocks} verbraucht.",
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
-      emptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.", // TODO :: translate this one and next 9
+      emptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke, um ein Programm zu schreiben.",
       tooManyBlocks: "Du benutzt zu viele Bausteine!",
       uninitializedVar: "Nicht initialisierte Variable:",
       valueTrue: 'wahr',
