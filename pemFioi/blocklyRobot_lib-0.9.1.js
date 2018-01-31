@@ -268,7 +268,9 @@ var getContext = function(display, infos, curLevel) {
             number: "Anzahl Objekte",
             exists: "Objekt vorhanden",
             trans_row: "Zeile des Objekts",
-            trans_col: "Spalte des Objekts"
+            trans_col: "Spalte des Objekts",
+            decrement: "1 an der Zahl im Kästchen abziehen",
+            numberIsZero: "Ist der Roboter auf 0"
          },
          code: {
             wait: "warte",
