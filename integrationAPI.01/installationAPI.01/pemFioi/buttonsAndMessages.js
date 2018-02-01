@@ -253,7 +253,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht. Du kannst {0}.",
          reloadSubmittedAnswer: "Lade die Lösung, die du eingereicht hast",
          difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen.",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard." // to be translated 
       },
       nl: {
          version: "Versie",
@@ -322,7 +322,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "De wedstrijd is reeds afgelopen, je antwoord werd niet bewaard. Je kan {0}.",
          reloadSubmittedAnswer: "het antwoord herlanden dat je hebt ingediend",
          difficultyWarning: "<strong>Let op</strong>: deze versie oplossen vraagt tijd.<br/>Je kan waarschijnlijk sneller de versies met 2 of 3 sterren van andere vragen oplossen.",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard." /* to be translated */
+         enemyWarning: "<strong>Let op :</strong> in deze opdracht, zorgt de computer ervoor dat je de oplossing niet per toeval kan vinden."
       },
       ar: {
          version: "المستوى",
