@@ -48,7 +48,7 @@
          'showSolution': 'Lösung anzeigen',
          'yourScore': "Dein Punktestand:",
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
-         'gradeAnswer': 'Test grader'
+         'gradeAnswer': 'Test grader' /* to be translated */
       },
       nl: {
          'task': 'Vraag',
@@ -59,7 +59,7 @@
          'showSolution': 'Toon de oplossing',
          'yourScore': "Jouw score:",
          'canReadSolution': "Je kan de oplossing nu zien onderaan deze pagina.",
-         'gradeAnswer': 'Test grader' /* to be translated */
+         'gradeAnswer': 'Test de evaluator' 
       },
       es: {
          'task': 'Problema',
