@@ -338,8 +338,8 @@ var getContext = function(display, infos, curLevel) {
             exists: "objektVorhanden",
             trans_row: "zeileObjekt",
             trans_col: "spalteObjekt",
-			
-			decrement: "decrement",			/* to be translated */
+
+            decrement: "decrement",			/* to be translated */
             numberIsZero: "numberIsZero"    /* to be translated */
          },
 
