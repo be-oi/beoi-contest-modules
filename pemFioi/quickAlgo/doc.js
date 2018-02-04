@@ -73,7 +73,25 @@ var docLanguageStrings = {
     nameUndefined: 'undefined!',
     action: 'Action',
     sensor: 'Sensor'
-  }
+  },
+  nl: {
+    lang: 'Nederlands',
+
+    title: 'Documentatie van de quickAlgo bibliotheken',
+    library: 'Bibliotheek :',
+    language: 'Taal :',
+    blocklyTitle: 'Documentatie voor generieke Blockly blokken',
+    scratchTitle: 'Documentatie voor generieke Scratch blokken',
+    libTitle: 'Documentatie van de bibliotheek',
+
+    category: 'Categorie “{}”',
+    subcategory: 'Subcategorie “{}”',
+    blocklyColumns: ["Afgebeelde naam", "Interne naam", "Commentaar"],
+    columns: ["Naam blok", "Naam Python", "Interne naam", "Type", "Argumenten", "Beschrijving", "Commentaar"],
+    nameUndefined: 'niet gedefinieerd!',
+    action: 'Actie',
+    sensor: 'Sensor'
+  },
 };
 
 // Comments for each Blockly/Scratch block
