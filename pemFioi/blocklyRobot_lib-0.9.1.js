@@ -337,7 +337,10 @@ var getContext = function(display, infos, curLevel) {
             number: "anzahlObjekte",
             exists: "objektVorhanden",
             trans_row: "zeileObjekt",
-            trans_col: "spalteObjekt"
+            trans_col: "spalteObjekt",
+			
+			decrement: "decrement",			/* to be translated */
+            numberIsZero: "numberIsZero"    /* to be translated */
          },
 
          messages: {
@@ -357,11 +360,35 @@ var getContext = function(display, infos, curLevel) {
             failureAllMarblesInHoles: "Der Roboter hat die Murmeln nicht richtig abgelegt.",
             leavesGrid: "Der Roboter hat das Gitter verlassen!"
          },
-         description: {
+         description: {		/* to be translated */
+            platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
+            obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
+            onHole: "surTrou() : le robot est-il sur un trou ?",
+            onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+            onRoundObject: "surRond() : le robot est-il sur un objet rond ?",
+            onSquareObject: "surCarre() : le robot est-il sur un objet carré ?",
+            onTriangleObject: "surTriangle() : le robot est-il sur un objet triangle ?",
+            onDottedObject: "surObjetPoints() : le robot est-il sur un objet rempli de points ?",
+            onFullObject: "surObjetPlein() : le robot est-il sur un objet plein ?",
+            onStripedObject: "surObjetRaye() : le robot est-il sur un objet rayé ?",
+            paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
+            gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
+            gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
+            gridEdgeWest: "bordGrilleDroite() : le bord de la grille est-il juste à droite du robot ?",
+            gridEdgeAbove: "bordGrilleAuDessus() : le bord de la grille est-il juste au dessus du robot ?",
+            gridEdgeBelow: "bordGrilleEnDessous() : le bord de la grille est-il juste en dessous du robot ?",
+            platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
+            numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
+            col: "colonne() : colonne du robot",
+            row: "ligne() : ligne du robot",
+            paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
+            paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
+            paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
+            writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot",
+            decrement: "decrement(): soustrait 1 à la valeur actuelle de la case du robot"
          },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
          startingBlockName: "Roboter-Programm",
-
          exit_grid: "Der Roboter hat das Gitter verlassen!",
          nothingToPickUp: "Hier gibt es nichts zum aufheben!",
          alreadyTransportingObject: "Der Roboter transportiert bereits etwas.",
@@ -906,7 +933,7 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "rijTransportable",
             trans_col: "kolomTransportable",
 
-            decrement: "trek-1-af",
+            decrement: "trekEenAf",
             numberIsZero: "nummerIsNul"
          },
          messages: {
@@ -951,7 +978,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthWest: "kleurLinksboven() : is het vakje linksboven gekleurd?",
             paintNorthEast: "kleurRechtsboven() : is het vakje rechtsboven gekleurd?",
             writeNumber: "schrijfNummer(nummer) : schrijf dit nummer op het vakje van de robot",
-            decrement: "trek-1-af(): trek 1 af van het nummer van het vakje van de robot"
+            decrement: "trekEenAf(): trek 1 af van het nummer van het vakje van de robot"
          },
          obstacle: "De robot probeert zich te verplaatsen op een obstakel!",
          startingBlockName: "Programma van de robot",
