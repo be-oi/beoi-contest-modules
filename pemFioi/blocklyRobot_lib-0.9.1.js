@@ -339,8 +339,8 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "zeileObjekt",
             trans_col: "spalteObjekt",
 
-            decrement: "decrement",			/* to be translated */
-            numberIsZero: "numberIsZero"    /* to be translated */
+            decrement: "dekrementiere",			/* to be translated */
+            numberIsZero: "zahlIstNull"    /* to be translated */
          },
 
          messages: {
