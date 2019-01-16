@@ -175,7 +175,7 @@ if (!isCrossDomain()) {
       }
    };
    platform.stop = function() {
-      platform.chan.destroy(); 
+      platform.chan.destroy();
    };
    platform.validate = function (sMode, success, error) {
       if (!success) success = function(){}; // not mandatory, as most code doesn't use it
@@ -882,7 +882,7 @@ window.displayHelper = {
          }
          addTaskHTML += '</div>';
          if (!document.getElementById('displayHelperAnswering')) {
-            $(self.taskSelector).append(addTaskHTML);   
+            $(self.taskSelector).append(addTaskHTML);
          }
          self.loaded = true;
          self.timeLoaded = new Date().getTime();
@@ -982,7 +982,7 @@ window.displayHelper = {
          task.reloadStateObject(task.getDefaultStateObject(), true);
          task.reloadAnswerObject(task.getDefaultAnswerObject());
       }
-      
+
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
@@ -1101,7 +1101,7 @@ window.displayHelper = {
          }
      }
    },
-   
+
    useFullWidth: function() {
       // TODO: find a clean way to do this
       try {
@@ -1144,7 +1144,7 @@ window.displayHelper = {
       state.level = newLevel;
       this.taskLevel = newLevel;
       var self = this;
-      
+
       var afterReload = function() {
          self.submittedScore = self.levelsScores[self.taskLevel];
          self.refreshMessages = true;
@@ -1157,7 +1157,7 @@ window.displayHelper = {
                self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
-               var easyVersionKey = "levelVersionName_easy"; 
+               var easyVersionKey = "levelVersionName_easy";
                if (self.pointsAsStars) {
                   hardVersionKey += "_stars";
                   easyVersionKey += "_stars";
@@ -1171,7 +1171,7 @@ window.displayHelper = {
             }
          }
       };
-      
+
       if(self.reloadWithCallbacks) {
          task.reloadStateObject(state, function() {
             task.reloadAnswerObject(answer, afterReload);
@@ -1359,12 +1359,12 @@ window.displayHelper = {
          });
       }
    },
-   
+
    setValidateString: function(str) {
       this.customValidateString = str;
-      $("#displayHelper_validate > input").val(str);      
+      $("#displayHelper_validate > input").val(str);
    },
-   
+
    callValidate: function() {
       if (this.customValidate != undefined) {
          this.customValidate();
@@ -1640,7 +1640,7 @@ window.displayHelper = {
          if (!this.hasSolution) {
             if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = this.strings.yourScoreIsNow;
-            } else if (this.prevSavedScore > this.submittedScore) { 
+            } else if (this.prevSavedScore > this.submittedScore) {
                scoreDiffMsg = this.strings.worseScoreStays;
                showRetrieveAnswer = true;
             }
@@ -1711,7 +1711,7 @@ window.displayHelper = {
                   } else {
                      message += this.strings.forMorePointsMoveToNextLevel;
                   }
-               } else if (this.submittedScore < prevScore) { 
+               } else if (this.submittedScore < prevScore) {
                   message += this.strings.youDidBetterBefore;
                   showRetrieveAnswer = true;
                }
@@ -1738,7 +1738,7 @@ window.displayHelper = {
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
                   return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
-               } 
+               }
             }
             break;
       }
@@ -1792,7 +1792,7 @@ window.displayHelper = {
       this.initLanguage();
       var self = this;
       this.refreshMessages = false;
-      var suffix, prefix; 
+      var suffix, prefix;
       if (this.hasAnswerChanged) {
          suffix = 'changed';
       } else {
@@ -1951,7 +1951,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       [[22, 90], [50, 77], [78, 90], [75, 60], [25, 60]]
    ];
 
-   
+
    if ($('#' + id).length == 0) {
       return;
    }
@@ -1966,7 +1966,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
          fill: fillColors[mode],
          stroke: 'none'
       }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
-      
+
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
       if (xClip > 0) {
@@ -2423,7 +2423,7 @@ window.implementGetResources = function(task) {
       if (!res.title) {
          res.title = $('title').text();
       }
-      
+
       // Resources
       var curDest = 'task';
       var curType = 'javascript';
@@ -2471,14 +2471,14 @@ window.implementGetResources = function(task) {
          else {
             curDest = res.task;
          }
-         
+
          if ($(this).is('script')) {
             curType = 'javascript';
          }
          else if ($(this).is('style') || $(this).is('link')) {
             curType = 'css';
          }
-         
+
          if ($(this).attr('src')) {
             curDest.push({ type: curType, url: $(this).attr('src'), id: $(this).attr('id') });
          }
