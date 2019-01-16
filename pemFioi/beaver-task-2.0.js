@@ -444,6 +444,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(result.successRate > 0) {
             score = Math.round(result.successRate * (maxScore - minScore) + minScore);
          }
+         if("multiplier" in result) {
+            score = Math.round(score * result.multiplier);
+         }
          callback({
             score: score,
             message: result.message
