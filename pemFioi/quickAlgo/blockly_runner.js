@@ -38,7 +38,7 @@ function initBlocklyRunner(context, messageCallback) {
          var itp = interpreters[0];
          if(itp.isa(value, itp.ARRAY)) {
             var strs = [];
-            for(var i = 0; i < value.length; i++) {
+            for(var i = 0; i < value.properties.length; i++) {
                strs[i] = runner.valueToString(value.properties[i]);
             }
             return '['+strs.join(', ')+']';
@@ -77,7 +77,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
          return value;
       };
-      
+
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             runner.stackCount = 0;
@@ -91,10 +91,33 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
+      runner.waitEvent = function(callback, target, eventName, func) {
+         runner.stackCount = 0;
+         var listenerFunc = null;
+         listenerFunc = function(e) {
+            target.removeEventListener(eventName, listenerFunc);
+            runner.noDelay(callback, func(e));
+         };
+         target.addEventListener(eventName, listenerFunc);
+      };
+
+      runner.waitCallback = function(callback, value) {
+         // Returns a callback to be called once we can continue the execution
+         runner.stackCount = 0;
+         return function() {
+            runner.noDelay(callback, value);
+         }
+      };
+
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value != undefined) {
-            primitive = interpreters[context.curRobot].createPrimitive(value);
+            if(typeof value.length != 'undefined') {
+               // It's an array, create a primitive out of it
+               primitive = interpreters[context.curRobot].nativeToPseudo(value);
+            } else {
+               primitive = value;
+            }
          }
          if (runner.stackCount > 100) {
             runner.stackCount = 0;
@@ -112,6 +135,23 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.initInterpreter = function(interpreter, scope) {
+         // Wrapper for async functions
+         var createAsync = function(func) {
+            return function() {
+               var args = [];
+               for(var i=0; i < arguments.length-1; i++) {
+                  // TODO :: Maybe JS-Interpreter has a better way of knowing?
+                  if(typeof arguments[i] != 'undefined' && arguments[i].isObject) {
+                     args.push(interpreter.pseudoToNative(arguments[i]));
+                  } else {
+                     args.push(arguments[i]);
+                  }
+               }
+               args.push(arguments[arguments.length-1]);
+               func.apply(func, args);
+               };
+         };
+
          var makeHandler = function(runner, handler) {
             // For commands belonging to the "actions" category, we count the
             // number of actions to put a limit on steps without actions
@@ -120,7 +160,7 @@ function initBlocklyRunner(context, messageCallback) {
                handler.apply(this, arguments);
             };
          };
-         
+
          for (var objectName in context.customBlocks) {
             for (var category in context.customBlocks[objectName]) {
                for (var iBlock in context.customBlocks[objectName][category]) {
@@ -136,35 +176,58 @@ function initBlocklyRunner(context, messageCallback) {
                   } else {
                      var handler = blockInfo.handler;
                   }
-                  
-                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
+
+                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(createAsync(handler)));
                }
-            }            
+            }
          }
-         
-         
+
+         var makeNative = function(func) {
+            return function() {
+               var value = func.apply(func, arguments);
+               var primitive = undefined;
+               if (value != undefined) {
+                  if(typeof value.length != 'undefined') {
+                     // It's an array, create a primitive out of it
+                     primitive = interpreters[context.curRobot].nativeToPseudo(value);
+                  } else {
+                     primitive = value;
+                  }
+               }
+               return primitive;
+            };
+         }
+
+         if(Blockly.JavaScript.externalFunctions) {
+            for(var name in Blockly.JavaScript.externalFunctions) {
+               interpreter.setProperty(scope, name, interpreter.createNativeFunction(makeNative(Blockly.JavaScript.externalFunctions[name])));
+            }
+         }
+
          /*for (var objectName in context.generators) {
             for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
                var generator = context.generators[objectName][iGen];
                interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
             }
          }*/
-         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
+         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(createAsync(context.program_end)));
 
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
-            
+
             if (context.display) {
-               if(!runner.scratchMode) {
-                  context.blocklyHelper.workspace.traceOn(true);
-                  context.blocklyHelper.workspace.highlightBlock(id);
-                  highlightPause = true;
-               } else {
-                  context.blocklyHelper.glowBlock(id);
-                  highlightPause = true;
-               }
+               try {
+                  if(!runner.scratchMode) {
+                     context.blocklyHelper.workspace.traceOn(true);
+                     context.blocklyHelper.workspace.highlightBlock(id);
+                     highlightPause = true;
+                  } else {
+                     context.blocklyHelper.glowBlock(id);
+                     highlightPause = true;
+                  }
+               } catch(e) {}
             }
-            
+
             // We always execute directly the first highlightBlock
             if(runner.firstHighlight || !runner.stepMode) {
                runner.firstHighlight = false;
@@ -179,11 +242,11 @@ function initBlocklyRunner(context, messageCallback) {
          }
 
          // Add an API function for highlighting blocks.
-         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(highlightBlock));
+         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(createAsync(highlightBlock)));
 
          // Add an API function to report a value.
          interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
-        
+
       };
 
       runner.stop = function() {
@@ -237,6 +300,7 @@ function initBlocklyRunner(context, messageCallback) {
                      context.curSteps[iInterpreter].withoutAction++;
                   }
                }
+
                if (!context.programEnded[iInterpreter]) {
                   if (context.curSteps[iInterpreter].total >= runner.maxIter) {
                      isRunning[iInterpreter] = false;
@@ -248,6 +312,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
          } catch (e) {
+            context.onExecutionEnd && context.onExecutionEnd();
             runner.stepInProgress = false;
 
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
@@ -255,7 +320,7 @@ function initBlocklyRunner(context, messageCallback) {
                context.programEnded[iInterpreter] = true;
             }
 
-            var message = e.toString();
+            var message = e.message || e.toString();
 
             // Translate "Unknown identifier" message
             if(message.substring(0, 20) == "Unknown identifier: ") {
@@ -269,7 +334,11 @@ function initBlocklyRunner(context, messageCallback) {
                }
                message = runner.strings.uninitializedVar + ' ' + varName;
             }
-            
+
+            if(message.indexOf('undefined') != -1) {
+               message += '. ' + runner.strings.undefinedMsg;
+            }
+
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
                if (context.success) {
                   message = context.messagePrefixSuccess + message;
@@ -278,12 +347,15 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
             if (context.success) {
-               message = "<span style='color:green;font-weight:bold'>" + message + "</span>"; 
+               message = "<span style='color:green;font-weight:bold'>" + message + "</span>";
                if (context.linkBack) {
                   //message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
             }
             runner.delayFactory.destroyAll();
+            if(window.quickAlgoInterface) {
+               window.quickAlgoInterface.setPlayPause(false);
+            }
             setTimeout(function() { messageCallback(message); }, 0);
          }
       };

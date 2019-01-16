@@ -33,6 +33,7 @@ var importableModules = function () {
       'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
+      'acorn-walk': {src: modulesPath+"/ext/acorn/walk.js", id: "acorn-walk"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
@@ -53,15 +54,21 @@ var importableModules = function () {
       'blockly_nl': {src: modulesPath+"/ext/blockly/nl.js", id: "blockly_nl"},
       'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
       'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},
+      'blockly_sl': {src: modulesPath+"/ext/blockly/sl.js", id: "blockly_sl"},
       'blockly_fioi': {src: modulesPath+"/ext/blockly-fioi/fioi-blockly.min.js", id: "blockly_fioi"},
 
       'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
       'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"}, // for BWINF legacy
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
+      'blockly-printer2': {src: modulesPath+"/pemFioi/blocklyPrinter_lib-2.1.js", id: "blocklyPrinter_lib"},
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
       'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
       'blockly-template': {src: modulesPath+"/pemFioi/blocklyTemplate_lib.js", id: "blocklyTemplate_lib"},
       'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
+
+      'blockly-isndraw': {src: modulesPath+"/pemFioi/blocklyIsnDraw_lib.js", id: "blocklyIsnDraw_lib"},
+      'blockly-maths': {src: modulesPath+"/pemFioi/blocklyMaths_lib.js", id: "blocklyMaths_lib"},
+      'blockly-printer-2.0': {src: modulesPath+"/pemFioi/blocklyPrinter_lib-2.0.js", id: "blocklyPrinter_lib-2.0"},
 
       'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},
       'quickAlgo_i18n': {src: modulesPath+"/pemFioi/quickAlgo/i18n.js", id: "quickAlgo_i18n"},
@@ -87,7 +94,36 @@ var importableModules = function () {
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
       'simple_draw': {src: modulesPath+"/pemFioi/javascool/simple_draw.js", id: "simple_draw"},
-      'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"}
+      'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"},
+
+      'p5': {src: modulesPath+"/pemFioi/p5/p5.js", id: "p5"},
+      'p5.sound': {src: modulesPath+"/pemFioi/p5/p5.sound.js", id: "p5.sound"},
+      'player_p5': {src: modulesPath+"/pemFioi/p5/player_p5.js", id: "player_p5"},
+      'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
+
+      'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
+      'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"},
+
+      'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
+      'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
+      'database_css': {type: "stylesheet", src: modulesPath+"/pemFioi/database/styles.css", id: "database_css"},
+
+      'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
+      'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
+      'logger': {src: modulesPath+"/pemFioi/shared/logger.js", id: "logger"},
+
+      'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
+      'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
+      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
+
+      // Bundles
+      'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
+      'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
+      'js-interpreter': {src: modulesPath+"bundles/js-interpreter.js", id: "bundle-js-interpreter"},
+      'blockly-base': {src: modulesPath+"bundles/blockly-base.js", id: "bundle-blockly-base"},
+      'scratch-base': {src: modulesPath+"bundles/scratch-base.js", id: "bundle-scratch-base"},
+      'quickAlgo-all-blockly': {src: modulesPath+"bundles/quickAlgo-all-blockly.js", id: "bundle-quickAlgo-all-blockly"},
+      'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"}
    }
 }
 
@@ -96,6 +132,7 @@ var languageScripts = function () {
    return {
       blockly: [
          'acorn',
+         'acorn-walk',
          'interpreter',
          'blockly',
          'blockly_blocks',
@@ -115,6 +152,7 @@ var languageScripts = function () {
       ],
       scratch: [
          'acorn',
+         'acorn-walk',
          'interpreter',
          'scratch',
          'scratch_blocks_common',
@@ -154,6 +192,19 @@ var languageScripts = function () {
    }
 }
 
+var bundledModules = function () {
+   // List of bundles and which modules they include
+   // How to import the bundles is defined in importableModules
+   return [
+      {name: 'bebras-base', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'beaver-task-2.0', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0']},
+      {name: 'bebras-interface', included: ['platform-pr', 'buttonsAndMessages', 'beav-1.0', 'installationAPI.01', 'miniPlatform']},
+      {name: 'js-interpreter', included: ['acorn', 'acorn-walk', 'interpreter']},
+      {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
+      {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
+      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
+      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
+   ];
+};
 
 // from http://stackoverflow.com/questions/979975/
 var QueryString = function () {
@@ -180,10 +231,47 @@ var QueryString = function () {
 }();
 
 
+function getBundles(modulesList) {
+   // Check modulesList for modules which are already bundled together
+
+   // For now, only do it if useBundles is true
+   if(!window.useBundles) { return modulesList; }
+
+   if(typeof bundledModules == 'function') {
+      bundledModules = bundledModules();
+   }
+   for(var iBundle in bundledModules) {
+      var bundleIncludes = bundledModules[iBundle].included;
+      var newModulesList = modulesList.slice();
+      var isFirst = true;
+      var ok = true;
+      for(var iMod in bundleIncludes) {
+         var idx = newModulesList.indexOf(bundleIncludes[iMod]);
+         if(idx == -1) {
+            ok = false;
+            break;
+         }
+         if(isFirst) {
+            // Include the name of the bundle to include instead
+            newModulesList.splice(idx, 1, bundledModules[iBundle].name);
+            isFirst = false;
+         } else {
+            newModulesList.splice(idx, 1);
+         }
+      }
+      if(ok) {
+         modulesList = newModulesList;
+      }
+   }
+   return modulesList;
+}
+
+
 function importModules(modulesList) {
    if(typeof importableModules == 'function') {
       importableModules = importableModules();
    };
+   modulesList = getBundles(modulesList);
    var modulesStr = '';
    for(var iMod in modulesList) {
       var moduleName = modulesList[iMod];
@@ -198,6 +286,10 @@ function importModules(modulesList) {
 
          var modClass = curModule.classStr ? curModule.classStr : 'module';
          var modSrc = curModule.src;
+         if(QueryString.v) {
+            // Add v= parameters to the URLs
+            modSrc += (modSrc.indexOf('?') > -1 ? '&' : '?') + 'v=' + QueryString.v;
+         }
          var modId = curModule.id ? curModule.id : moduleName;
          if(curModule.type == 'stylesheet') {
             modulesStr += '<link class="'+modClass+'" rel="stylesheet" type="text/css" href="'+modSrc+'" id="'+modId+'">';

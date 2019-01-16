@@ -206,3 +206,12 @@ function debounce(fn, threshold, wait) {
       timeout = setTimeout(delayed, threshold || 100);
    }
 }
+
+function addInSet(l, val) {
+   // Add val to list l if not already present
+   if(l.indexOf(val) == -1) {
+      l.push(val);
+   }
+}
+
+window.iOSDetected = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));

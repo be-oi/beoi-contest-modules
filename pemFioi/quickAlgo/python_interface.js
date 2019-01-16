@@ -8,7 +8,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * Class properties
    */
   this._nbTestCases = nbTestCases;
-  this._maxInstructions = maxInstructions || undefined;
+  this._maxInstructions = maxInstructions || null;
   this.language = 'python';
   this._textFile = null;
   this._extended = false;
@@ -23,6 +23,8 @@ function LogicController(nbTestCases, maxInstructions) {
   this._startingBlock = true;
   this._visible = true;
   this._strings = window.languageStrings;
+  this._options = {};
+  this._readOnly = false;
   this.includeBlocks = null;
 
   this.loadContext = function (mainContext) {
@@ -53,13 +55,14 @@ function LogicController(nbTestCases, maxInstructions) {
     this.language = e.value;
   };
 
-  this.load = function (language, display, nbTestCases, _options) {
+  this.load = function (language, display, nbTestCases, options) {
     this._nbTestCases = nbTestCases;
+    this._options = options;
     this._loadBasicEditor();
-    
+
     if(this._aceEditor && ! this._aceEditor.getValue()) {
-      if(_options.defaultCode !== undefined)
-         this._aceEditor.setValue(_options.defaultCode);
+      if(options.defaultCode !== undefined)
+         this._aceEditor.setValue(options.defaultCode);
       else
          this._aceEditor.setValue(this.getDefaultContent());
     }
@@ -67,6 +70,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.unload = function () {
     this.stop();
+    this._unbindEditorEvents();
   };
 
   this.unloadLevel = this.unload;
@@ -93,9 +97,13 @@ function LogicController(nbTestCases, maxInstructions) {
       display("Le mot-clé "+forbidden+" est interdit ici !");
       return false;
     }
-    if(pythonCount(code) > maxInstructions) {
+    if(maxInstructions && pythonCount(code) > maxInstructions) {
       display("Vous utilisez trop d'éléments Python !");
       return false;
+    }
+    var limited = this.findLimited(code);
+    if(limited) {
+      display('Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".');
     }
     if(pythonCount(code) <= 0) {
       display("Vous ne pouvez pas valider un programme vide !");
@@ -150,7 +158,14 @@ function LogicController(nbTestCases, maxInstructions) {
     var code = codes[0];
 
     // Abort if code is not valid
-    if(!this.checkCode(code, function(err) { $('#errors').html(err); })) {
+    if(!this.checkCode(code, function(err) {
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(err);
+        window.quickAlgoInterface.setPlayPause(false);
+      } else {
+        $('#errors').html(err);
+      }
+    })) {
        return;
     }
 
@@ -196,7 +211,12 @@ function LogicController(nbTestCases, maxInstructions) {
             var xml = Blockly.Xml.textToDom(code);
             that.programs[0][that.player].blockly = code;
           } catch (e) {
-            $("#errors").html(that.strings.invalidContent);
+
+            if(window.quickAlgoInterface) {
+              window.quickAlgoInterface.displayError(that._strings.invalidContent);
+            } else {
+              $("#errors").html(that._strings.invalidContent);
+            }
           }
           that.languages[that.player] = "blockly";
         } else {
@@ -208,7 +228,12 @@ function LogicController(nbTestCases, maxInstructions) {
 
       reader.readAsText(file);
     } else {
-      $("#errors").html(this.strings.unknownFileType);
+
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(this._strings.unknownFileType);
+      } else {
+        $("#errors").html(this._strings.unknownFileType);
+      }
     }
   };
   this.saveProgram = function () {
@@ -267,49 +292,85 @@ function LogicController(nbTestCases, maxInstructions) {
       $('#languageInterface').html(
         this._loadEditorWorkSpace()
       );
+      if(window.quickAlgoResponsive) {
+        $('#blocklyLibContent').prepend('<div class="pythonIntroSimple"></div>');
+        $('#editorBar').prependTo('#languageInterface');
+      }
       this._loadAceEditor();
       this._bindEditorEvents();
+      this.updateTaskIntro();
     }
+  };
+  this.onResize = function() {
+    // On resize function to be called by the interface
+    this._aceEditor.resize();
   };
   this._loadAceEditor = function () {
     this._aceEditor = ace.edit('python-workspace');
+    this._aceEditor.setOption('readOnly', !!this._options.readOnly);
     this._aceEditor.$blockScrolling = Infinity;
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
   };
+
+  this.findLimited = function(code) {
+    if(this._mainContext.infos.limitedUses) {
+      return pythonFindLimited(code, this._mainContext.infos.limitedUses, this._mainContext.strings.code);
+    } else {
+      return false;
+    }
+  };
+
+  this.getCapacityInfo = function() {
+    // Handle capacity display
+    var code = this._aceEditor.getValue();
+
+    var forbidden = pythonForbidden(code, this.includeBlocks);
+    if(forbidden) {
+      return {text: "Mot-clé interdit utilisé : "+forbidden, invalid: true, type: 'forbidden'};
+    }
+    var text = '';
+    var remaining = 1;
+    if(maxInstructions) {
+      remaining = maxInstructions - pythonCount(code);
+      var optLimitElements = {
+        maxBlocks: maxInstructions,
+        remainingBlocks: Math.abs(remaining)
+      };
+      var strLimitElements = remaining < 0 ? this._strings.limitElementsOver : this._strings.limitElements;
+      text = strLimitElements.format(optLimitElements);
+    }
+    if(remaining < 0) {
+      return {text: text, invalid: true, type: 'capacity'};
+    }
+    var limited = this.findLimited(code);
+    if(limited) {
+      return {text: 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".', invalid: true, type: 'limited'};
+    } else if(remaining == 0) {
+      return {text: text, warning: true, type: 'capacity'};
+    }
+    return {text: text, type: 'capacity'};
+  };
+
+  this._removeDropDownDiv = function() {
+    $('.blocklyDropDownDiv').remove();
+  }
+
   this._bindEditorEvents = function () {
-    $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
+    $('body').on('click', this._removeDropDownDiv);
     var that = this;
     var onEditorChange = function () {
-      if(!maxInstructions || !that._aceEditor) { return; }
+      if(!that._aceEditor) { return; }
 
       if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
         that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
         that._mainContext.runner._editorMarker = null;
       }
 
-      var code = that._aceEditor.getValue();
-
-      var forbidden = pythonForbidden(code, that.includeBlocks);
-      if(forbidden) {
-        $('#capacity').html("Mot-clé interdit utilisé : "+forbidden);
-        quickAlgoInterface.blinkRemaining(5, true);
-        return;
-      }
-
-      var remaining = maxInstructions - pythonCount(code);
-      var optLimitElements = {
-         maxBlocks: maxInstructions,
-         remainingBlocks: Math.abs(remaining)
-         };
-      var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
-      $('#capacity').html(strLimitElements.format(optLimitElements));
-      if(remaining == 0) {
-         quickAlgoInterface.blinkRemaining(4);
-      } else if(remaining < 0) {
-         quickAlgoInterface.blinkRemaining(5, true);
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
       } else {
-         quickAlgoInterface.blinkRemaining(0);
+        $('#capacity').html(that.getCapacityInfo().text);
       }
 
       // Interrupt any ongoing execution
@@ -318,13 +379,21 @@ function LogicController(nbTestCases, maxInstructions) {
          that._mainContext.reset();
       }
 
-      $('#errors').html('');
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(null);
+      } else {
+        $("#errors").html('');
+      }
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();
     }
     this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
+
+  this._unbindEditorEvents = function () {
+    $('body').off('click', this._removeDropDownDiv);
+  }
 
   this.getAvailableModules = function () {
     if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
@@ -341,20 +410,22 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.updateTaskIntro = function () {
-    var pythonDiv = $('#taskIntro .pythonIntro');
-    if(pythonDiv.length == 0) {
-      pythonDiv = $('<hr />'
-        + '<div class="pythonIntro">'
+    if(!this._mainContext.display) { return; }
+    if($('.pythonIntro').length == 0) {
+      quickAlgoInterface.appendTaskIntro('<hr class="pythonIntroElement long" />'
+        + '<div class="pythonIntro pythonIntroElement long">'
         + '  <div class="pythonIntroSimple"></div>'
         + '  <div class="pythonIntroFull"></div>'
         + '  <div class="pythonIntroBtn"></div>'
-        + '</div>').appendTo('#taskIntro');
+        + '</div>');
     }
 
+    $('.pythonIntro').off('click', 'code');
     if(this._mainContext.infos.noPythonHelp) {
-       pythonDiv.html('');
+       $('.pythonIntroElement').css('display', 'none');
        return;
     }
+    $('.pythonIntroElement').css('display', '');
 
     var fullHtml = '';
     var simpleHtml = '';
@@ -400,7 +471,6 @@ function LogicController(nbTestCases, maxInstructions) {
           fullHtml += '<li>' + blockDesc + '</li>';
           simpleElements.push(funcProto);
         }
-        simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
 
         // Handle constants as well
         if(this._mainContext.customConstants && this._mainContext.customConstants[generatorName]) {
@@ -414,6 +484,7 @@ function LogicController(nbTestCases, maxInstructions) {
           }
         }
       }
+      simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
       fullHtml += '</ul>';
     }
 
@@ -424,13 +495,19 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
 
-    function processForbiddenList(list, word) {
-      var elifIdx = list.indexOf('elif');
-      if(elifIdx >= 0) {
-        list.splice(elifIdx, 1);
+    function processForbiddenList(origList, allowed) {
+      var list = origList.slice();
+
+      var hiddenWords = ['__getitem__', '__setitem__', 'elif'];
+      for(var i = 0; i < hiddenWords.length; i++) {
+        var word = hiddenWords[i];
+        var wIdx = list.indexOf(word);
+        if(wIdx > -1) {
+          list.splice(wIdx, 1);
+        }
       }
 
-      var bracketsWords = { list_brackets: 'crochets [ ]', dict_brackets: 'accolades { }' };
+      var bracketsWords = { list_brackets: 'crochets [ ]+[]', dict_brackets: 'accolades { }+{}', var_assign: 'variables+x =' };
       for(var bracketsCode in bracketsWords) {
         var bracketsIdx = list.indexOf(bracketsCode);
         if(bracketsIdx >= 0) {
@@ -438,17 +515,25 @@ function LogicController(nbTestCases, maxInstructions) {
         }
       }
 
+      var word = allowed ? 'autorisé' : 'interdit';
+      var cls = allowed ? '' : ' class="pflForbidden"';
       if(list.length == 1) {
-        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
+        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code'+cls+'>' + list[0] + '</code>.</p>';
       } else if(list.length > 0) {
-        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
+        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code'+cls+'>' + list.join('</code>, <code'+cls+'>') + '</code>.</p>';
       }
       return list;
     }
-    var pflAllowed = processForbiddenList(pflInfos.allowed, 'autorisé');
-    processForbiddenList(pflInfos.forbidden, 'interdit');
+    var pflAllowed = processForbiddenList(pflInfos.allowed, true);
+    processForbiddenList(pflInfos.forbidden, false);
     if(pflAllowed.length) {
       simpleHtml += '<br />Mots-clés autorisés : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
+    }
+
+    if(pflInfos.allowed.indexOf('var_assign') > -1) {
+      fullHtml += '<p>Les variables sont autorisées.</p>';
+    } else {
+      fullHtml += '<p>Les variables sont interdites.</p>';
     }
 
     fullHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
@@ -456,11 +541,34 @@ function LogicController(nbTestCases, maxInstructions) {
     $('.pythonIntroSimple').html(simpleHtml);
     $('.pythonIntroFull').html(fullHtml);
 
-    this.collapseTaskIntro(true);
+    // Display the full details in the responsive version
+    this.collapseTaskIntro(!window.quickAlgoResponsive);
+    if(window.quickAlgoResponsive) {
+        $('.pythonIntroBtn').hide();
+    }
+
+    $('.pythonIntroSimple code, .pythonIntroFull code').each(function() {
+      var elem = $(this);
+      var txt = elem.text();
+      var pIdx = txt.indexOf('+');
+      if(pIdx > -1) {
+        var newTxt = txt.substring(0, pIdx);
+        var code = txt.substring(pIdx+1);
+      } else {
+        var newTxt = txt;
+        var code = txt;
+      }
+      elem.attr('data-code', code);
+      elem.text(newTxt);
+    });
 
     var controller = this;
-    pythonDiv.on('click', 'code', function() {
-      controller._aceEditor && controller._aceEditor.insert(this.textContent);
+    $('.pythonIntroSimple code, .pythonIntroFull code').not('.pflForbidden').on('click', function() {
+      quickAlgoInterface.toggleLongIntro(false);
+      if(controller._aceEditor) {
+        controller._aceEditor.insert(this.getAttribute('data-code'));
+        controller._aceEditor.focus();
+      }
     });
   };
 
@@ -469,12 +577,12 @@ function LogicController(nbTestCases, maxInstructions) {
     var div = $('.pythonIntroBtn').html('');
     if(collapse) {
       $('<a>Plus de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(false); });
-      $('.pythonIntroFull').hide();
-      $('.pythonIntroSimple').show();
+      $('.pythonIntro .pythonIntroFull').hide();
+      $('.pythonIntro .pythonIntroSimple').show();
     } else {
       $('<a>Moins de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(true); });
-      $('.pythonIntroFull').show();
-      $('.pythonIntroSimple').hide();
+      $('.pythonIntro .pythonIntroFull').show();
+      $('.pythonIntro .pythonIntroSimple').hide();
     }
   };
 
@@ -499,6 +607,27 @@ function LogicController(nbTestCases, maxInstructions) {
       $("#grid").css("left", panelWidth + 20 + "px");
     }
     this._prevWidth = panelWidth;
+  };
+  this.resetDisplay = function () {
+    if(this._mainContext.runner) {
+      console.log('ok');
+      this._mainContext.runner.removeEditorMarker();
+    }
+  };
+  this.reload = function () {};
+  this.setReadOnly = function(newState) {
+    // setReadOnly called by quickAlgoInterface
+
+    // TODO :: should we actually set the readOnly flag?
+    return;
+
+    if(!!newState == this._readOnly) { return; }
+    this._readOnly = !!newState;
+
+    // options.readOnly has priority
+    if(this._options.readOnly) { return; }
+
+    this._aceEditor.setOption('readOnly', this._readOnly);
   };
 }
 

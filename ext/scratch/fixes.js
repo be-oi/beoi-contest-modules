@@ -436,6 +436,28 @@ Blockly.is3dSupported = function() {
   return Blockly.cache3dSupported_;
 };
 
+// Remove the numpad as it doesn't really work
+Blockly.FieldNumber.prototype.showEditor_ = function() {
+  Blockly.FieldNumber.superClass_.showEditor_.call(this, arguments);
+};
+
+Blockly.FieldTextInput.prototype.oldShowEditor_ = Blockly.FieldTextInput.prototype.showEditor_;
+Blockly.FieldTextInput.prototype.showEditor_ = function() {
+  var mobile =
+      goog.userAgent.MOBILE || goog.userAgent.ANDROID || goog.userAgent.IPAD;
+  if(mobile) {
+     // Display a prompt on mobile, as Blockly does
+     var newValue = prompt
+     var newValue = window.prompt(Blockly.Msg.CHANGE_VALUE_TITLE, this.text_);
+     if (this.sourceBlock_) {
+       newValue = this.callValidator(newValue);
+     }
+     this.setValue(newValue);
+  } else {
+     Blockly.FieldTextInput.prototype.oldShowEditor_.apply(this, arguments);
+  }
+}
+
 
 Blockly.Colours['input'] = {
     'primary': '#891431',
@@ -963,21 +985,21 @@ Blockly.JavaScript['operator_not'] = function(block) {
 
 Blockly.JavaScript['data_listrepeat'] = function(block) {
   // Create a list with one element repeated.
-  var functionName = Blockly.JavaScript.provideFunction_(
-      'listsRepeat',
-      ['function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
-          '(value, n) {',
-       '  var array = [];',
-       '  for (var i = 0; i < n; i++) {',
-       '    array[i] = value;',
-       '  }',
-       '  return array;',
-       '}']);
+  Blockly.JavaScript.externalFunctions['listsRepeat'] = function(value, n) {
+    if(n > FioiBlockly.maxListSize) {
+      throw Blockly.Msg.LISTS_CREATE_WITH_TOO_LARGE.replace('%1', n).replace('%2', FioiBlockly.maxListSize);
+    }
+    var array = [];
+    for (var i = 0; i < n; i++) {
+      array[i] = value;
+    }
+    return array;
+  };
   var element = Blockly.JavaScript.valueToCode(block, 'ITEM',
       Blockly.JavaScript.ORDER_COMMA) || 'null';
   var repeatCount = Blockly.JavaScript.valueToCode(block, 'TIMES',
       Blockly.JavaScript.ORDER_COMMA) || '0';
-  var code = functionName + '(' + element + ', ' + repeatCount + ')';
+  var code = 'listsRepeat(' + element + ', ' + repeatCount + ')';
 
   var blockVarName = block.getFieldValue('LIST');
   if(blockVarName) {
@@ -1019,7 +1041,9 @@ Blockly.JavaScript['data_replaceitemoflist'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'ITEM',
       Blockly.JavaScript.ORDER_ASSIGNMENT) || 'null';
   var at = Blockly.JavaScript.getAdjusted(block, 'INDEX');
-  return varName + '[' + at + '] = ' + value + ';\n';
+  code = 'if(' + at + ' > 1000000) { throw "List index > 1000000"; }\n';
+  code += varName + '[' + at + '] = ' + value + ';\n';
+  return code;
 };
 
 
@@ -1099,11 +1123,11 @@ Blockly.JavaScript['text'] = function(block) {
   // Text value. Output an integer if the content is an int, as Scratch is
   // ambiguous on these fields.
   var val = block.getFieldValue('TEXT');
-  if(val.search(/^\d+$/) < 0) {
+  if(val.search(/^-?\d+\.?\d*$/) < 0) {
     // string
     var code = Blockly.JavaScript.quote_(val);
   } else {
-    // int
+    // float
     var code = val;
   }
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -1226,9 +1250,20 @@ Blockly.Python['data_replaceitemoflist'] = function(block) {
     var varName = 'unnamed_variable'; // Block is still loading
   }
 
+  // TODO :: make it an option
+/*  Blockly.Python.definitions_['lists_assignIndex'] = '' +
+    'def assignIndex(l, i, x):\n' +
+    '    if i > 1000000:\n' +
+    '        raise IndexError("list index > 1000000")\n' +
+    '    n = len(l)\n' +
+    '    if i >= n:\n' +
+    '        l.extend([None]*(i-n+1))\n' +
+    '    l[i] = x\n';*/
+
   var value = Blockly.Python.valueToCode(block, 'ITEM',
       Blockly.Python.ORDER_ASSIGNMENT) || 'null';
   var at = Blockly.Python.getAdjustedInt(block, 'INDEX');
+//  return 'assignIndex(' + varName + ', ' + at + ', ' + value + ')\n';
   return varName + '[' + at + '] = ' + value + '\n';
 }
 
@@ -1271,11 +1306,11 @@ Blockly.Python['data_changevariableby'] = function(block) {
 
 Blockly.Python['text'] = function(block) {
   var val = block.getFieldValue('TEXT');
-  if(val.search(/^\d+$/) < 0) {
+  if(val.search(/^-?\d+\.?\d*$/) < 0) {
     // string
     var code = Blockly.Python.quote_(val);
   } else {
-    // int
+    // float
     var code = val;
   }
   return [code, Blockly.Python.ORDER_ATOMIC];
@@ -1283,11 +1318,11 @@ Blockly.Python['text'] = function(block) {
 
 Blockly.Python['operators'] = function(block) {
   var nameToOp = {
-    'operator_add': {op: '+', varname: 'NUM', order: Blockly.Python.ORDER_ADDITION},
-    'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_SUBTRACTION},
-    'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATION},
-    'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_DIVISION},
-    'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_EQUALITY},
+    'operator_add': {op: '+', varname: 'NUM', order: Blockly.Python.ORDER_ADDITIVE},
+    'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_ADDITIVE},
+    'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
+    'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
+    'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_and': {op: 'and', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_AND},

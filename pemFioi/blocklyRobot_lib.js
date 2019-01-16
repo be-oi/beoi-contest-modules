@@ -816,7 +816,11 @@ var getRobotGridContext = function(display, infos, curLevel) {
       this.delayFactory.destroyAll();
       this.raphaelFactory.destroyAll();
       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-      $("#errors").html("");
+      if(window.quickAlgoInterface) {
+            window.quickAlgoInterface.displayError(null);
+      } else {
+            $("#errors").html('');
+      }
       resetBoard();
       context.blocklyHelper.updateSize();
       resetItems();
@@ -1180,4 +1184,11 @@ var getRobotGridContext = function(display, infos, curLevel) {
    }
 
    return context;
+}
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('robot', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['robot', getContext]);
 }

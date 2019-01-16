@@ -15,9 +15,9 @@ var makeTurtle = function(coords) {
       if (this.drawingContext)
          this.drawingContext.clearRect(0, 0, 300, 300);
       if (this.turtle) {
-         this.turtle.style.left= this.x - 11 + "px";
-         this.turtle.style.top= this.y - 13 + "px";
+         this.turtle.src = this.turtle.getAttribute("pendown");
          this.turtle.style.transform = "none";
+         this.placeTurtle();
       }
       if (stepsize) {
          this.stepsize = stepsize;
@@ -28,6 +28,7 @@ var makeTurtle = function(coords) {
    this.turn = function(angle) {
       this.direction += angle*Math.PI/180;
       if (this.turtle) {
+         // TODO :: Do we need to put "none" first?
          this.turtle.style.transform = "none";
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
       }
@@ -45,17 +46,20 @@ var makeTurtle = function(coords) {
          this.drawingContext.lineTo(this.x, this.y);
          this.drawingContext.stroke();
       }
-      
-      if (this.turtle) {
-         this.turtle.style.left= this.x - 11 + "px";
-         this.turtle.style.top= this.y - 13 + "px";
-      }
+
+      this.placeTurtle();      
    }
    this.start_painting = function() {
       this.paint = true;
+      if(this.turtle) {
+         this.turtle.src = this.turtle.getAttribute("pendown");
+      }
    }
    this.stop_painting = function() {
       this.paint = false;
+      if(this.turtle) {
+         this.turtle.src = this.turtle.src = this.turtle.getAttribute("penup");
+      }
    }
    
    this.set_colour = function(colour) {
@@ -71,9 +75,17 @@ var makeTurtle = function(coords) {
    }
    this.setTurtle = function(turtle) {
       this.turtle = turtle;
-
-      this.turtle.style.left= this.x - 11 + "px";
-      this.turtle.style.top= this.y - 13 + "px";
+      this.placeTurtle();
+   }
+   this.placeTurtle = function() {
+      if(!this.turtle) { return; }
+      this.turtle.style.left= this.x - 12 + "px";
+      this.turtle.style.top= this.y - 15 + "px";
+   }
+   this.fixTurtle = function() {
+      // Add padding so the turtle styas centered
+      this.turtle.style.paddingRight = '2px';
+      this.turtle.style.paddingBottom = '3px';
    }
 };
 
@@ -81,6 +93,10 @@ var makeTurtle = function(coords) {
 var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
+         turnleft: "droite ↺",
+         turnright: "gauche ↻",
+         penup: "lever le pinceau",
+         pendown: "baisser le pinceau",
          categories: {
             turtle: "Tortue"
          },
@@ -100,6 +116,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
             turnleftamountvalue_options: "drehe um %1 nach links ↺",
             turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_moreoptions: "drehe um %1 nach links ↺",
+            turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turneitheramount: "tourner de %1° vers la %2",
             turneitheramountvalue: "tourner de %1 vers la %2",
             penup: "lever le pinceau",
@@ -120,14 +138,17 @@ var getContext = function(display, infos) {
             movebackamountvalue: "reculer",
             turnleft: "tournerGauche",
             turnright: "tournerDroite",
-            turnleftamount: "dreheLinksGrad",
-            turnrightamount: "dreheRechtsGrad",
+            turnleftamount: "gauche",
+            turnrightamount: "droite",
             turnleftamountvalue: "gauche",
             turnrightamountvalue: "droite",
             turnleftamountvalue_noround: "dreheLinksGrad",
             turnrightamountvalue_noround: "dreheRechtsGrad",
             turnleftamountvalue_options: "dreheLinksGrad",
             turnrightamountvalue_options: "dreheRechtsGrad",
+            turnleftamountvalue_moreoptions: "dreheLinksGrad",
+            turnrightamountvalue_moreoptions: "dreheRechtsGrad",
+            turneitheramount: "tourner",
             turneitheramountvalue: "tourner",
             penup: "leverPinceau",
             pendown: "baisserPinceau",
@@ -144,19 +165,24 @@ var getContext = function(display, infos) {
          startingBlockName: "Programme de la tortue",
          messages: {
             paintingWrong: "La tortue n'a pas tout dessiné correctement.",
-            paintingCorrect: "Bravo! La tortue a tout dessiné correctement."
+            paintingCorrect: "Bravo! La tortue a tout dessiné correctement.",
+            paintingFree: "La tortue a tracé le dessin que vous avez programmé. Si vous voulez le garder, faites une capture d'écran."
          }
       },
       de: {
+         left: "links ↺",
+         right: "rechts ↻",
+         penup: "hebe Stift ab",
+         pendown: "setze Stift auf",
          categories: {
             turtle: "Schildkröte"
          },
          label: {
             move: "gehe",
             moveamount: "gehe %1 Schritte",
-            movebackamount: "gehe zurück %1 Schritte",
+            movebackamount: "gehe %1 Schritte zurück",
             moveamountvalue: "gehe %1 Schritte",
-            movebackamountvalue: "gehe zurück %1 Schritte",
+            movebackamountvalue: "gehe %1 Schritte zurück",
             turnleft: "drehe nach links ↺",
             turnright: "drehe nach rechts ↻",
             turnleftamount: "drehe um %1° nach links ↺",
@@ -167,6 +193,12 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
             turnleftamountvalue_options: "drehe um %1 nach links ↺",
             turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_moreoptions: "drehe um %1 nach links ↺",
+            turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_europe: "drehe um %1 nach links ↺",
+            turnrightamountvalue_europe: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_nikolaus: "drehe um %1 nach links ↺",
+            turnrightamountvalue_nikolaus: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
             penup: "hebe Stift ab",
@@ -182,9 +214,9 @@ var getContext = function(display, infos) {
          code: {
             move: "gehe",
             moveamount: "geheSchritte",
-            movebackamount: "geheZuruckSchritte",
+            movebackamount: "geheZurueckSchritte",
             moveamountvalue: "geheSchritte",
-            movebackamountvalue: "geheZuruckSchritte",
+            movebackamountvalue: "geheZurueckSchritte",
             turnleft: "dreheLinks",
             turnright: "dreheRechts",
             turnleftamount: "dreheLinksGrad",
@@ -195,6 +227,13 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "dreheRechtsGrad",
             turnleftamountvalue_options: "dreheLinksGrad",
             turnrightamountvalue_options: "dreheRechtsGrad",
+            turnleftamountvalue_moreoptions: "dreheLinksGrad",
+            turnrightamountvalue_moreoptions: "dreheRechtsGrad",
+            turnleftamountvalue_europe: "dreheLinksGrad",
+            turnrightamountvalue_europe: "dreheRechtsGrad",
+            turnleftamountvalue_nikolaus: "dreheLinksGrad",
+            turnrightamountvalue_nikolaus: "dreheRechtsGrad",
+            turneitheramount: "dreheGrade",
             turneitheramountvalue: "dreheGrad",
             penup: "stiftHoch",
             pendown: "stiftRunter",
@@ -211,7 +250,8 @@ var getContext = function(display, infos) {
          startingBlockName: "Schildkröten-Programm",
          messages: {
             paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
-            paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet."
+            paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet.",
+            paintingFree: "La tortue a tracé le dessin que vous avez programmé. Si vous voulez le garder, vous pouvez faire une capture d'écran."
          }
       },
       none: {
@@ -237,13 +277,15 @@ var getContext = function(display, infos) {
                categories: {
                   logic: 100,
                   loops: 180,
-                  math: 220,
-                  texts: 250,
-                  lists: 60,
-                  colour: 60,
-                  turtle: 310,
-                  turtleInput: 20,
-                  _default: 280
+                  math: 230,
+                  texts: 60,
+                  lists: 40,
+                  colour: 20,
+                  variables: 330,
+                  functions: 290,
+                  turtle: 260,
+                  turtleInput: 200,
+                  _default: 0
                },
                blocks: {}
             };
@@ -315,13 +357,19 @@ var getContext = function(display, infos) {
 
    context.resetDisplay = function() {
       var turtleFileName = "turtle.svg";
-      if (context.infos.turtleFileName != undefined) {
+      
+      if ($("#turtleImg").length > 0) {
          turtleFileName = $("#turtleImg").attr("src");
       }
-      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
+      var turtleUpFileName = "turtle.svg";
+      if ($("#turtleUpImg").length > 0) {
+         turtleUpFileName = $("#turtleUpImg").attr("src");
+      }
+      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
       
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
+      context.turtle.displayTurtle.fixTurtle(); // TODO :: find a way to define whether the turtle needs fixing or not
       context.turtle.displayTurtle.reset();
       
       context.updateScale(); // does nothing for now 
@@ -447,6 +495,12 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_noround = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_options = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_options = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_moreoptions = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_moreoptions = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_europe = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_europe = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_nikolaus = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_nikolaus = context.turtle.turnrightamount;
    
 
    context.turtle.colour2 = function(colour, callback) {
@@ -463,14 +517,18 @@ var getContext = function(display, infos) {
    }
    context.turtle.colourvalue = context.turtle.colour2;
    
+   var defaultMoveAmount = 1;
+   if(context.infos.defaultMoveAmount != undefined)
+      defaultMoveAmount = context.infos.defaultMoveAmount;
+   
    context.customBlocks = {
       turtle: {
          turtle: [
             { name: "move" },
             { name: "moveamount", params: [null]},
             { name: "movebackamount", params: [null]},
-            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 5}]}},
-            { name: "movebackamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 5}]}},
+            { name: "moveamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
+            { name: "movebackamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "turnleft" },
             { name: "turnright" },
             { name: "turn",      params: [null]},
@@ -483,22 +541,34 @@ var getContext = function(display, infos) {
             { name: "turnleftamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
                 ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
             { name: "turnrightamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
-                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
+               ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
+            { name: "turnleftamountvalue_moreoptions", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+               ["15 °","15"],["18 °","18"],["30 °","30"],["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["150 °","150"],["162 °","162"],["165 °","165"],["180 °","180"]]}]}},
+            { name: "turnrightamountvalue_moreoptions", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+               ["15 °","15"],["18 °","18"],["30 °","30"],["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["150 °","150"],["162 °","162"],["165 °","165"],["180 °","180"]]}]}},
+            { name: "turnleftamountvalue_europe", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["15 °","15"],["30 °","30"],["75 °","75"],["90 °","90"],["105 °","105"],["144 °","144"],["162 °","162"],["180 °","180"]]}]}},
+            { name: "turnrightamountvalue_europe", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["15 °","15"],["30 °","30"],["75 °","75"],["90 °","90"],["105 °","105"],["144 °","144"],["162 °","162"],["180 °","180"]]}]}},
+            { name: "turnleftamountvalue_nikolaus", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["36.9 °","36.86989"],["53.1 °","53.13010"],["73.7 °","73.73979"],["90 °","90"],["106.3 °","106.26020"],["126.9 °","126.86989"],["143.1 °","143.13010"],["180 °","180"]]}]}},
+            { name: "turnrightamountvalue_nikolaus", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["36.9 °","36.86989"],["53.1 °","53.13010"],["73.7 °","73.73979"],["90 °","90"],["106.3 °","106.26020"],["126.9 °","126.86989"],["143.1 °","143.13010"],["180 °","180"]]}]}},
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["links ↺","'l'"],["rechts ↻","'r'"]]}]}},
+                 [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
             { name: "turneitheramountvalue", blocklyJson: {"args0": [
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["gauche ↺","'l'"],["droite ↻","'r'"]]}]}}, // mis les parametres en français mais bug, TODO gérer les deux langues
+                 [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
                {"type": "field_dropdown", "name": "PARAM_0", "options":
-                [["hebe Stift ab","'up'"],["setze Stift auf","'down'"]]}]}},
+                 [[localLanguageStrings[window.stringsLanguage]["penup"],"up"],[localLanguageStrings[window.stringsLanguage]["pendown"],"down"]]}]}},
             { name: "colour2", params: [null]},
-            { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
+            { name: "colourvalue", params: [null], blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
          ],
          turtleInput: [
             { name: "inputvalue", yieldsValue: true }
@@ -513,7 +583,13 @@ var getContext = function(display, infos) {
          ]
       }
    };
-   
 
    return context;
+}
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('turtle', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['turtle', getContext]);
 }

@@ -11,7 +11,6 @@
  * Untouched parts from beaver-task-1.0.
  ************************************************************************/
 
-
 var task = {};
 
 task.showViews = function(views, callback) {
@@ -73,7 +72,31 @@ task.getMetaData = function(callback) {
 // TODO We update the grader below, if the task has levels. Is this line necessary?
 var grader = grader ? grader : {};
 
-function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
+function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+window.forcedLevel = getUrlParameter("level");
+
+function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) { 
+   if (window.forcedLevel !== undefined) {
+      if (window.forcedLevel) {
+         levels = null;
+      }
+   }
+  
+   
    // Create a subTask instance, possibly operating on an existing object.
    function createTask(displayFlag) {
       var subTask = {};
@@ -152,7 +175,10 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
-               if(mainTask.assumeLevels) {
+               if (window.forcedLevel) {
+                  defaultLevel = window.forcedLevel;
+                  $("." + window.forcedLevel).show(); // TODO: why is it needed here?
+               } else if(mainTask.assumeLevels) {
                   defaultLevel = "easy";
                } else {
                   defaultLevel = levels[0];
@@ -167,7 +193,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             };
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
-               displayHelper.setupLevels(null, reloadWithCallbacks);
+               displayHelper.setupLevels(null, reloadWithCallbacks, levels);
             }
             callback();
          }
@@ -188,10 +214,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       else {
          // TODO is this the desired behavior? It is from beaver-task-1.0.
          var currentState = {};
-         mainTask.getAnswer(function(displayedAnswer) {
-            currentState.displayedAnswer = displayedAnswer;
-            callback(JSON.stringify(currentState));
-         });
+         var displayedAnswer = mainTask.getAnswerObject();
+         currentState.displayedAnswer = displayedAnswer;
+         callback(JSON.stringify(currentState));
       }
    };
    
@@ -208,12 +233,14 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          hasJustLoaded = false;
          task.gradeAnswer(strAnswer, null, function(score, message) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            var level = "easy";
-            if(score >= maxScores.medium) {
-               level = "hard";
+            var level = levels[0];
+            for(var i=1; i < levels.length; i++) {
+               if(score >= maxScores[levels[i-1]] || (level == 'basic' && levels[i] == 'easy')) {
+                  level = levels[i];
+               }
             }
-            else if(score >= maxScores.easy) {
-               level = "medium";
+            if (window.forcedLevel != null) {
+               level = window.forcedLevel;
             }
             var newAnswer = null;
             if(strAnswer && strAnswer !== '') {
@@ -302,7 +329,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          state = newState;
          if(!state.levelStates) { state.levelStates = {}; }
          if(!state.levelAnswers) { state.levelAnswers = {}; }
-         if(!state.level) { state.level = 'easy'; }
+         if(!state.level) {
+            if (window.forcedLevel != null) {
+               state.level = window.forcedLevel;
+            } else {
+               state.level = 'easy';
+            }
+         }
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
@@ -399,7 +432,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
       }
-      if(!levels && mainTask.assumeLevels && answer.easy) {
+      if (window.forcedLevel != null) {
+         answer = answer[window.forcedLevel];
+      } else if(!levels && mainTask.assumeLevels && answer.easy) {
          answer = answer.easy;
       }
       gradingTask.reloadAnswerObject(answer);
@@ -509,11 +544,10 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          
          if(levels) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            var minScores = {
-               easy: 0,
-               medium: maxScores.easy,
-               hard: maxScores.medium
-            };
+            var minScores = {};
+            for(var i=0; i < levels.length; i++) {
+                minScores[levels[i]] = i > 0 ? maxScores[levels[i-1]] : 0;
+            }
             var levelAnswers = parsedAnswer;
             var scores = {};
             var messages = {};

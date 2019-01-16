@@ -19,14 +19,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       workspace: null,
       prevWidth: 0,
       options: {},
+      initialScale: 1,
       nbTestCases: 1,
       divId: 'blocklyDiv',
       hidden: false,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
-      startingBlock: true, 
+      startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "https://manage-static.be-oi.be/contestAssets/blockly/",
       unloaded: false,
+      reloadForFlyout: 0,
+      display: false,
+      readOnly: false,
       quickAlgoInterface: window.quickAlgoInterface,
 
       glowingBlock: null,
@@ -62,7 +66,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             $("submitBtn").html("<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" + $("submitBtn").html());
          }
       },
-      
+
       loadContext: function (mainContext) {
          this.mainContext = mainContext;
          this.createGeneratorsAndBlocks();
@@ -85,28 +89,47 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.strings.startingBlockName = options.startingBlockName;
          }
 
+         if (options.maxListSize) {
+            FioiBlockly.maxListSize = options.maxListSize;
+         }
+
          this.locale = locale;
          this.nbTestCases = nbTestCases;
          this.options = options;
 
+         this.addExtraBlocks();
+         this.createSimpleGeneratorsAndBlocks();
+
+         this.display = display;
+
          if (display) {
             this.loadHtml(nbTestCases);
-            this.addExtraBlocks();
-            this.createSimpleGeneratorsAndBlocks();
             var xml = this.getToolboxXml();
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
+               comments: true,
                sounds: false,
-               media: this.mediaUrl
+               trashcan: true,
+               media: this.mediaUrl,
+               scrollbars: true,
+               zoom: { startScale: 1 }
             };
-            wsConfig.comments = true;
-            wsConfig.scrollbars = true;
-            wsConfig.trashcan = true;
-            if (options.readOnly) {
-               wsConfig.readOnly = true;
+
+            if(typeof options.scrollbars != 'undefined') { wsConfig.scrollbars = !!options.scrollbars; }
+            // IE <= 10 needs scrollbars
+            if(navigator.userAgent.indexOf("MSIE") > -1) { wsConfig.scrollbars = true; }
+
+            wsConfig.readOnly = !!options.readOnly || this.readOnly;
+            if(options.zoom) {
+               wsConfig.zoom.controls = !!options.zoom.controls;
+               wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
             }
             if (this.scratchMode) {
-               wsConfig.zoom = { startScale: 0.75 };
+               wsConfig.zoom.startScale = wsConfig.zoom.startScale * 0.75;
+            }
+            this.initialScale = wsConfig.zoom.startScale;
+            if(wsConfig.zoom.controls && window.blocklyUserScale) {
+               wsConfig.zoom.startScale *= window.blocklyUserScale;
             }
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
@@ -116,7 +139,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             Blockly.removeEvents();
 
             // Inject Blockly
-            this.workspace = Blockly.inject(this.divId, wsConfig);
+            window.blocklyWorkspace = this.workspace = Blockly.inject(this.divId, wsConfig);
 
             // Start checking whether it's hidden, to sort out contents
             // automatically when it's displayed
@@ -131,7 +154,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if (toolboxNode.length != 0) {
                toolboxNode.html(xml);
             }
-            
+
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             this.workspace.addChangeListener(this.onChange.bind(this));
             this.onChange();
@@ -184,6 +207,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       reload: function() {
          // Reload Blockly editor
+         this.reloading = true;
          this.savePrograms();
          var programs = this.programs;
          this.unloadLevel();
@@ -191,6 +215,49 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.load(this.locale, true, this.nbTestCases, this.options);
          this.programs = programs;
          this.loadPrograms();
+         if(window.quickAlgoInterface) {
+            quickAlgoInterface.onResize();
+         }
+         this.reloading = false;
+      },
+
+      setReadOnly: function(newState) {
+         if(!!newState == this.readOnly) { return; }
+         this.readOnly = !!newState;
+
+         // options.readOnly has priority
+         if(this.options.readOnly) { return; }
+
+         this.reload();
+      },
+
+      onResizeFct: function() {
+         // onResize function to be called by the interface
+         if(document.documentElement.clientHeight < 600 || document.documentElement.clientWidth < 800) {
+            FioiBlockly.trashcanScale = 0.75;
+            FioiBlockly.zoomControlsScale = 0.9;
+         } else {
+            FioiBlockly.trashcanScale = 1;
+            FioiBlockly.zoomControlsScale = 1;
+         }
+         Blockly.svgResize(this.workspace);
+
+         // Reload Blockly if the flyout is not properly rendered
+         // TODO :: find why it's not properly rendered in the first place
+         if(this.workspace.flyout_ && this.reloadForFlyout < 5) {
+            var flyoutWidthDiff = Math.abs(this.workspace.flyout_.svgGroup_.getBoundingClientRect().width -
+               this.workspace.flyout_.svgBackground_.getBoundingClientRect().width);
+            if(flyoutWidthDiff > 5) {
+               this.reloadForFlyout += 1;
+               this.reload();
+            }
+         }
+      },
+
+      onResize: function() {
+         // This function will replace itself with the debounced onResizeFct
+         this.onResize = debounce(this.onResizeFct.bind(this), 500, false);
+         this.onResizeFct();
       },
 
       hiddenCheck: function() {
@@ -200,7 +267,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.hidden = false;
             // Reload the Blockly editor to remove display issues after
             // being hidden
-            console.log('reload');
             this.reload();
             return; // it will be restarted by reload
          }
@@ -208,17 +274,61 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 500);
       },
 
-      resetDisplayFct: function() {
+      onChangeResetDisplayFct: function() {
+         if(this.unloaded || this.reloading) { return; }
          if(this.mainContext.runner) {
             this.mainContext.runner.reset();
          }
          if(this.scratchMode) {
             this.glowBlock(null);
          }
-         if(this.quickAlgoInterface) {
+         if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
-         $('#errors').html('');
+         this.displayError('');
+      },
+
+      onChangeResetDisplay: function() {
+         // This function will replace itself with the debounced onChangeResetDisplayFct
+         this.onChangeResetDisplay = debounce(this.onChangeResetDisplayFct.bind(this), 500, false);
+         this.onChangeResetDisplayFct();
+      },
+
+      resetDisplay: function() {
+         if(this.scratchMode) {
+            this.glowBlock(null);
+         } else if(Blockly.selected) {
+            // Do not execute that while the user is moving blocks around
+            Blockly.selected.unselect();
+         }
+      },
+
+      getCapacityInfo: function() {
+         var remaining = 1;
+         var text = '';
+         if(maxBlocks) {
+            // Update the remaining blocks display
+            remaining = this.getRemainingCapacity(this.workspace);
+            var optLimitBlocks = {
+               maxBlocks: maxBlocks,
+               remainingBlocks: Math.abs(remaining)
+            };
+            var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
+            text = strLimitBlocks.format(optLimitBlocks);
+         }
+
+         if(remaining < 0) {
+            return {text: text, invalid: true, type: 'capacity'};
+         }
+
+         // We're over the block limit, is there any block used too often?
+         var limited = this.findLimited(this.workspace);
+         if(limited) {
+            return {text: this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".', invalid: true, type: 'limited'};
+         } else if(remaining == 0) {
+            return {text: text, warning: true, type: 'capacity'};
+         }
+         return {text: text, type: 'capacity'};
       },
 
       onChange: function(event) {
@@ -231,35 +341,24 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
-            if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
-               // Update the remaining blocks display
-               var remaining = this.getRemainingCapacity(this.workspace);
-               var optLimitBlocks = {
-                  maxBlocks: maxBlocks,
-                  remainingBlocks: Math.abs(remaining)
-               };
-               var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
-               $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
-               if(remaining == 0) {
-                  quickAlgoInterface.blinkRemaining(4);
-               } else if(remaining < 0) {
-                  quickAlgoInterface.blinkRemaining(5, true);
-               } else {
-                  quickAlgoInterface.blinkRemaining(0); // reset
+            var capacityInfo = this.getCapacityInfo();
+            if(window.quickAlgoInterface) {
+               if(eventType === Blockly.Events.Move) {
+                  // Only display popup when we drop the block, not on creation
+                  capacityInfo.popup = true;
                }
+               window.quickAlgoInterface.displayCapacity(capacityInfo);
+            } else {
+               $('#capacity').html(capacityInfo.text);
             }
-
-            if(!this.resetDisplay) {
-               this.resetDisplay = debounce(this.resetDisplayFct.bind(this), 500, false);
-            }
-            this.resetDisplay();
+            this.onChangeResetDisplay();
          } else {
             Blockly.svgResize(this.workspace);
          }
 
          // Refresh the toolbox for new procedures (same with variables
          // but it's already handled correctly there)
-         if(this.scratchMode && this.includeBlocks.groupByCategory) {
+         if(this.scratchMode && this.includeBlocks.groupByCategory && this.workspace.toolbox_) {
             this.workspace.toolbox_.refreshSelection();
          }
       },
@@ -292,6 +391,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          Blockly.Xml.domToWorkspace(xml, this.workspace);
       },
 
+      getOrigin: function() {
+         // Get x/y origin
+         if(this.includeBlocks.groupByCategory && typeof this.options.scrollbars != 'undefined' && !this.options.scrollbars) {
+            return this.scratchMode ? {x: 340, y: 20} : {x: 105, y: 2};
+         }
+         return this.scratchMode ? {x: 4, y: 20} : {x: 2, y: 2};
+      },
+
       setPlayer: function(newPlayer) {
          this.player = newPlayer;
          $("#selectPlayer").val(this.player);
@@ -313,7 +420,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          $(".language_blockly, .language_javascript").hide();
          $(".language_" + this.languages[this.player]).show();
-         
+
          var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv");
          $("#selectLanguage").val(this.languages[this.player]);
          if (this.languages[this.player] == "blockly") {
@@ -331,11 +438,17 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             return;
          }
 
+         // Save zoom
+         if(this.display && this.workspace.scale) {
+             window.blocklyUserScale = this.workspace.scale / this.initialScale;
+         }
+
          this.checkRobotStart();
 
          this.programs[this.player].javascript = $("#program").val();
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
+            this.cleanBlockAttributes(xml);
             this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.player].blocklyJS = this.getCode("javascript");
             //this.programs[this.player].blocklyPython = this.getCode("python");
@@ -346,7 +459,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
-            this.cleanBlockIds(xml);
+            this.cleanBlockAttributes(xml, this.getOrigin());
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
          $("#program").val(this.programs[this.player].javascript);
@@ -356,22 +469,22 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          var example = this.scratchMode ? exampleObj.scratch : exampleObj.blockly
          if (this.workspace != null && example) {
             var xml = Blockly.Xml.textToDom(example);
-            this.cleanBlockIds(xml);
 
-            
+            // Shift to x=200 y=20 + offset
+            if(!this.exampleOffset) { this.exampleOffset = 0; }
+            var origin = this.getOrigin();
+            origin.x += 200 + this.exampleOffset;
+            origin.y += 20 + this.exampleOffset;
+            // Add an offset of 10 each time, so if someone clicks the button
+            // multiple times the blocks don't stack
+            this.exampleOffset += 10;
 
             // Remove robot_start
             if(xml.children.length == 1 && xml.children[0].getAttribute('type') == 'robot_start') {
                xml = xml.firstChild.firstChild;
             }
 
-            // Shift to x=200 y=20 + offset
-            if(!this.exampleOffset) { this.exampleOffset = 0; }
-            xml.firstChild.setAttribute('x', 200 + this.exampleOffset);
-            xml.firstChild.setAttribute('y', 20 + this.exampleOffset);
-            // Add an offset of 10 each time, so if someone clicks the button
-            // multiple times the blocks don't stack
-            this.exampleOffset += 10;
+            this.cleanBlockAttributes(xml);
 
             Blockly.Xml.domToWorkspace(xml, this.workspace);
 
@@ -412,13 +525,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                if (code[0] == "<") {
                   try {
                      var xml = Blockly.Xml.textToDom(code);
+                     that.cleanBlockAttributes(xml);
                      if(!that.checkBlocksAreAllowed(xml)) {
-                        //throw 'not allowed'; // TODO :: do something; for now do nothing as the system might not be complete
+                        throw 'not allowed'; // TODO :: check it's working properly
                      }
                      that.programs[that.player].blockly = code;
                      that.languages[that.player] = "blockly";
                   } catch(e) {
-                     $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
+                     that.displayError('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
                } else {
                   that.programs[that.player].javascript = code;
@@ -430,7 +544,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
             reader.readAsText(file);
          } else {
-            $("#errors").html('<span class="testError">'+this.strings.unknownFileType+'</span>');
+            that.displayError('<span class="testError">'+this.strings.unknownFileType+'</span>');
          }
       },
 
@@ -467,14 +581,29 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.updateSize();
       },
 
-      updateSize: function() {
+      updateSize: function(force) {
+         if(window.experimentalSize) {
+            // Temporary test
+            var isPortrait = $(window).width() <= $(window).height();
+            if(isPortrait && !this.wasPortrait) {
+               this.reload();
+            }
+            this.wasPortrait = isPortrait;
+            $('#blocklyDiv').height($('#blocklyLibContent').height() - 34);
+            $('#blocklyDiv').width($('#blocklyLibContent').width() - 4);
+            if (this.trashInToolbox) {
+               Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+            }
+            Blockly.svgResize(this.workspace);
+            return;
+         }
          var panelWidth = 500;
          if (this.languages[this.player] == "blockly") {
             panelWidth = $("#blocklyDiv").width() - 10;
          } else {
             panelWidth = $("#program").width() + 20;
          }
-         if (panelWidth != this.prevWidth) {
+         if (force || panelWidth != this.prevWidth) {
             if (this.languages[this.player] == "blockly") {
                if (this.trashInToolbox) {
                   Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
@@ -526,11 +655,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               $("#errors").html('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
+               this.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
                return;
             }
          }
-            
+
          this.savePrograms();
 
          var codes = [];
@@ -541,19 +670,24 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             }
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
-         that.highlightPause = false;
-         if(that.getRemainingCapacity(that.workspace) < 0) {
-            $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+         this.highlightPause = false;
+         if(this.getRemainingCapacity(that.workspace) < 0) {
+            this.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            return;
+         }
+         var limited = this.findLimited(this.workspace);
+         if(limited) {
+            this.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {
-            that.workspace.traceOn(true);
-            that.workspace.highlightBlock(null);
+            this.workspace.traceOn(true);
+            this.workspace.highlightBlock(null);
          }
          this.mainContext.runner.initCodes(codes);
       },
 
-      
+
       run: function () {
          this.initRun();
          this.mainContext.runner.run();
@@ -564,6 +698,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.initRun();
          }
          this.mainContext.runner.step();
+      },
+
+
+      displayError: function(message) {
+        if(this.quickAlgoInterface) {
+            this.quickAlgoInterface.displayError(message);
+            this.quickAlgoInterface.setPlayPause(false);
+         } else {
+            $('#errors').html(message);
+         }
       }
    }
 }

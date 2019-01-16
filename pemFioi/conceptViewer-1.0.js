@@ -13,6 +13,7 @@ var conceptViewer = {
       {id: 'scratch', lbl: 'Scratch'},
       {id: 'python', lbl: 'Python'}
       ];
+    // TODO :: this.selectedLanguage
     var langOptions = '';
     for(var i=0; i<allLangs.length; i++) {
       langOptions += '<option value="' + allLangs[i].id + '"';
@@ -49,6 +50,7 @@ var conceptViewer = {
       }
     });
     this.loaded = true;
+    this.loadNavigation();
   },
 
   loadNavigation: function () {
@@ -75,19 +77,24 @@ var conceptViewer = {
       return;
     } else if (defaultUrl) {
       // else show the default concept
-      $('#conceptViewer .viewerContent').attr('src', defaultUrl);
+      this.loadUrl(defaultUrl);
     } else {
       // else show nothing
-      $('#conceptViewer .viewerContent').attr('src', '');
+      this.loadUrl('');
       this.shownConcept = null;
     }
   },
 
   loadConcepts: function (newConcepts) {
     // Load new concept information
-    this.load();
     this.concepts = newConcepts;
-    this.loadNavigation();
+    if(this.loaded) {
+      this.loadNavigation();
+    }
+  },
+
+  setLanguage: function(lang) {
+    this.selectedLanguage = lang;
   },
 
   show: function (initConcept) {
@@ -104,7 +111,7 @@ var conceptViewer = {
     // Hide the conceptViewer
     this.load();
     $('#conceptViewer').fadeOut(500);
-    $('#conceptViewer .viewerContent').attr('src', '');
+    this.loadUrl('');
   },
 
   showConcept: function (concept, show) {
@@ -137,13 +144,21 @@ var conceptViewer = {
       }
       conceptUrl = urlSplit.join('#');
 
-      $('#conceptViewer .viewerContent').attr('src', conceptUrl);
+      this.loadUrl(conceptUrl);
       $('#conceptViewer .navigationContent ul a').removeClass('highlight');
       $('#conceptViewer .navigationContent ul a[data-id='+conceptId+']').addClass('highlight');
       return true;
     } else {
       return false;
     }
+  },
+
+  loadUrl: function (url) {
+    // Load an URL into the iframe
+    if(window.conceptViewerUrlFunction) {
+      url = window.conceptViewerUrlFunction(url);
+    }
+    $('#conceptViewer .viewerContent').attr('src', url);
   },
 
   hasConcept: function (conceptName) {
@@ -158,6 +173,11 @@ var conceptViewer = {
 
   languageChanged: function () {
     this.loadNavigation();
+  },
+
+  unload: function() {
+    $('#conceptViewer').remove();
+    this.loaded = false;
   }
 }
 
@@ -184,6 +204,8 @@ var testConcepts = [
     {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
     {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
     {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
+    {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list'},
+    {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function'},
     {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
     {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
     ];
@@ -203,7 +225,7 @@ function conceptsFill(baseConcepts, allConcepts) {
   for(var c=0; c<allConcepts.length; c++) {
     var fullConcept = allConcepts[c];
     if(baseConceptsById[fullConcept.id]) {
-      var curConcept = baseConceptsById[fullConcept.id]; 
+      var curConcept = baseConceptsById[fullConcept.id];
       if(!curConcept.name) {
         curConcept.name = fullConcept.name;
       }
@@ -222,26 +244,58 @@ function conceptsFill(baseConcepts, allConcepts) {
   return concepts;
 }
 
-function getConceptsFromBlocks(includeBlocks, allConcepts) {
-  if(!includeBlocks.standardBlocks) { return []; }
+function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
+  if(!includeBlocks) { return []; }
 
-  var allConceptsById = {};
-  for(var c = 0; c<allConcepts.length; c++) {
-    allConceptsById[allConcepts[c].id] = allConcepts[c];
-  }
-
-  var concepts = ['language'];
-  if(includeBlocks.standardBlocks.includeAll) {
+  if(includeBlocks.standardBlocks) {
+    var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
-      if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
-        concepts.push(allConcepts[c]);
+      allConceptsById[allConcepts[c].id] = allConcepts[c];
+    }
+
+    var concepts = ['language'];
+    if(includeBlocks.standardBlocks.includeAll) {
+      for(var c = 0; c<allConcepts.length; c++) {
+        if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
+          concepts.push(allConcepts[c]);
+        }
+      }
+    } else if(includeBlocks.standardBlocks.singleBlocks) {
+      for(var b = 0; b<includeBlocks.standardBlocks.singleBlocks.length; b++) {
+        var blockName = includeBlocks.standardBlocks.singleBlocks[b];
+        if(allConceptsById['blockly_'+blockName]) {
+          concepts.push(allConceptsById['blockly_'+blockName]);
+        }
       }
     }
-  } else if(includeBlocks.standardBlocks.singleBlocks) {
-    for(var b = 0; b<includeBlocks.standardBlocks.singleBlocks.length; b++) {
-      var blockName = includeBlocks.standardBlocks.singleBlocks[b];
-      if(allConceptsById['blockly_'+blockName]) {
-        concepts.push(allConceptsById['blockly_'+blockName]);
+  }
+
+  if(includeBlocks.generatedBlocks) {
+    for(var genName in includeBlocks.generatedBlocks) {
+      var categoriesByBlocks = {};
+      var includedCategories = [];
+      if(context && context.customBlocks && context.customBlocks[genName]) {
+        for(var catName in context.customBlocks[genName]) {
+          var categoryConceptName = genName + '_' + catName;
+          if(!allConceptsById[categoryConceptName]) { continue; }
+          var blockList = context.customBlocks[genName][catName];
+          for(var i=0; i<blockList.length; i++) {
+            categoriesByBlocks[blockList[i].name] = categoryConceptName;
+          }
+        }
+      }
+      if(allConceptsById[genName + '_introduction']) {
+        concepts.push(allConceptsById[genName + '_introduction']);
+      }
+      for(var i=0; i<includeBlocks.generatedBlocks[genName].length; i++) {
+        var blockName = includeBlocks.generatedBlocks[genName][i];
+        if(categoriesByBlocks[blockName] && includedCategories.indexOf(categoriesByBlocks[blockName]) == -1) {
+          concepts.push(allConceptsById[categoriesByBlocks[blockName]]);
+        }
+        var conceptRef = genName + '_' + blockName;
+        if(allConceptsById[conceptRef]) {
+          concepts.push(allConceptsById[conceptRef]);
+        }
       }
     }
   }
@@ -253,7 +307,7 @@ function getConceptsFromTask(allConcepts) {
   if(typeof taskSettings === 'undefined') { return; }
 
   var baseConcepts = ['taskplatform'];
- 
+
   if(taskSettings.conceptViewer.length) {
     baseConcepts = baseConcepts.concat(taskSettings.conceptViewer);
   }

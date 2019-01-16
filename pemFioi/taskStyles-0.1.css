@@ -140,14 +140,27 @@ textarea {
    text-align: center;
 }
 
-.warningHeader { 
-   margin: 10px 0px 10px 0px; 
-   padding: 10px 10px 10px 10px; 
-   background: #FFEEEE; 
+.warningHeader {
+   margin: 10px 0px 10px 0px;
+   padding: 10px 10px 10px 10px;
+   background: #FFEEEE;
    /*font-weight: bold;*/
-   border: 2px solid black; 
+   border: 2px solid black;
    border-radius: 6px;
  }
+
+#miniPlatformHeader {
+   width:100%;
+   border-bottom:1px solid #B47238;
+   overflow:hidden;
+}
+#miniPlatformHeader > table {
+   width:770px;
+   margin: auto;
+}
+#miniPlatformHeader .platform {
+    font-size: 32px;
+}
 #task h1,
 .question h1,
 #solution {
@@ -213,7 +226,7 @@ textarea {
    display: block;
    padding: 8px;
    color: #000;
-   text-decoration: none; 
+   text-decoration: none;
    font-size: 1.1em;
 }
 #tabsMenu .li.lockedLevel a {
@@ -282,6 +295,7 @@ h1 .stars {
 #popupMessage img.beaver {
    position: absolute;
    width: 90px;
+   left: 0px;
 }
 #popupMessage img.messageArrow {
    position: absolute;
@@ -327,9 +341,9 @@ h1 .stars {
 #displayHelper_cancel {
    display: inline-block;
 }
-#displayHelper_validate > [value="Valider"],
-#displayHelper_cancel > [value="Recommencer"] {
-   margin: 0 10px;
+#displayHelper_validate > input,
+#displayHelper_cancel > input {
+   margin: 0 20px;
    width: 9em;
 }
 #displayHelper_saved {

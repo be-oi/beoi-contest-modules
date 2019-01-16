@@ -257,8 +257,8 @@ var getContext = function(display, infos, curLevel) {
             paintNorth: "Farbe oben",
             paintNorthEast: "Farbe oben rechts",
             colorUnder: "auf Farbe",
-            numberUnder: "Nummer des Feldes",
-            writeNumber: "Setze die Nummer des Feldes auf",
+            numberUnder: "Zahl auf dem Feld",
+            writeNumber: "ändere Zahl auf dem Feld zu",
             dir: "Richtung des Roboters",
             col: "Spalte des Roboters",
             row: "Zeile des Roboters",
@@ -315,8 +315,8 @@ var getContext = function(display, infos, curLevel) {
             gridEdgeBelow: "ueberGitterrand",
             obstacleInFront: "vorHindernis",
             obstacleRight: "hindernisRechts",
-            obstacleLeft: "hindernisLinks",
-            obstacleEast: "hindernisRechts",
+            obstacleLeft: "hindernisAufLinkerSeite",
+            obstacleEast: "hindernisAufRechterSeite",
             obstacleWest: "hindernisLinks",
             obstacleNorth: "hindenisOben",
             obstacleSouth: "hindenisUnten",
@@ -350,8 +350,8 @@ var getContext = function(display, infos, curLevel) {
             successDroppedAllObjects: "Bravo! Du hast alle Sachen abgelegt.",
             successMarkersPainted: "Bravo! Du hast das Muster richtig nachgezeichnet.",
             failureMarkersPainted: "Der Roboter hat das Muster nicht genau so gemalt, wie vorgegeben!",
-            successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
-            failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
+            successPickedAllCollectibles: "Bravo! Der Roboter hat alles eingesammelt.",
+            failurePickedAllCollectibles: "Der Roboter hat nicht alles eingesammelt!",
             successReachGeenArea: "Bravo! Der Roboter hat das grüne Feld erreicht.",
             failureReachGeenArea: "Der Roboter ist nicht auf dem grünen Feld!",
             successOneMarbleInHole: "Bravo! Der Roboter hat die Murmel richtig abgelegt.",
@@ -1056,15 +1056,15 @@ var getContext = function(display, infos, curLevel) {
                categories: {
                   logic: 100,
                   loops: 180,
-                  math: 220,
-                  text: 250,
-                  lists: 60,
-                  colour: 310,
-                  variables: 340,
-                  functions: 20,
+                  math: 230,
+                  text: 60,
+                  lists: 40,
+                  colour: 20,
+                  variables: 330,
+                  functions: 290,
                   actions: 260,
-                  sensors: 340,
-                  _default: 280
+                  sensors: 200,
+                  _default: 0
                },
                blocks: {}
             };
@@ -1535,7 +1535,7 @@ var getContext = function(display, infos, curLevel) {
             if (context.display) {
                redisplayItem(itemsUnder[0]);
             }
-  
+
          }
       }
       context.callCallback(callback);
@@ -1916,8 +1916,8 @@ var getContext = function(display, infos, curLevel) {
             { name: "platformInFrontAndBelow", yieldsValue: true },
             { name: "platformAbove",      yieldsValue: true },
             { name: "dir",                yieldsValue: true },
-            { name: "col",                yieldsValue: true },
-            { name: "row",                yieldsValue: true },
+            { name: "col",                yieldsValue: 'int' },
+            { name: "row",                yieldsValue: 'int' },
             { name: "onPill",             yieldsValue: true }
          ]
       },
@@ -2219,13 +2219,18 @@ var getContext = function(display, infos, curLevel) {
       if (paper == null) {
          return;
       }
-      var newCellSide;
+      var newCellSide = 0;
+      if(window.quickAlgoResponsive) {
+         var areaWidth = Math.max(200, $('#grid').width()-24);
+         var areaHeight = Math.max(150, $('#grid').height()-24);
+      } else {
+         var areaWidth = 400;
+         var areaHeight = 600;
+      }
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
-      } else {
-         newCellSide = 0;
+         newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
       paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
@@ -2347,3 +2352,10 @@ var robotEndConditions = {
       }
    }
 };
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('robot', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['robot', getContext]);
+}

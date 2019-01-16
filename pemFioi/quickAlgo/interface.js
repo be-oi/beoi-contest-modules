@@ -26,7 +26,7 @@ var quickAlgoInterface = {
          "  <div id='capacity'></div>" +
          "</div>" +
          "<div id='languageInterface'></div>" +
-         "<div id='saveOrLoadModal' style='display:none'></div>\n");
+         "<div id='saveOrLoadModal' class='modalWrapper'></div>\n");
 
       // Upper right load buttons
       $("#editorButtons").html(
@@ -75,34 +75,41 @@ var quickAlgoInterface = {
       }
 
       var gridButtonsAfter = scaleControl
-        + "<div id='testSelector'></div>"
-        + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
-        + this.strings.submitProgram
-        + "</button><br/>"
-        + "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
-        + addTaskHTML;
+        + "<div id='testSelector'></div>";
+      if(!this.context || !this.context.infos || !this.context.infos.hideValidate) {
+         gridButtonsAfter += ''
+            + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+            + this.strings.submitProgram
+            + "</button><br/>";
+      }
+      gridButtonsAfter += "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>" + addTaskHTML;
       $("#gridButtonsAfter").html(gridButtonsAfter);
       $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
 
+   bindBlocklyHelper: function(blocklyHelper) {
+      this.blocklyHelper = blocklyHelper;
+   },
+
    setOptions: function(opt) {
       // Load options from the task
-      if(opt.hideSaveOrLoad) {
-         $('#saveOrLoadBtn').hide();
-      } else {
-         $('#saveOrLoadBtn').show();
-      }
-      if(opt.hasExample) {
-         $('#loadExampleBtn').show();
-      } else {
-         $('#loadExampleBtn').hide();
-      }
+      var hideControls = opt.hideControls ? opt.hideControls : {};
+      $('#saveOrLoadBtn').toggle(!hideControls.saveOrLoad);
+      $('#loadExampleBtn').toggle(!!opt.hasExample);
       if(opt.conceptViewer) {
          conceptViewer.load(opt.conceptViewerLang);
          $('#displayHelpBtn').show();
       } else {
          $('#displayHelpBtn').hide();
       }
+   },
+
+   appendTaskIntro: function(html) {
+      $('#taskIntro').append(html);
+   },
+
+   toggleLongIntro: function(forceNewState) {
+      // For compatibility with new interface
    },
 
    onScaleDrawingChange: function(e) {
@@ -112,6 +119,9 @@ var quickAlgoInterface = {
       this.context.setScale(scaled ? 2 : 1);
    },
 
+   onResize: function() {},
+   updateBestAnswerStatus: function() {},
+
    blinkRemaining: function(times, red) {
       var capacity = $('#capacity');
       if(times % 2 == 0) {
@@ -119,12 +129,24 @@ var quickAlgoInterface = {
       } else {
          capacity.addClass('capacityRed');
       }
+      this.delayFactory.destroy('blinkRemaining');
       if(times > (red ? 1 : 0)) {
          var that = this;
-         this.delayFactory.destroy('blinkRemaining');
-         this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 200);
+         this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 400);
       }
    },
+
+   displayCapacity: function(info) {
+      $('#capacity').html(info.text ? info.text : '');
+      if(info.invalid) {
+         this.blinkRemaining(11, true);
+      } else if(info.warning) {
+         this.blinkRemaining(6);
+      } else {
+         this.blinkRemaining(0);
+      }
+   },
+
 
    initTestSelector: function (nbTestCases) {
       // Create the DOM for the tests display (typically on the left side)
@@ -207,6 +229,7 @@ var quickAlgoInterface = {
    updateTestScores: function (testScores) {
       // Display test results
       for(var iTest=0; iTest<testScores.length; iTest++) {
+         if(!testScores[iTest]) { continue; }
          if(testScores[iTest].successRate >= 1) {
             var icon = '<span class="testResultIcon" style="color: green">✔</span>';
             var label = '<span class="testResult testSuccess">'+this.strings.correctAnswer+'</span>';
@@ -235,7 +258,22 @@ var quickAlgoInterface = {
       $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
    },
 
+   unloadLevel: function() {
+      // Called when level is unloaded
+      this.resetTestScores();
+   },
+
    saveOrLoad: function () {
       $("#saveOrLoadModal").show();
-   }
+   },
+
+   displayError: function(message) {
+      message ? $('#errors').html(message) : $('#errors').empty();
+   },
+
+   displayResults: function(mainResults, worstResults) {
+      this.displayError('<span class="testError">'+mainResults.message+'</span>');
+   },
+
+   setPlayPause: function(isPlaying) {} // Does nothing
 };

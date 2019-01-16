@@ -43,7 +43,7 @@ var getContext = function(display, infos) {
             width: "largeur",
             height: "hauteur",
             // shape_2D
-            arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5° et %6°",
+            arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5 et %6",
             ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
             line: "dessiner une ligne de %1 %2 à %3 %4",
             point: "dessiner un point à %1 %2",
@@ -97,10 +97,10 @@ var getContext = function(display, infos) {
             printMatrix: "sortir la matrice de transformation",
             pushMatrix: "empiler la matrice de transformation",
             resetMatrix: "réinitialiser la matrice de transformation",
-            rotate: "pivoter de %1°",
-            rotateX: "pivoter sur l'axe X de %1°",
-            rotateY: "pivoter sur l'axe Y de %1°",
-            rotateZ: "pivoter sur l'axe Z de %1°",
+            rotate: "pivoter de %1",
+            rotateX: "pivoter sur l'axe X de %1",
+            rotateY: "pivoter sur l'axe Y de %1",
+            rotateZ: "pivoter sur l'axe Z de %1",
             scale: "appliquer une échelle de %1 %2 %3",
             translate: infos['processing3D'] ? "déplacer de %1 %2 %3" : "déplacer de %1 %2",
             // effect_lights
@@ -770,7 +770,7 @@ var getContext = function(display, infos) {
             width: "width",
             height: "height",
             // shape_2D
-            arc: "draw an arc at %1 %2 of size %3 %4 between angles %5° and %6°",
+            arc: "draw an arc at %1 %2 of size %3 %4 between angles %5 and %6",
             ellipse: "draw an ellipse at %1 %2 of size %3 %4",
             line: "draw a line from %1 %2 to %3 %4",
             point: "draw a point at %1 %2",
@@ -824,10 +824,10 @@ var getContext = function(display, infos) {
             printMatrix: "print transform matrix",
             pushMatrix: "push transform matrix",
             resetMatrix: "reset transform matrix",
-            rotate: "rotate by %1°",
-            rotateX: "rotate on X axis by %1°",
-            rotateY: "rotate on Y axis by %1°",
-            rotateZ: "rotate on Z axis by %1°",
+            rotate: "rotate by %1",
+            rotateX: "rotate on X axis by %1",
+            rotateY: "rotate on Y axis by %1",
+            rotateZ: "rotate on Z axis by %1",
             scale: "scale by %1 %2 %3",
             translate: infos['processing3D'] ? "translate by %1 %2 %3" : "translate by %1 %2",
             // effect_lights
@@ -1168,7 +1168,7 @@ var getContext = function(display, infos) {
 
    context.processing = {
       internalInstance: new Processing(),
-      ops: [],
+      ops: [], // This should actually be removed, we should draw directly
       state: {
          scale: 1,
          hideInitialDrawing: false
@@ -1238,6 +1238,31 @@ var getContext = function(display, infos) {
       }
    };
 
+   var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/index.html';
+   context.conceptList = [
+      {id: 'processing_introduction', name: 'Processing - introduction', url: conceptBaseUrl+'#processing_introduction'},
+      {id: 'processing_environment', name: 'Environnement', url: conceptBaseUrl+'#processing_environment'},
+      {id: 'processing_shape_2D', name: 'Formes - 2D', url: conceptBaseUrl+'#processing_shape_2D'},
+      {id: 'processing_shape_curves', name: 'Formes - courbes', url: conceptBaseUrl+'#processing_shape_curves'},
+      {id: 'processing_shape_attributes', name: 'Formes - ellipse', url: conceptBaseUrl+'#processing_shape_attributes'},
+      {id: 'processing_shape_vertex', name: 'Formes - sommets', url: conceptBaseUrl+'#processing_shape_vertex'},
+      {id: 'processing_shape_other', name: 'Formes - autres', url: conceptBaseUrl+'#processing_shape_other'},
+      {id: 'processing_transforms', name: 'Transformations', url: conceptBaseUrl+'#processing_transforms'},
+      {id: 'processing_effect_lights', name: 'Effets - lumière', url: conceptBaseUrl+'#processing_effect_lights'},
+      {id: 'processing_effect_camera', name: 'Effets - caméra', url: conceptBaseUrl+'#processing_effect_camera'},
+      {id: 'processing_coordinates', name: 'Effets - coordonnées', url: conceptBaseUrl+'#processing_coordinates'},
+      {id: 'processing_effect_matter', name: 'Effets - matière', url: conceptBaseUrl+'#processing_effect_matter'},
+      {id: 'processing_color_setting', name: 'Couleurs - réglages', url: conceptBaseUrl+'#processing_color_setting'},
+      {id: 'processing_image_displaying', name: 'Couleurs - création et lecture', url: conceptBaseUrl+'#processing_image_displaying'},
+      {id: 'processing_image_textures', name: 'Images - affichage', url: conceptBaseUrl+'#processing_image_textures'},
+      {id: 'processing_image_pixels', name: 'Images - pixels', url: conceptBaseUrl+'#processing_image_pixels'},
+      {id: 'processing_rendering', name: 'Rendu', url: conceptBaseUrl+'#processing_rendering'},
+      {id: 'processing_typography_display', name: 'Typographie - affichage', url: conceptBaseUrl+'#processing_typography_display'},
+      {id: 'processing_typography_attributes', name: 'Typographie - attributs', url: conceptBaseUrl+'#processing_typography_attributes'},
+      {id: 'processing_typography_measures', name: 'Typographie - mesures', url: conceptBaseUrl+'#processing_typography_measures'},
+      {id: 'processing_constants', name: '', url: conceptBaseUrl+'#processing_constants'},
+   ];
 
 
    function initGraphics2D(pg, forceInitialDrawing) {
@@ -2233,7 +2258,7 @@ var getContext = function(display, infos) {
       'String': { bType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
       'Colour': { bType: 'input_value', vType: 'colour_picker', fName: 'COLOUR', defVal: "#ffffff",
          conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
-      'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
+      'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_angle', fName: 'ANGLE', defVal: 0,
          conv: function(value) { return value * Math.PI / 180; } },
       'Const': { conv: function(value) { return context.processing.internalInstance[value] || value; } },
       'ColorModeConst': { options: ["RGB", "HSB"] },
@@ -2395,7 +2420,7 @@ var processingEndConditions = {
             context.processing.internalInstance.color(0xFF00FF00),
             initialPixels,
             finalPixels
-         )
+         );
       }
 
       if (options.checkAllFiguresConnected) {
@@ -2403,7 +2428,7 @@ var processingEndConditions = {
             context.processing.internalInstance.color(context.constants.BACKGROUND),
             finalPixels,
             context.processing.getCanvasSize().width
-         )
+         );
       }
 
       if (options.checkBackgroundCovered) {
@@ -2412,7 +2437,7 @@ var processingEndConditions = {
             initialPixels,
             finalPixels,
             options.checkBackgroundCovered
-         )
+         );
       }
 
       throw(window.languageStrings.messages.taskCompleted);
@@ -2427,7 +2452,7 @@ var processingEndConditions = {
          toAvoid,
          initialPixels,
          finalPixels
-      )
+      );
       if (!success[0] && !success[1]) {
          throw(window.languageStrings.messages.redNotCoveredGreenCovered || '');
       } else if (!success[0]) {
@@ -2480,7 +2505,7 @@ var processingEndConditions = {
          var old_root = links[ll];
          if (old_root) {
             if (new_root == old_root) return;
-            for (var i=0; i<links.length; i++) {
+            for (var i = 0; i < links.length; i++) {
                if (links[i] == old_root) {
                   links[i] = new_root;
                }
@@ -2491,8 +2516,8 @@ var processingEndConditions = {
       }
 
       var n = 0;
-      var fl,ft;
-      for (var i=0; i<pixels.getLength(); i++) {
+      var fl, ft;
+      for (var i = 0; i < pixels.getLength(); i++) {
          if (pixels.getPixel(i) === bg) continue;
          ll = i - 1 >= 0 ? labels[i - 1] : 0;
          lt = i - width >= 0 ? labels[i - width] : 0;
@@ -2510,14 +2535,14 @@ var processingEndConditions = {
          }
       }
       var v;
-      for (var i=0; i<labels.length; i++) {
+      for (var i = 0; i < labels.length; i++) {
          if (v = links[labels[i]]) {
             labels[i] = v;
          }
       }
       var count = 0;
       var is_counted = {};
-      for (var i=0; i<labels.length; i++) {
+      for (var i = 0; i < labels.length; i++) {
          v = labels[i];
          if (!v || is_counted[v]) continue;
          is_counted[v] = true;
@@ -2530,7 +2555,7 @@ var processingEndConditions = {
 
    ckeckBackgroundCovered: function(background, initialPixels, finalPixels, options) {
       var initial = processingEndConditions.getCoveredPixelsCount(background, initialPixels),
-         final = processingEndConditions.getCoveredPixelsCount(background, finalPixels);
+         final = processingEndConditions.getCoveredPixelsCount(background, finalPixels),
          delta = Math.abs(final - initial);
       if (delta < options.threshold) return;
       var score = Math.max(0, options.initial_score + options.threshold - delta * options.score_lost);
@@ -2547,7 +2572,7 @@ var processingEndConditions = {
 
    getCoveredPixelsCount: function(bg, pixels) {
       var res = 0;
-      for (var i=0; i<pixels.getLength(); i++) {
+      for (var i = 0; i < pixels.getLength(); i++) {
          if (pixels.getPixel(i) !== bg) {
             res++;
          }
@@ -2558,7 +2583,12 @@ var processingEndConditions = {
 
 };
 
-
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('processing', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['processing', getContext]);
+}
 
 /*
 pdebug = {

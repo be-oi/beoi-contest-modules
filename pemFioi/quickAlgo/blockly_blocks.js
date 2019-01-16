@@ -18,15 +18,22 @@ var blocklyToScratch = {
       'lists_setIndex': ['data_replaceitemoflist'],
       'logic_negate': ['operator_not'],
       'logic_boolean': [],
-      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
+      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt', 'operator_not'],
       'logic_operation': ['operator_and', 'operator_or'],
+      'text': [],
+      'text_append': [],
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
       'math_change': ['data_changevariableby'],
       'math_number': [],
       'variables_get': ['data_variable'],
       'variables_set': ['data_setvariableto']
-    }
+   },
+   wholeCategories: {
+      'loops': 'control',
+      'logic': 'operator',
+      'math': 'operator'
+   }
 };
 
 function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
@@ -35,14 +42,107 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    return {
       allBlocksAllowed: [],
 
+      getBlockLabel: function(type) {
+         // Fetch user-friendly name for the block
+         var msg = this.mainContext.strings.label[type];
+         // TODO :: Names for Blockly/Scratch blocks
+         return msg ? msg : type;
+      },
+
+      checkConstraints: function(workspace) {
+         // Check we satisfy constraints
+         return this.getRemainingCapacity(workspace) >= 0 && !this.findLimited(workspace);
+      },
+
+      makeLimitedUsesPointers: function() {
+         // Make the list of pointers for each block to the limitedUses it
+         // appears in
+         if(this.limitedPointers && this.limitedPointers.limitedUses === this.mainContext.infos.limitedUses) { return; }
+         this.limitedPointers = {
+            // Keep in memory the limitedUses these limitedPointers were made for
+            limitedUses: this.mainContext.infos.limitedUses
+            };
+         for(var i=0; i < this.mainContext.infos.limitedUses.length; i++) {
+            var curLimit = this.mainContext.infos.limitedUses[i];
+            if(this.scratchMode) {
+                // Convert block list to Scratch
+                var blocks = [];
+                for(var j=0; j < curLimit.blocks.length; j++) {
+                    var curBlock = curLimit.blocks[j];
+                    var convBlockList = blocklyToScratch.singleBlocks[curBlock];
+                    if(convBlockList) {
+                        for(var k=0; k < convBlockList.length; k++) {
+                            addInSet(blocks, convBlockList[k]);
+                        }
+                    } else {
+                        addInSet(blocks, curBlock);
+                    }
+                }
+            } else {
+                var blocks = curLimit.blocks;
+            }
+
+            for(var j=0; j < blocks.length; j++) {
+                var block = blocks[j];
+                if(!this.limitedPointers[block]) {
+                    this.limitedPointers[block] = [];
+                }
+                this.limitedPointers[block].push(i);
+            }
+         }
+      },
+
+      findLimited: function(workspace) {
+         // Check we don't use blocks with limited uses too much
+         // Returns false if there's none, else the name of the first block
+         // found which is over the limit
+         if(!this.mainContext.infos || !this.mainContext.infos.limitedUses) { return false; }
+         this.makeLimitedUsesPointers();
+
+         var workspaceBlocks = workspace.getAllBlocks();
+         var usesCount = {};
+
+         for(var i = 0; i < workspaceBlocks.length; i++) {
+            var blockType = workspaceBlocks[i].type;
+            if(!this.limitedPointers[blockType]) { continue; }
+            for(var j = 0; j < this.limitedPointers[blockType].length; j++) {
+                // Each pointer is a position in the limitedUses array that
+                // this block appears in
+                var pointer = this.limitedPointers[blockType][j];
+                if(!usesCount[pointer]) { usesCount[pointer] = 0; }
+                usesCount[pointer]++;
+
+                // Exceeded the number of uses
+                if(usesCount[pointer] > this.mainContext.infos.limitedUses[pointer].nbUses) {
+                    return blockType;
+                }
+            }
+         }
+
+         // All blocks are under the use limit
+         return false;
+      },
+
       getRemainingCapacity: function(workspace) {
          // Get the number of blocks allowed
+         if(!this.maxBlocks) { return Infinity; }
          var remaining = workspace.remainingCapacity(this.maxBlocks+1);
          if(this.maxBlocks && remaining == Infinity) {
             // Blockly won't return anything as we didn't set a limit
             remaining = this.maxBlocks+1 - workspace.getAllBlocks().length;
          }
          return remaining;
+      },
+
+      isEmpty: function(workspace) {
+         // Check if workspace is empty
+         if(!workspace) { workspace = this.workspace; }
+         var blocks = workspace.getAllBlocks();
+         if(blocks.length == 1) {
+            return blocks[0].type == 'robot_start';
+         } else {
+            return blocks.length == 0;
+         }
       },
 
       getCodeFromXml: function(xmlText, language) {
@@ -75,7 +175,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(this.getRemainingCapacity(codeWorkspace) < 0) {
+         if(!this.checkConstraints(codeWorkspace)) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }
@@ -145,7 +245,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if (block.yieldsValue) {
                block.blocklyJson.output = null;
                if(this.scratchMode) {
-                   block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   if(block.yieldsValue == 'int') {
+                       block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_ROUND;
+                   } else {
+                       block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   }
                    block.blocklyJson.colour = Blockly.Colours.sensing.primary;
                    block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
                    block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
@@ -566,7 +670,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "logic_operation",
-                  blocklyXml: "<block type='logic_operation'></block>"
+                  blocklyXml: "<block type='logic_operation' inline='false'></block>"
                },
                {
                   name: "logic_negate",
@@ -588,6 +692,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                }
             ],
             loops: [
+               {
+                  name: "controls_loop",
+                  blocklyXml: "<block type='controls_loop'></block>",
+                  excludedByDefault: true
+               },
                {
                   name: "controls_repeat",
                   blocklyXml: "<block type='controls_repeat'></block>",
@@ -885,6 +994,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='text'></block>"
                },
                {
+                  name: "text_eval",
+                  blocklyXml: "<block type='text_eval'></block>"
+               },
+               {
                   name: "text_print",
                   blocklyXml: "<block type='text_print'>" +
                               "  <value name='TEXT'>" +
@@ -1135,6 +1248,133 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                {
                   name: "lists_append",
                   blocklyXml: "<block type='lists_append'></block>"
+               }
+            ],
+            tables: [
+               {
+                  name: "tables_2d_init",
+                  blocklyXml: "<block type='tables_2d_init'>" +
+                              "  <value name='LINES'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COLS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_2d_set",
+                  blocklyXml: "<block type='tables_2d_set'>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_2d_get",
+                  blocklyXml: "<block type='tables_2d_get'>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_init",
+                  blocklyXml: "<block type='tables_3d_init'>" +
+                              "  <value name='LAYERS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINES'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COLS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_set",
+                  blocklyXml: "<block type='tables_3d_set'>" +
+                              "  <value name='LAYER'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_get",
+                  blocklyXml: "<block type='tables_3d_get'>" +
+                              "  <value name='LAYER'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
                }
             ],
             // Note :: this category is not enabled unless explicitly specified
@@ -1399,6 +1639,133 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   }
                ],
+            tables: [
+               {
+                  name: "tables_2d_init",
+                  blocklyXml: "<block type='tables_2d_init'>" +
+                              "  <value name='LINES'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COLS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_2d_set",
+                  blocklyXml: "<block type='tables_2d_set'>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_2d_get",
+                  blocklyXml: "<block type='tables_2d_get'>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_init",
+                  blocklyXml: "<block type='tables_3d_init'>" +
+                              "  <value name='LAYERS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINES'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COLS'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_set",
+                  blocklyXml: "<block type='tables_3d_set'>" +
+                              "  <value name='LAYER'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='ITEM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "tables_3d_get",
+                  blocklyXml: "<block type='tables_3d_get'>" +
+                              "  <value name='LAYER'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>2</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LINE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='COL'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               }
+            ],
             texts: [
                {
                   name: "text_print",
@@ -1419,6 +1786,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "    </shadow>" +
                               "  </value>" +
                               "</block>"
+               },
+               {
+                  name: "text_eval",
+                  blocklyXml: "<block type='text_eval'></block>"
                }
                ],
             variables: [],
@@ -1458,7 +1829,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   colour: colours.blocks[blockName]
                };
             }
-            categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+            var blockXml = blockXmlInfo.xml;
+            if(categoriesInfos[categoryName].blocksXml.indexOf(blockXml) == -1) {
+               categoriesInfos[categoryName].blocksXml.push(blockXml);
+            }
             this.allBlocksAllowed.push(blockName);
          }
 
@@ -1495,7 +1869,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
 
-         if('wholeCategories' in this.includeBlocks.generatedBlocks) {
+         if(this.includeBlocks.generatedBlocks && 'wholeCategories' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.wholeCategories) {
               var categories = this.includeBlocks.generatedBlocks.wholeCategories[blockType];
               for(var i=0; i<categories.length; i++) {
@@ -1515,7 +1889,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               }
             }
          }
-         if('singleBlocks' in this.includeBlocks.generatedBlocks) {
+         if(this.includeBlocks.generatedBlocks && 'singleBlocks' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.singleBlocks) {
               this.addBlocksAndCategories(
                 this.includeBlocks.generatedBlocks.singleBlocks[blockType],
@@ -1551,14 +1925,22 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          if (this.includeBlocks.standardBlocks.includeAll) {
             if(this.scratchMode) {
-               this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "texts", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "tables", "texts", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"];
             }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
+         var handledCategories = [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
+            if(this.scratchMode && !this.includeBlocks.standardBlocks.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
+               categoryName = blocklyToScratch.wholeCategories[categoryName];
+            }
+
+            if(handledCategories.indexOf(categoryName) != -1) { continue; }
+            handledCategories.push(categoryName);
+
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: []
@@ -1708,6 +2090,21 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.JavaScript['controls_untilWhile'] = Blockly.JavaScript['controls_whileUntil'];
          Blockly.Python['controls_untilWhile'] = Blockly.Python['controls_whileUntil'];
 
+         Blockly.Blocks['math_angle'] = {
+            init: function() {
+               this.setOutput(true, 'Number');
+               this.appendDummyInput()
+                   .appendField(new Blockly.FieldAngle(90), "ANGLE");
+               this.setColour(Blockly.Blocks.math.HUE);
+            }
+         };
+         Blockly.JavaScript['math_angle'] = function(block) {
+           return ['' + block.getFieldValue('ANGLE'), Blockly.JavaScript.ORDER_FUNCTION_CALL];
+         };
+         Blockly.Python['math_angle'] = function(block) {
+           return ['' + block.getFieldValue('ANGLE'), Blockly.Python.ORDER_FUNCTION_CALL];
+         };
+
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -1802,6 +2199,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
            return [code, Blockly.Python.ORDER_FUNCTION_CALL];
          };
 
+         Blockly.Blocks['controls_loop'] = {
+           init: function() {
+             this.appendDummyInput()
+             .appendField(that.strings.loopRepeat);
+             this.appendStatementInput("inner_blocks")
+             .setCheck(null)
+             .appendField(that.strings.loopDo);
+             this.setPreviousStatement(true, null);
+             this.setNextStatement(true, null);
+             this.setColour(that.getDefaultColours().categories["loops"])
+             this.setTooltip("");
+             this.setHelpUrl("");
+           }
+         }
+         Blockly.JavaScript['controls_loop'] = function(block) {
+           var statements = Blockly.JavaScript.statementToCode(block, 'inner_blocks');
+           var code = 'while(true){\n' + statements + '}\n';
+           return code;
+         };
+
 
          if(this.scratchMode) {
             Blockly.Blocks['robot_start'] = {
@@ -1878,7 +2295,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       fixScratch: function() {
-         // Store the maxBlocks information somehwere, as Scratch ignores it
+         // Store the maxBlocks information somewhere, as Scratch ignores it
          Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
          // Translate requested Blocks from Blockly to Scratch blocks
@@ -1914,14 +2331,46 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return !(notAllowed.length);
       },
 
-      cleanBlockIds: function(xml) {
-         // Clean up block IDs which contain now forbidden characters
+      cleanBlockAttributes: function(xml, origin) {
+         // Clean up block attributes
+         if(!origin) {
+            origin = {x: 0, y: 0};
+         }
          var blockList = xml.getElementsByTagName('block');
+         var minX = Infinity, minY = Infinity;
          for(var i=0; i<blockList.length; i++) {
             var block = blockList[i];
+
+            // Clean up IDs which contain now forbidden characters
             var blockId = block.getAttribute('id');
             if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
                block.setAttribute('id', Blockly.genUid());
+            }
+
+            // Clean up read-only attributes
+            if(block.getAttribute('type') != 'robot_start') {
+               block.removeAttribute('deletable');
+               block.removeAttribute('movable');
+               block.removeAttribute('editable');
+            }
+
+            // Get minimum x and y
+            var x = block.getAttribute('x');
+            if(x !== null) { minX = Math.min(minX, parseInt(x)); }
+            var y = block.getAttribute('y');
+            if(y !== null) { minY = Math.min(minY, parseInt(y)); }
+         }
+
+         // Move blocks to start at x=0, y=0
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var x = block.getAttribute('x');
+            if(x !== null) {
+                block.setAttribute('x', parseInt(x) - minX + origin.x);
+            }
+            var y = block.getAttribute('y');
+            if(y !== null) {
+                block.setAttribute('y', parseInt(y) - minY + origin.y);
             }
          }
       }
