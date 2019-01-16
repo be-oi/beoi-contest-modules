@@ -1045,7 +1045,7 @@ window.displayHelper = {
          buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + noButtonText + '</button>';
       }
       var popupHtml = '<div class="container">' +
-         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
+         '<img class="beaver" style="left:10px;" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>';
       if(mode == 'input') {
