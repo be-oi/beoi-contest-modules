@@ -765,20 +765,20 @@ var getContext = function(display, infos, curLevel) {
 
          nl: {
             label: {
-               dropObject: "semer une graine",
-               onContainer: "terre sur la case",
-               obstacleInFront: "fleur devant"
+               dropObject: "een zaadje zaaien",
+               onContainer: "aarde op het vakje",
+               obstacleInFront: "bloem voor"
             },
             code: {
-               dropObject: "semerGraine",
-               onContainer: "terreSurCase",
-               obstacleInFront: "fleurDevant"
+               dropObject: "zaadjeZaaien",
+               onContainer: "aardeOpVakje",
+               obstacleInFront: "bloemVoor"
             },
             messages: {
-               successContainersFilled: "Bravo, votre robot est un bon jardinier !",
-               failureContainersFilled: "Votre robot a semé hors des zones de terre.",
-               failureContainersFilledLess: "Il reste de la terre vide de fleur !",
-					obstacle: "Attention à la fleur !",
+               successContainersFilled: "Bravo, jouw robot is een goede tuinman!",
+               failureContainersFilled: "Jouw robot heeft buiten de vakjes met aarde gezaaid.",
+               failureContainersFilledLess: "Er is nog aarde zonder bloemen!",
+					obstacle: "Opgepast voor de bloem!",
             }
          },
 
