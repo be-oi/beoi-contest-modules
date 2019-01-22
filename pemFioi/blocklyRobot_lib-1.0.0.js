@@ -319,46 +319,46 @@ var getContext = function(display, infos, curLevel) {
                shootCondition_noShadow: "Rückkehr von der Schießrichtung %1"
             },
             code: {
-               row: "ligneRobot",
-               col: "colonneRobot",
-               north: "haut",
-               south: "bas",
-               east: "droite",
-               west: "gauche",
-               left: "tournerGauche",
-               right: "tournerDroite",
-               turnAround: "demiTour",
-               forward: "avancer",
-               backwards: "reculer",
-               jump: "sauter",
-               obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleDroite",
-               obstacleWest: "obstacleGauche",
-               obstacleNorth: "obstacleHaut",
-               obstacleSouth: "obstacleBas",
-               obstacleRight: "obstacleDroiteRel",
-               obstacleLeft: "obstacleGaucheRel",
-               gridEdgeEast: "bordGrilleDroite",
-               gridEdgeWest: "bordGrilleGauche",
-               gridEdgeNorth: "bordGrilleHaut",
-               gridEdgeSouth: "bordGrilleBas",
-               platformInFront: "plateformeDevant",
-               platformAbove: "plateformeDessus",
-               withdrawObject: "ramasserObjet",
-               dropObject: "deposerObjet",
-               onObject: "surObjet",
-               onContainer: "surConteneur",
-               onNumber: "surNombre",
-               onWritable: "surTableau",
-               onLauncher: "surLanceur",
-               writeNumber: "ecrireNombre",
-               readNumber: "nombreSurCase",
-               pushObject: "pousserObjet",
-               pushableInFront: "poussableDevant",
-               shoot: "tirerLaser",
-               shoot_noShadow: "tirerLaser",
-               shootCondition: "tirerCondition",
-               shootCondition_noShadow: "tirerCondition"
+               row: "zeileRoboter",
+               col: "spalteRoboter",
+               north: "oben",
+               south: "unten",
+               east: "rechts",
+               west: "links",
+               left: "linksDrehen",
+               right: "rechtsDrehen",
+               turnAround: "umkehren",
+               forward: "vorwaerts",
+               backwards: "rueckwaerts",
+               jump: "springen",
+               obstacleInFront: "hindernisVoraus",
+               obstacleEast: "hindernisRechts",
+               obstacleWest: "hindernisLinks",
+               obstacleNorth: "hindernisOben",
+               obstacleSouth: "hindernisUnten",
+               obstacleRight: "hindernisRechtsRel",
+               obstacleLeft: "hindernisLinksRel",
+               gridEdgeEast: "gitterrandRechts",
+               gridEdgeWest: "gitterrandLinks",
+               gridEdgeNorth: "gitterrandOben",
+               gridEdgeSouth: "gitterrandUnten",
+               platformInFront: "plattformVoraus",
+               platformAbove: "plattformOben",
+               withdrawObject: "objektEinsammeln",
+               dropObject: "objektAbsetzen",
+               onObject: "aufObjekt",
+               onContainer: "aufContainer",
+               onNumber: "aufZahl",
+               onWritable: "aufTabelle",
+               onLauncher: "aufLaser",
+               writeNumber: "schreibeZahl",
+               readNumber: "leseZahl",
+               pushObject: "objektDruecken",
+               pushableInFront: "verschiebbaresObjektVoraus",
+               shoot: "laserFeuern",
+               shoot_noShadow: "laserFeuern",
+               shootCondition: "abfeuerBedingung",
+               shootCondition_noShadow: "abfeuerBedingung"
             },
             messages: {
                leavesGrid: "Der Roboter hat das Gitter verlassen!",
@@ -381,7 +381,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Der Roboter hat nicht alle Behälter gefüllt.",
                failureContainersFilledBag: "Der Roboter hat nicht alle Objekte platziert.",
                failureUnfilteredObject: "Dein Roboter hat ein nicht erlaubtes Objekt aufgehoben!",
-               failureTooManyMoves: "Votre robot a effectué trop de déplacements.",
+               failureTooManyMoves: "Dein Roboter hat zu viele Bewegungen ausgeführt.",
                failureWriteHere: "Der Roboter kann an dieser Stelle nicht schreiben!",
                failureReadHere: "An dieser Stelle steht keine Zahl!",
                successNumbersWritten: "Bravo! Der Roboter hat die richtigen Zahlen geschrieben.",
@@ -784,20 +784,20 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               dropObject: "semer une graine",
-               onContainer: "terre sur la case",
-               obstacleInFront: "fleur devant"
+               dropObject: "Samen aussäen",
+               onContainer: "Erde auf dem Feld",
+               obstacleInFront: "Blume voraus"
             },
             code: {
-               dropObject: "semerGraine",
-               onContainer: "terreSurCase",
-               obstacleInFront: "fleurDevant"
+               dropObject: "samenAussaeen",
+               onContainer: "erdeAufFeld",
+               obstacleInFront: "blumeVoraus"
             },
             messages: {
-               successContainersFilled: "Bravo, votre robot est un bon jardinier !",
-               failureContainersFilled: "Votre robot a semé hors des zones de terre.",
-               failureContainersFilledLess: "Il reste de la terre vide de fleur !",
-					obstacle: "Attention à la fleur !",
+               successContainersFilled: "Bravo, dein Roboter ist ein guter Gärtner !",
+               failureContainersFilled: "Dein Roboter hat ausserhalb der Erde gesät.",
+               failureContainersFilledLess: "Es gibt noch Erde ohne Blumen !",
+					obstacle: "Achtung, beachte die Blume !",
             }
          },
 
@@ -964,24 +964,24 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               withdrawObject: "ramasser la bille",
-               dropObject: "déposer la bille",
-               onObject: "sur une bille",
-               onContainer: "sur un trou",
+               withdrawObject: "die Kugel einsammeln",
+               dropObject: "die Kugel absetzen",
+               onObject: "auf einer Kugel",
+               onContainer: "auf einem Loch",
             },
             code: {
-               withdrawObject: "ramasserBille",
-               dropObject: "deposerBille",
-               onObject: "surBille",
-               onContainer: "surTrou",
+               withdrawObject: "kugelEinsammeln",
+               dropObject: "kugelAbsetzen",
+               onObject: "aufKugel",
+               onContainer: "aufLoch",
             },
             messages: {
-               emptyBag: "Le robot ne porte pas de bille !",
-               tooManyObjects: "Le robot porte déjà une bille !",
-               successContainersFilled: "Bravo, vous avez rangé les billes !",
-               failureContainersFilled: "Les billes ne sont pas toutes bien rangées.",
-               failureContainersFilledLess: "Il reste une bille à ranger.",
-               failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
+               emptyBag: "Der Roboter trägt keine Kugel !",
+               tooManyObjects: "Der Roboter trägt schon eine Kugel !",
+               successContainersFilled: "Bravo, du hast alle Kugeln sortiert !",
+               failureContainersFilled: "Nicht alle Kugeln sind richtig sortiert.",
+               failureContainersFilledLess: "Eine Kugel muss noch sortiert werden.",
+               failureContainersFilledBag: "Du musst die Kugel in einem Loch absetzen !",
             }
          },
 
@@ -1150,25 +1150,25 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               pushObject: "pousser la caisse",
-               onContainer: "sur une case marquée",
-               pushableInFront: "caisse devant",
-               obstacleInFront: "obstacle devant",
-               readNumber: "nombre de la case"
+               pushObject: "schiebe die Kiste",
+               onContainer: "auf einem markiertem Feld",
+               pushableInFront: "kisteVoraus",
+               obstacleInFront: "hindernisVoraus",
+               readNumber: "Feldzahl"
             },
             code: {
-               pushObject: "pousserCaisse",
-               onContainer: "surCaseMarquee",
-               pushableInFront: "caisseDevant",
-               obstacleInFront: "obstacleDevant",
-               readNumber: "nombreSurCase"
+               pushObject: "schiebeKiste",
+               onContainer: "aufMarkiertemFeld",
+               pushableInFront: "kisteVoraus",
+               obstacleInFront: "hindernisVoraus",
+               readNumber: "feldzahl"
             },
             messages: {
-               successContainersFilled: "Bravo, les caisses sont bien rangées !",
-               failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
-               failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
-               failureWhilePushing: "Le robot ne peut pas pousser ici !",
-               obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
+               successContainersFilled: "Bravo, die Kisten sind alle sortiert !",
+               failureContainersFilled: "Es geben noch Kisten, die nicht an ihrer richtigen Stelle sind.",
+               failureNothingToPush: "Hier kann keine Kiste geschoben werden !",
+               failureWhilePushing: "Der Roboter kann hier nicht schieben !",
+               obstacle: "Der Roboter versucht in eine Mauer oder in eine Kiste zu schieben !"
             }
          },
 
