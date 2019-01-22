@@ -438,7 +438,7 @@ window.displayHelper = {
          youDidBetterBefore: "Je hebt eerder al beter gedaan.",
          scoreStays2: "Je score blijft hetzelfde.",
          reloadBestAnswer: "Herlaad je beste antwoord.",
-         noAnswerSaved: "No answer saved so far for this version.",
+         noAnswerSaved: "Nog geen antwoord opgeslagen voor deze versie.",
          validate: "Valideren",
          restart: "Herbeginnen",
          harderLevelSolved: "Let op: je hebt al een moeilijkere versie opgelost. Je kan met deze versie geen extra punten halen.",
