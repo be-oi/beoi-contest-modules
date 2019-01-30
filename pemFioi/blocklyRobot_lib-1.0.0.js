@@ -941,24 +941,24 @@ var getContext = function(display, infos, curLevel) {
 
          nl: {
             label: {
-               withdrawObject: "ramasser la bille",
-               dropObject: "déposer la bille",
-               onObject: "sur une bille",
-               onContainer: "sur un trou",
+               withdrawObject: "de knikker oprapen",
+               dropObject: "de knikker neerleggen",
+               onObject: "op een knikker",
+               onContainer: "op een gat",
             },
             code: {
-               withdrawObject: "ramasserBille",
-               dropObject: "deposerBille",
-               onObject: "surBille",
-               onContainer: "surTrou",
+               withdrawObject: "knikkerOprapen",
+               dropObject: "knikkerNeerleggen",
+               onObject: "opKnikker",
+               onContainer: "opGat",
             },
             messages: {
-               emptyBag: "Le robot ne porte pas de bille !",
-               tooManyObjects: "Le robot porte déjà une bille !",
-               successContainersFilled: "Bravo, vous avez rangé les billes !",
-               failureContainersFilled: "Les billes ne sont pas toutes bien rangées.",
-               failureContainersFilledLess: "Il reste une bille à ranger.",
-               failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
+               emptyBag: "De robot draagt geen knikker!",
+               tooManyObjects: "De robot draagt reeds een knikker!",
+               successContainersFilled: "Bravo, je hebt de knikkers correct verlegd!",
+               failureContainersFilled: "De knikkers zijn niet allemaal goed verlegd.",
+               failureContainersFilledLess: "Je moet nog één knikker correct leggen.",
+               failureContainersFilledBag: "Je moet de knikkers in een gat leggen!",
             }
          },
 
