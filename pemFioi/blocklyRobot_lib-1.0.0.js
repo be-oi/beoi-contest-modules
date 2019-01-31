@@ -403,6 +403,7 @@ var getContext = function(display, infos, curLevel) {
                right: "draai naar rechts",
                left: "draai naar links",
                forward: "ga vooruit",
+               backwards: "ga achteruit",
                turnAround: "maak rechtsomkeer",
                jump: "spring",
                down: "naar beneden",
@@ -1126,25 +1127,25 @@ var getContext = function(display, infos, curLevel) {
 
          nl: {
             label: {
-               pushObject: "pousser la caisse",
-               onContainer: "sur une case marquée",
-               pushableInFront: "caisse devant",
-               obstacleInFront: "obstacle devant",
-               readNumber: "nombre de la case"
+               pushObject: "duw de kist vooruit",
+               onContainer: "op een gemarkeerd vak",
+               pushableInFront: "kist voor",
+               obstacleInFront: "obstakel voor",
+               readNumber: "nummer van de kist"
             },
             code: {
-               pushObject: "pousserCaisse",
-               onContainer: "surCaseMarquee",
-               pushableInFront: "caisseDevant",
-               obstacleInFront: "obstacleDevant",
-               readNumber: "nombreSurCase"
+               pushObject: "duwKist",
+               onContainer: "opGemarkeerdVak",
+               pushableInFront: "kistVoor",
+               obstacleInFront: "obstakelVoor",
+               readNumber: "nummerVanKist"
             },
             messages: {
-               successContainersFilled: "Bravo, les caisses sont bien rangées !",
-               failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
-               failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
-               failureWhilePushing: "Le robot ne peut pas pousser ici !",
-               obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
+               successContainersFilled: "Proficiat, de kisten staan juist!",
+               failureContainersFilled: "Er zijn nog kisten die niet op hun plaats staan.",
+               failureNothingToPush: "Er is hier geen kist om tegen te duwen!",
+               failureWhilePushing: "De robot kan hier niet duwen!",
+               obstacle: "De robot botst tegen een muur of een kist!"
             }
          },
 
