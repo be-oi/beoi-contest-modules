@@ -1864,6 +1864,31 @@ var getContext = function(display, infos, curLevel) {
             number: { num: 5, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
+      },
+      beoi2020bruno: {
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            0: { num: 10, side: 60, category: "number", isObstacle: false, value: 0, zOrder: 3 },
+            1: { num: 11, side: 60, category: "number", isObstacle: false, value: 1, zOrder: 3 },
+            2: { num: 12, side: 60, category: "number", isObstacle: false, value: 2, zOrder: 3 },
+            3: { num: 13, side: 60, category: "number", isObstacle: false, value: 3, zOrder: 3 },
+            4: { num: 14, side: 60, category: "number", isObstacle: false, value: 4, zOrder: 3 },
+            5: { num: 15, side: 60, category: "number", isObstacle: false, value: 5, zOrder: 3 },
+            6: { num: 16, side: 60, category: "number", isObstacle: false, value: 6, zOrder: 3 },
+            7: { num: 17, side: 60, category: "number", isObstacle: false, value: 7, zOrder: 3 },
+            8: { num: 18, side: 60, category: "number", isObstacle: false, value: 8, zOrder: 3 },
+            9: { num: 19, side: 60, category: "number", isObstacle: false, value: 9, zOrder: 3 }
+         }
+      },
+      beoi2020q08: {
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
+            cone: { num: 3, img: "cone.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
+            contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 },
+            fixed_cone: { num: 5, img: "radioactive.png", side: 60, isObstacle: true, zOrder: 1 },
+            number: { num: 6, side: 60, zOrder: 1 }
+         }
       }
    };
    var iconSrc = $("img[src$='icon.png']").attr("src");
