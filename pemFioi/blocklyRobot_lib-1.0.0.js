@@ -1031,6 +1031,24 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
          },
+         nl: {
+             label: {
+               dropObject: "schilder het vakje",
+               onContainer: "op een gemarkeerd vakje",
+               readNumber: "nummer van het vakje",
+             },
+             code: {
+                dropObject: "schilderVakje",
+                onContainer: "opGemarkeerdVakje",
+                readNumber: "nummerVanVakje",
+             },
+             messages: {
+               successContainersFilled: "Proficiat, jouw robot heeft het motief geschilderd!",
+               failureContainersFilled: "Jouw robot heeft niet de juiste vakjes geschilderd.",
+               failureContainersFilledLess: "Jouw robot heeft niet alle gemarkeerde vakjes geschilderd.",
+               failureContainersFilledBag: "Jouw robot heeft niet alle objecten geplaatst.",
+             }
+         },
 
          es: {
              label: {
