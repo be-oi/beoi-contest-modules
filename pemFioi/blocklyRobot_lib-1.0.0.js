@@ -422,6 +422,7 @@ var getContext = function(display, infos, curLevel) {
                onFullObject: "op een volgekleurd object",
                onStripedObject: "op een gestreept object",
                onHole: "op een gat",
+               onContainer: "op een container",
                transportableShape: "vorm van het object",
                transportableColor: "kleur van het object",
                transportableRed:  "het object is rood",
@@ -454,6 +455,7 @@ var getContext = function(display, infos, curLevel) {
                paintNorthEast: "kleur rechtsboven",
                colorUnder: "kleur van het vakje",
                numberUnder: "nummer van het vakje",
+               readNumber: "nummer van het vakje",
                writeNumber: "geef het vakje nummer",
                dir: "richting van de robot",
                col: "kolom van de robot",
@@ -492,6 +494,7 @@ var getContext = function(display, infos, curLevel) {
                onFullObject: "opVolgekleurd",
                onStripedObject: "opGestreept",
                onHole: "opGat",
+               onContainer: "opContainer",
                transportableShape: "vormObject",
                transportableColor: "kleurObject",
                transportableRed: "objectRood",
@@ -524,6 +527,7 @@ var getContext = function(display, infos, curLevel) {
                paintNorthEast: "kleurRechtsboven",
                colorUnder: "kleurVakje",
                numberUnder: "nummerVakje",
+               readNumber: "nummerVakje",
                writeNumber: "schrijfNummer",
                dir: "richting",
                col: "kolom",
@@ -1029,6 +1033,24 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
                failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
+             }
+         },
+         nl: {
+             label: {
+               dropObject: "schilder het vakje",
+               onContainer: "op een gemarkeerd vakje",
+               readNumber: "nummer van het vakje",
+             },
+             code: {
+                dropObject: "schilderVakje",
+                onContainer: "opGemarkeerdVakje",
+                readNumber: "nummerVanVakje",
+             },
+             messages: {
+               successContainersFilled: "Proficiat, jouw robot heeft het motief geschilderd!",
+               failureContainersFilled: "Jouw robot heeft niet de juiste vakjes geschilderd.",
+               failureContainersFilledLess: "Jouw robot heeft niet alle gemarkeerde vakjes geschilderd.",
+               failureContainersFilledBag: "Jouw robot heeft niet alle objecten geplaatst.",
              }
          },
 
