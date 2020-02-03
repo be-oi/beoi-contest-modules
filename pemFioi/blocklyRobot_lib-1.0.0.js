@@ -475,7 +475,21 @@ var getContext = function(display, infos, curLevel) {
                trans_col: "kolom van het te verplaatsen object",
 
                decrement: "verminder het nummer van het vakje met 1",
-               numberIsZero: "robot op een 0"
+               numberIsZero: "robot op een 0",
+
+               withdrawObject: "ramasser l'objet",
+               dropObject: "déposer l'objet",
+               onObject: "sur un objet",
+               onNumber: "sur un nombre",
+               onWritable: "sur un tableau",
+               onLauncher: "sur un lanceur laser",
+               pushObject: "pousser l'objet",
+               pushableInFront: "poussable devant",
+               shoot: "tirer au laser dans la direction %1",
+               shoot_noShadow: "tirer au laser dans la direction %1",
+               shootCondition: "retour départ tir direction %1",
+               shootCondition_noShadow: "retour départ tir direction %1"
+
             },
             code: {
                wait: "wachten",
@@ -547,7 +561,24 @@ var getContext = function(display, infos, curLevel) {
                trans_col: "kolomTransportable",
 
                decrement: "trekEenAf",
-               numberIsZero: "nummerIsNul"
+               numberIsZero: "nummerIsNul",
+
+               jump: "sauter",
+               gridEdgeNorth: "bordGrilleHaut",
+               gridEdgeSouth: "bordGrilleBas",
+               withdrawObject: "ramasserObjet",
+               dropObject: "deposerObjet",
+               onObject: "surObjet",
+               onContainer: "surConteneur",
+               onNumber: "surNombre",
+               onWritable: "surTableau",
+               onLauncher: "surLanceur",
+               pushObject: "pousserObjet",
+               pushableInFront: "poussableDevant",
+               shoot: "tirerLaser",
+               shoot_noShadow: "tirerLaser",
+               shootCondition: "tirerCondition",
+               shootCondition_noShadow: "tirerCondition"
             },
             messages: {
                nothingToPickUp: "Niets op te rapen.",
