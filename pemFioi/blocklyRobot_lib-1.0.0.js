@@ -712,7 +712,7 @@ var getContext = function(display, infos, curLevel) {
                platformInFront: "platformInFront",
                platformAbove: "platformAbove",
                withdrawObject: "withdrawObject",
-               dropObject: " dropObject",
+               dropObject: "dropObject",
                onObject: "onObject",
                onContainer: "onContainer",
                onNumber: " onNumber",
