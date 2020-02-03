@@ -22,6 +22,12 @@ var getContext = function(display, infos, curLevel) {
         messages: {},
         description: {}
       },
+      en: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
+      },
       nl: {
          label: {},
          code: {},
