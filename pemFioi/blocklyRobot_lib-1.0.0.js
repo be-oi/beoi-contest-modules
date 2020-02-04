@@ -1229,20 +1229,20 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-              dropObject: "peindre la case",
-              onContainer: "sur une case marquée",
-              readNumber: "nombre de la case",
+              dropObject: "Feld ausmalen",
+              onContainer: "auf ausgemaltem Feld",
+              readNumber: "Zahl des Feldes",
             },
             code: {
-               dropObject: "peindreCase",
-               onContainer: "surCaseMarquee",
-               readNumber: "nombreSurCase",
+               dropObject: "FeldAusmalen",
+               onContainer: "aufAusgemaltemFeld",
+               readNumber: "ZahlDesFeldes",
             },
             messages: {
-              successContainersFilled: "Bravo, votre robot a peint le motif !",
-              failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
-              failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
-              failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
+              successContainersFilled: "Bravo, dein Roboter hat dein Feld ausgemalt !",
+              failureContainersFilled: "Dein Roboter hat nicht die richtigen Felder ausgemalt.",
+              failureContainersFilledLess: "Dein Roboter hat nicht alle Felder ausgemalt.",
+              failureContainersFilledBag: "Dein Roboter hat nicht alle Objekte abgesetzt !",
             }
         },
 
