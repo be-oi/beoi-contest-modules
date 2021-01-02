@@ -7,11 +7,16 @@ var Beav = new Object();
 Beav.Object = new Object();
 
 Beav.Object.eq = function eq(x, y) {
-   // assumes arguments to be of same type
+   // assumes arguments to be of same type, except if one of the two arguments is null,
+   // in which case the comparison returns true if the other argument is also null.
+   if (x == null || y == null) {
+      return (x == null && y == null);
+   }
    var tx = typeof(x);
-   var ty = typeof(y);
-   if (tx != ty)
+   var ty = typeof(y); 
+   if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
+   }
    if (tx == "boolean" || tx == "number" || tx == "string" || tx == "undefined") {
       return x == y;
    }
@@ -50,6 +55,10 @@ Beav.Object.eq = function eq(x, y) {
       return true;
    }
    throw "Beav.Object.eq unsupported types";
+};
+
+Beav.Object.clone = function(obj) {
+   return JSON.parse(JSON.stringify(obj))
 };
 
 
@@ -366,6 +375,57 @@ Beav.Raphael.lineRelative = function(paper, x1, y1, dx, dy) {
    return Beav.Raphael.line(paper, x1, y1, x1+dx, y1+dy);
 };
 
+Beav.Raphael.loadTextExtensions = function(paper) {
+   paper.text_prebeav = paper.text;
+
+   var valign = function(dir) { // dir = 'center', or 'top', or 'bottom'
+      var b = this.getBBox();
+      var h = b.height;
+      var d = 0;
+      if (dir == 'center') {
+         d = 0;
+      } else if (dir == 'top') {
+         d = h/2;
+      } else if (dir == 'top') {
+         d = - h/2; // TODO: maybe remove one pixel in case h is odd number?
+      }
+      try {
+         // this.translate(0, d); // not supported by IE8
+         // this.attr({'y': b.y + d}); // does not seem to work
+         this.transform("t0," + d); // workaround?
+      } catch(e) {}
+      return this;
+   };
+
+   paper.text = function(x, y, text, fontSize) {
+      if(!window.enableRtl || !text || typeof text == "string" || !text.length) {
+         var txt = paper.text_prebeav(x, y, text);
+         txt.valign = valign;
+         return txt;
+      }
+      var set = paper.set();
+      if(!fontSize) { fontSize = 16; }
+      var lineHeight = fontSize * 1.2; // Raphael's line-height
+      var startY = y - ((text.length - 1) / 2) * lineHeight
+      for(var i = 0; i < text.length; i++) {
+         var txt = paper.text_prebeav(x, startY + i * lineHeight, text[i]);
+         txt.valign = valign;
+         set.push(txt);
+      }
+      return set;
+   }
+
+   var setproto = paper.set().__proto__;
+   try {
+   setproto.valign = function(dir) {
+      this.forEach(function(item) {
+         item.valign(dir);
+      });
+      return this;
+   };
+   } catch(err) {
+   }
+};
 
 /**********************************************************************************/
 /* Random */
@@ -387,3 +447,74 @@ Beav.Task.scoreInterpolate = function(minScore, maxScore, minResult, maxResult, 
    return Math.round(minScore + (maxScore - minScore) * (result - minResult) / (maxResult - minResult));
 };
 
+
+/**********************************************************************************/
+/* Geometry */
+
+Beav.Geometry = new Object();
+
+Beav.Geometry.distance = function(x1,y1,x2,y2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
+};
+
+/*
+   This is used to handle drag on devices that have both a touch screen and a mouse.
+   Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
+   To call instead of element.drag(onMove, onStart, onEnd);
+*/
+Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
+   var touchingX = 0;
+   var touchingY = 0;
+   var disabled = false;
+
+   function onTouchStart(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      touchingX = touches[0].pageX;
+      touchingY = touches[0].pageY;
+      onStart(touches[0].pageX, touches[0].pageY, evt);         
+   }
+
+   function onTouchEnd(evt) {
+      if (disabled) {
+         return;
+      }
+      onEnd(null);
+   }
+   
+   function onTouchMove(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      var dx = touches[0].pageX - touchingX;
+      var dy = touches[0].pageY - touchingY;
+      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+   }
+   
+   function callOnStart(x,y,event) {
+      disabled = true;
+      onStart(x,y,event);
+   }
+   
+   function callOnMove(dx,dy,x,y,event) {
+      disabled = true;
+      onMove(dx,dy,x,y,event);
+   }
+   
+   function callOnEnd(event) {
+      disabled = false;
+      onEnd(event);
+   }
+
+   // element.undrag();
+   element.drag(callOnMove,callOnStart,callOnEnd);
+   if (element.touchstart) {
+      element.touchstart(onTouchStart);
+      element.touchend(onTouchEnd);
+      element.touchcancel(onTouchEnd);
+      element.touchmove(onTouchMove);
+   }
+}

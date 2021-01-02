@@ -7,6 +7,8 @@ var importableModules = function () {
    return {
       'jquery-1.7.1': {src: modulesPath+"/ext/jquery/1.7/jquery.min.js", id: "http://code.jquery.com/jquery-1.7.1.min.js"},
       'jquery-ui.touch-punch': {src: modulesPath+"/ext/jquery-ui/jquery.ui.touch-punch.min.js", id: "jquery.ui.touch-punch.min.js"},
+      'jquery-ui-1.10.3': {src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js", id: "https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"},
+      'jquery-ui-1.10.3-styles': {type: "stylesheet", src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui.css", id: "https://code.jquery.com/ui/1.10/jquery-ui.css"},      
       'JSON-js': {src: modulesPath+"/ext/json/json2.min.js", id: "https://github.com/douglascrockford/JSON-js"},
       'raphael-2.2.1': {src: modulesPath+"/ext/raphael/2.2.1/raphael.min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1/raphael.min.js"},
       'beaver-task-2.0': {src: modulesPath+"/pemFioi/beaver-task-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beaver-task-2.0.js"},
@@ -20,26 +22,35 @@ var importableModules = function () {
       'raphaelButton-1.0': {src: modulesPath+"/pemFioi/raphaelButton-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-1.0.js"},
       'graph-1.0': {src: modulesPath+"/pemFioi/graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-1.0.js"},
       'visual-graph-1.0': {src: modulesPath+"/pemFioi/visual-graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.0.js"},
+      'visual-graph-1.1': {src: modulesPath+"/pemFioi/visual-graph-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.1.js"},
       'graph-mouse-1.0': {src: modulesPath+"/pemFioi/graph-mouse-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.0.js"},
+      'graph-mouse-1.1': {src: modulesPath+"/pemFioi/graph-mouse-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.1.js"},
       'crane-1.0': {src: modulesPath+"/pemFioi/crane-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/crane-1.0.js"},
       'grid-1.0': {src: modulesPath+"/pemFioi/grid-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.0.js"},
+      'grid-1.1': {src: modulesPath+"/pemFioi/grid-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.1.js"},
       'drag_lib-2.0': {src: modulesPath+"/pemFioi/drag_lib-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/drag_lib-2.0.js"},
       'randomGenerator-1.0': {src: modulesPath+"/pemFioi/randomGenerator-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/randomGenerator-1.0.js"},
       'simpleKeyboard-1.0': {src: modulesPath+"/pemFioi/simpleKeyboard-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simpleKeyboard-1.0.js"},
+      'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
+      'shape-paths': {src: modulesPath+"/pemFioi/shape-paths.js", id: "shape-paths"},
 
       'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
       'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
       'installationAPI.01': {classStr: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
       'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform_M.js"},
+      'static-task': {src: modulesPath+"/pemFioi/static-task.js"},
+      'fonts-loader-1.0': {src: modulesPath+"/pemFioi/fontsLoader-1.0.js", id: "fonts-loader"},
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'acorn-walk': {src: modulesPath+"/ext/acorn/walk.js", id: "acorn-walk"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
+      'ace_language_tools': {src: modulesPath+"/ext/ace/ext-language_tools.js", id: "ace_language_tools"},
       'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
 
-      'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
+      'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1_M.css"},
+      'taskStyles-0.2': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.2_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.2_M.css"},
 
       'conceptDisplay-1.0': {src: modulesPath+"/pemFioi/conceptDisplay-1.0.js", id: "concept_display"},
       'conceptViewer-1.0': {src: modulesPath+"/pemFioi/conceptViewer-1.0.js", id: "concept_viewer"},
@@ -51,7 +62,6 @@ var importableModules = function () {
       'blockly_python': {src: modulesPath+"/ext/blockly/python_compressed.js", id: "blockly_python"},
       'blockly_fr': {src: modulesPath+"/ext/blockly/fr.js", id: "blockly_fr"},
       'blockly_en': {src: modulesPath+"/ext/blockly/en.js", id: "blockly_en"},
-      'blockly_nl': {src: modulesPath+"/ext/blockly/nl.js", id: "blockly_nl"},
       'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
       'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},
       'blockly_sl': {src: modulesPath+"/ext/blockly/sl.js", id: "blockly_sl"},
@@ -115,6 +125,31 @@ var importableModules = function () {
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
       'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
 
+      // map2d
+      'map2d': {src: modulesPath+"/pemFioi/components/map2d/map2d.js", id: "map2d"},
+      'map2d_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/map2d/styles.css", id: "map2d_styles"},
+      'openstreetmap_task': {src: modulesPath+"/pemFioi/components/map2d/task.js", id: "openstreetmap_task"},
+
+      // gaps table
+      'gaps_table': {src: modulesPath+"/pemFioi/components/gaps-table/component.js", id: "gaps_table"},
+      'gaps_table_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/gaps-table/styles.css", id: "gaps_table_styles"},
+      'gaps_table_task': {src: modulesPath+"/pemFioi/components/gaps-table/task.js", id: "gaps_table_task"},         
+
+      // csv editor
+      'csv_editor': {src: modulesPath+"/pemFioi/components/csv-text-editor/editor.js", id: "csv_editor"},
+      'csv_editor_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/csv-text-editor/styles.css", id: "csv_editor_styles"},
+      'csv_editor_task': {src: modulesPath+"/pemFioi/components/csv-text-editor/task.js", id: "csv_editor_task"},      
+
+      // LR_parser
+      'lr_parser-1.0': {src: modulesPath+"/pemFioi/LR_parser-1.0.js", id: "lr_parser-1.0"},
+      'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
+      'machines-grammar': {src: modulesPath+"/ext/machines/js/grammar.js", id: "machines-grammar"},
+      'machines-lrclosuretable': {src: modulesPath+"/ext/machines/js/lrclosuretable.js", id: "machines-lrclosuretable"},
+      'machines-lrtable': {src: modulesPath+"/ext/machines/js/lrtable.js", id: "machines-lrtable"},
+      'machines-tools-alt': {src: modulesPath+"/ext/machines/js/tools-alt.js", id: "machines-tools-alt"},
+      'machines-slritem': {src: modulesPath+"/ext/machines/js/slritem.js", id: "machines-slritem"},
+      'machines-underscore': {src: modulesPath+"/ext/machines/js/underscore.js", id: "machines-underscore"},
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
@@ -176,6 +211,7 @@ var languageScripts = function () {
          'python_count',
          'ace',
          'ace_python',
+         'ace_language_tools',
          'skulpt_quickAlgo',
          'skulpt_stdlib',
          'skulpt_debugger',

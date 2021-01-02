@@ -121,7 +121,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    var internalClickHandler = function(event) {
       var that = event.data.thisGrid;
       var paperPosition = that.getPaperMouse(event);
-
+      
       if(!that.isPaperPosOnGrid(paperPosition)) {
          return;
       }
@@ -204,7 +204,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
       return true;
    };
-
+   
    this.paperPosToGridPos = function(paperPosition) {
       var result = {};
       if(this.constWidth) {
@@ -269,7 +269,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var pos = this.getCellPos(row, col);
       data.xPos = pos.x;
       data.yPos = pos.y;
-
+      
       if(this.constWidth) {
          data.cellWidth = this.cellWidth;
       }
@@ -418,7 +418,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this._cellToHighlightID = function(row, col) {
       return row + "," + col;
    };
-
+   
    this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins, dragThreshold) {
       if(this.overlay) {
          return;
@@ -440,6 +440,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          anchorPaperPos = self.getPaperMouse(event);
          currentPaperPos = self.getPaperMouse(event);
          anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
+         if(self.dragSelection){ // bug fix
+            self.dragSelection.remove();
+         }
          self.dragSelection = paper.rect().attr(selectionBoxAttr);
          if(onStart) {
             onStart(x, y, event, anchorPaperPos, anchorGridPos);
@@ -467,14 +470,33 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          currentPaperPos.left = anchorPaperPos.left + dx;
          currentPaperPos.top = anchorPaperPos.top + dy;
 
+         // Keep drag within grid bounds
+         if(currentPaperPos.left < self.gridLeft) {
+            dx = self.gridLeft - anchorPaperPos.left;
+            currentPaperPos.left = self.gridLeft;
+         } else if(currentPaperPos.left > self.gridRight) {
+            dx = self.gridRight - anchorPaperPos.left;
+            currentPaperPos.left = self.gridRight;
+         }
+
+         if(currentPaperPos.top < self.gridTop) {
+            dy = self.gridTop - anchorPaperPos.top;
+            currentPaperPos.top = self.gridTop;
+         } else if(currentPaperPos.top > self.gridBottom) {
+            dy = self.gridBottom - anchorPaperPos.top;
+            currentPaperPos.top = self.gridBottom;
+         }
+
          var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
-         self.dragSelection.attr({
-            x: Math.min(anchorPaperPos.left, currentPaperPos.left),
-            y: Math.min(anchorPaperPos.top, currentPaperPos.top),
-            width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
-            height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
-         });
+         if(self.dragSelection){ // bug fix
+            self.dragSelection.attr({
+               x: Math.min(anchorPaperPos.left, currentPaperPos.left),
+               y: Math.min(anchorPaperPos.top, currentPaperPos.top),
+               width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
+               height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
+            });
+         }
 
          // Below threshold.
          if(usingThreshold && getVectorLength(dx, dy) < dragThreshold) {
@@ -496,17 +518,18 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
             }
          }
       }
-
+      
       var left = this.gridLeft - selectionMargins.left;
       var width = this.gridRight - this.gridLeft + selectionMargins.left + selectionMargins.right;
       var top = this.gridTop - selectionMargins.top;
       var height = this.gridBottom - this.gridTop + selectionMargins.top + selectionMargins.bottom;
-
+      
       this.overlay = this.paper.rect(left, top, width, height).attr({
          fill: "green",
          opacity: 0
       });
-      this.overlay.drag(dragMove, dragStart, dragEnd);
+      // this.overlay.drag(dragMove, dragStart, dragEnd);
+      Beav.dragWithTouch(this.overlay, dragMove, dragStart, dragEnd)
    };
 
    this.disableDragSelection = function() {
