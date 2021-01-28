@@ -923,18 +923,18 @@ var getContext = function(display, infos, curLevel) {
 
          nl: {
             label: {
-               dropObject: "déposer un plot",
-               onContainer: "sur une case marquée",
-               obstacleInFront: "plot devant"
+               dropObject: "een kegel plaatsen",
+               onContainer: "op een gemarkeerd vak",
+               obstacleInFront: "kegel voor"
             },
             code: {
-               dropObject: "deposerPlot",
-               onContainer: "surCaseMarquee",
-               obstacleInFront: "plotDevant"
+               dropObject: "kegelPlaatsen",
+               onContainer: "opGemarkeerdVak",
+               obstacleInFront: "kegelVoor"
             },
             messages: {
-               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
-               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+               successContainersFilled: "Bravo, je robot heeft kegels geplaatst op de juiste vakjes!",
+               failureContainersFilled: "Er ontbreken nog kegels of ze staan niet op de juiste plaats."
             }
          },
 
