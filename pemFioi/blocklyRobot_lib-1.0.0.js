@@ -904,6 +904,57 @@ var getContext = function(display, infos, curLevel) {
             }
          },
 
+         en: {
+            label: {
+               dropObject: "déposer un plot",
+               onContainer: "sur une case marquée",
+               obstacleInFront: "plot devant"
+            },
+            code: {
+               dropObject: "deposerPlot",
+               onContainer: "surCaseMarquee",
+               obstacleInFront: "plotDevant"
+            },
+            messages: {
+               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
+               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+            }
+         },
+
+         nl: {
+            label: {
+               dropObject: "déposer un plot",
+               onContainer: "sur une case marquée",
+               obstacleInFront: "plot devant"
+            },
+            code: {
+               dropObject: "deposerPlot",
+               onContainer: "surCaseMarquee",
+               obstacleInFront: "plotDevant"
+            },
+            messages: {
+               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
+               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+            }
+         },
+
+         de: {
+            label: {
+               dropObject: "déposer un plot",
+               onContainer: "sur une case marquée",
+               obstacleInFront: "plot devant"
+            },
+            code: {
+               dropObject: "deposerPlot",
+               onContainer: "surCaseMarquee",
+               obstacleInFront: "plotDevant"
+            },
+            messages: {
+               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
+               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+            }
+         },
+
          es: {
             label: {
                dropObject: "soltar un cono",
