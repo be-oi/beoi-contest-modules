@@ -906,18 +906,18 @@ var getContext = function(display, infos, curLevel) {
 
          en: {
             label: {
-               dropObject: "déposer un plot",
-               onContainer: "sur une case marquée",
-               obstacleInFront: "plot devant"
+               dropObject: "drop a cone",
+               onContainer: "on marked cell",
+               obstacleInFront: "cone in front"
             },
             code: {
-               dropObject: "deposerPlot",
-               onContainer: "surCaseMarquee",
-               obstacleInFront: "plotDevant"
+               dropObject: "dropCone",
+               onContainer: "onMarkedCell",
+               obstacleInFront: "coneInFront"
             },
             messages: {
-               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
-               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+               successContainersFilled: "Congratulations, your robot has dropped all cones on the right cells !",
+               failureContainersFilled: "Some cones are missing or are not at the right place."
             }
          },
 
