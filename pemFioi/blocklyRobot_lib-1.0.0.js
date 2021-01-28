@@ -940,18 +940,18 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               dropObject: "déposer un plot",
-               onContainer: "sur une case marquée",
-               obstacleInFront: "plot devant"
+               dropObject: "eine Markierung setzen",
+               onContainer: "auf eine Box mit Aufschrift",
+               obstacleInFront: "Markierung voraus"
             },
             code: {
-               dropObject: "deposerPlot",
-               onContainer: "surCaseMarquee",
-               obstacleInFront: "plotDevant"
+               dropObject: "markierungSetzen",
+               onContainer: "aufMarkierterBox",
+               obstacleInFront: "markierungVoraus"
             },
             messages: {
-               successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
-               failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+               successContainersFilled: "Glückwunsch, dein Roboter hat Markierungen auf die richtigen Boxen gesetzt!",
+               failureContainersFilled: "Es fehlen einige Markierungen oder sie sind an der falschen Stelle."
             }
          },
 
