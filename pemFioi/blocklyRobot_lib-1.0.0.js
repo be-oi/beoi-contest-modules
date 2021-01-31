@@ -1050,12 +1050,12 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               dropObject: "Samen aussäen",
+               dropObject: "Ein Samenkorn säen",
                onContainer: "Erde auf dem Feld",
                obstacleInFront: "Blume voraus"
             },
             code: {
-               dropObject: "samenAussaeen",
+               dropObject: "samenkornSaen",
                onContainer: "erdeAufFeld",
                obstacleInFront: "blumeVoraus"
             },

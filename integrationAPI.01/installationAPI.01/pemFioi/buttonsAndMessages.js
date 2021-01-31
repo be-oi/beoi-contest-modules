@@ -409,7 +409,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht. Du kannst {0}.",
          reloadSubmittedAnswer: "Lade die Lösung, die du eingereicht hast",
          difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen.",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+         enemyWarning: "<strong>Achtung:</strong> in dieser Herausforderung wird der Computer, den Sie von der Suche nach der Lösung zufällig verhindern."
       },
       nl: {
          version: "Versie",
