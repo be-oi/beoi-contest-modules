@@ -992,6 +992,25 @@ var getContext = function(display, infos, curLevel) {
             }
          },
 
+         en: {
+            label: {
+               dropObject: "sow a seed",
+               onContainer: "on a plot of soil",
+               obstacleInFront: "flower in front"
+            },
+            code: {
+               dropObject: "sowSeed",
+               onContainer: "onPlotOfSoil",
+               obstacleInFront: "flowerInFront"
+            },
+            messages: {
+               successContainersFilled: "Congratulations, your robot is a good gardener!",
+               failureContainersFilled: "Your robot sowed seeds outside plots of soil!",
+               failureContainersFilledLess: "Some plots of soil have no flower!",
+               obstacle: "Beware of the flower!",
+            }
+         },
+
          es: {
             label: {
                dropObject: "sembrar una semilla",
@@ -1031,12 +1050,12 @@ var getContext = function(display, infos, curLevel) {
 
          de: {
             label: {
-               dropObject: "Samen aussäen",
+               dropObject: "Ein Samenkorn säen",
                onContainer: "Erde auf dem Feld",
                obstacleInFront: "Blume voraus"
             },
             code: {
-               dropObject: "samenAussaeen",
+               dropObject: "samenkornSaen",
                onContainer: "erdeAufFeld",
                obstacleInFront: "blumeVoraus"
             },
