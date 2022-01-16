@@ -13,7 +13,7 @@ Beav.Object.eq = function eq(x, y) {
       return (x == null && y == null);
    }
    var tx = typeof(x);
-   var ty = typeof(y); 
+   var ty = typeof(y);
    if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
    }
@@ -329,6 +329,36 @@ Beav.Navigator.isIE8 = function() {
 }
 
 
+Beav.Navigator.getVersion = function(){
+   var ua= navigator.userAgent, tem,
+   M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+   if(/trident/i.test(M[1])){
+      tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+      return 'IE '+(tem[1] || '');
+   }
+   if(M[1]=== 'Chrome'){
+      tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+      if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+   }
+   M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+   if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+   return M
+}
+
+Beav.Navigator.supportsResponsive = function() {
+   if(Beav.Navigator.isIE8()){
+      return false
+   }
+   var navVersion = Beav.Navigator.getVersion();
+   if(navVersion[0].toLowerCase() == 'msie'){
+      return false
+   }
+   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 5){
+      return false
+   }
+   return true
+}
+
 /**********************************************************************************/
 /* Dom */
 
@@ -474,7 +504,7 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       var touches = evt.changedTouches;
       touchingX = touches[0].pageX;
       touchingY = touches[0].pageY;
-      onStart(touches[0].pageX, touches[0].pageY, evt);         
+      onStart(touches[0].pageX, touches[0].pageY, evt);
    }
 
    function onTouchEnd(evt) {
@@ -483,7 +513,7 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       }
       onEnd(null);
    }
-   
+
    function onTouchMove(evt) {
       if (disabled) {
          return;
@@ -493,17 +523,17 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       var dy = touches[0].pageY - touchingY;
       onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
    }
-   
+
    function callOnStart(x,y,event) {
       disabled = true;
       onStart(x,y,event);
    }
-   
+
    function callOnMove(dx,dy,x,y,event) {
       disabled = true;
       onMove(dx,dy,x,y,event);
    }
-   
+
    function callOnEnd(event) {
       disabled = false;
       onEnd(event);

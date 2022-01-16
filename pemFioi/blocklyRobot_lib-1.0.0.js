@@ -2212,6 +2212,13 @@ var getContext = function(display, infos, curLevel) {
             fixed_cone: { num: 5, img: "radioactive.png", side: 60, isObstacle: true, zOrder: 1 },
             number: { num: 6, side: 60, zOrder: 1 }
          }
+      },
+      beoi2022qcolor: {
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
+            red: { num: 5, side: 60, category: "paint", color: "red", isObstacle: false, hasColor: true },
+            blue: { num: 6, side: 60, category: "paint", color: "blue", isObstacle: false, hasColor: true },
+         }
       }
    };
    var iconSrc = $("img[src$='icon.png']").attr("src");
@@ -3175,6 +3182,11 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       return selected;
+   };
+
+   context.gridEdgeInFront = function() {
+      var coords = context.coordsInFront();
+      return context.hasOn(coords.row, coords.col, function(obj){ return true;});
    };
 
    context.isOn = function(filter) {
