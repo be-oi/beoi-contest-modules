@@ -2191,16 +2191,17 @@ var getContext = function(display, infos, curLevel) {
       beoi2020bruno: {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
-            0: { num: 10, side: 60, category: "number", isObstacle: false, value: 0, zOrder: 3 },
-            1: { num: 11, side: 60, category: "number", isObstacle: false, value: 1, zOrder: 3 },
-            2: { num: 12, side: 60, category: "number", isObstacle: false, value: 2, zOrder: 3 },
-            3: { num: 13, side: 60, category: "number", isObstacle: false, value: 3, zOrder: 3 },
-            4: { num: 14, side: 60, category: "number", isObstacle: false, value: 4, zOrder: 3 },
-            5: { num: 15, side: 60, category: "number", isObstacle: false, value: 5, zOrder: 3 },
-            6: { num: 16, side: 60, category: "number", isObstacle: false, value: 6, zOrder: 3 },
-            7: { num: 17, side: 60, category: "number", isObstacle: false, value: 7, zOrder: 3 },
-            8: { num: 18, side: 60, category: "number", isObstacle: false, value: 8, zOrder: 3 },
-            9: { num: 19, side: 60, category: "number", isObstacle: false, value: 9, zOrder: 3 }
+            wall: { num: 5, img: "obstacle.png", side: 60, category: "obstacle", isObstacle: true },
+            0: { num: 10, side: 60, category: "number", isObstacle: false, value: 0, zOrder: 3, isWritable: true },
+            1: { num: 11, side: 60, category: "number", isObstacle: false, value: 1, zOrder: 3, isWritable: true },
+            2: { num: 12, side: 60, category: "number", isObstacle: false, value: 2, zOrder: 3, isWritable: true },
+            3: { num: 13, side: 60, category: "number", isObstacle: false, value: 3, zOrder: 3, isWritable: true },
+            4: { num: 14, side: 60, category: "number", isObstacle: false, value: 4, zOrder: 3, isWritable: true },
+            5: { num: 15, side: 60, category: "number", isObstacle: false, value: 5, zOrder: 3, isWritable: true },
+            6: { num: 16, side: 60, category: "number", isObstacle: false, value: 6, zOrder: 3, isWritable: true },
+            7: { num: 17, side: 60, category: "number", isObstacle: false, value: 7, zOrder: 3, isWritable: true },
+            8: { num: 18, side: 60, category: "number", isObstacle: false, value: 8, zOrder: 3, isWritable: true },
+            9: { num: 19, side: 60, category: "number", isObstacle: false, value: 9, zOrder: 3, isWritable: true }
          }
       },
       beoi2020q08: {
@@ -2220,6 +2221,7 @@ var getContext = function(display, infos, curLevel) {
             blue: { num: 6, side: 60, category: "paint", color: "blue", isObstacle: false, hasColor: true },
          }
       }
+
    };
    var iconSrc = $("img[src$='icon.png']").attr("src");
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
