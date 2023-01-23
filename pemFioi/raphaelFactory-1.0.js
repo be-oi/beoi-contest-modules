@@ -1,7 +1,7 @@
 function RaphaelFactory() {
    this.items = {};
    this.animations = {};
-   
+
    this.create = function(id, elementID, width, height) {
       if(this.items[id] !== null && this.items[id] !== undefined) {
          throw "RaphaelFactory: id " + id + " already exists";
@@ -14,11 +14,11 @@ function RaphaelFactory() {
 
       return this.items[id];
    };
-   
+
    this.get = function(id) {
       return this.items[id];
    };
-   
+
    this.animate = function(name, object, params, time) {
       this.animations[name] = object;
       var self = this;
@@ -38,7 +38,7 @@ function RaphaelFactory() {
          this.animations[name].resume();
       }
    };
-   
+
    this.stopAnimate = function(name) {
       if (this.animations[name]) {
          this.animations[name].stop();
@@ -46,22 +46,29 @@ function RaphaelFactory() {
       }
    };
 
+   this.stopAnimateID = function(animID) {
+      if (this.animations[animID]) {
+         this.animations[animID].stop();
+         delete this.animations[animID];
+      }
+   };
+
    this.destroy = function(id) {
       this.stop(id);
       this.remove(id);
    };
-   
+
    this.stop = function(id) {
       var paper = this.items[id];
       if(paper !== null && paper !== undefined) {
          paper.remove();
       }
    };
-   
+
    this.remove = function(id) {
       delete this.items[id];
    };
-   
+
    this.destroyAll = function() {
       for(var id in this.items) {
          this.stop(id);
