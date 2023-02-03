@@ -951,7 +951,7 @@ var getContext = function(display, infos, curLevel) {
             successAllMarblesInHoles: "Bravo, je hebt alle knikkers opgeruimd!",
             failureOneMarbleInHole: "De knikker is niet opgeruimd!",
             failureAllMarblesInHoles: "Niet alle knikkers zijn opgeruimd!",
-            leavesGrid: "De robot probeer het rooster te verlaten!"
+            leavesGrid: "De robot probeert het rooster te verlaten!"
          },
          description: {
             platformAbove: "platformBoven() : is er een platform boven de robot?",
