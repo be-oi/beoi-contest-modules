@@ -499,6 +499,7 @@ var getContext = function(display, infos, curLevel) {
                jump: "springen",
                down: "dalen",
                forward: "vooruit",
+               backwards: "achteruit",
                east: "rechts",
                south: "onder",
                west: "links",
