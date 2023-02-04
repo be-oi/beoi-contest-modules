@@ -375,7 +375,7 @@ window.displayHelper = {
          scoreStays2: "Dein Punktestand bleibt gleich.",
          reloadBestAnswer: "Deine beste Antwort wieder laden.",
          noAnswerSaved: "Bisher noch keine Antwort für diese Version gespeichert.",
-         validate: "Erstellen",
+         validate: "Überprüfen",
          restart: "Neustarten",
          harderLevelSolved: "Achtung: Du hast schon eine schwerere Version gelöst. Du kannst mit dieser Version keine zusätzlichen Punkte bekommen.",
          showLevelAnyway: "Trotzdem anzeigen",
