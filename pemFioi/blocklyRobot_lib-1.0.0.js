@@ -3409,6 +3409,7 @@ var getContext = function(display, infos, curLevel) {
          var object = context.bag.pop();
          object.row = coords.row;
          object.col = coords.col;
+         object.isPaint = true;
          var itemsOn = context.getItemsOn(coords.row, coords.col);
          var maxi = object.zOrder;
          for(var item in itemsOn) {
