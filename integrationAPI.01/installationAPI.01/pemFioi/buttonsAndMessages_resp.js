@@ -433,7 +433,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "De wedstrijd is reeds afgelopen, je antwoord werd niet bewaard. Je kan {0}.",
          reloadSubmittedAnswer: "het antwoord herlanden dat je hebt ingediend",
          difficultyWarning: "<strong>Let op</strong>: deze versie oplossen kan wat tijd kosten.<br/>Je kan waarschijnlijk sneller de 2 of 3 sterren-versies van andere vragen oplossen.",
-         enemyWarning: "<strong>Let op :</strong> in deze opdracht, zorgt de computer ervoor dat je de oplossing niet per toeval kan vinden."
+         enemyWarning: "<strong>Let op :</strong> in deze opdracht zorgt de computer ervoor dat je de oplossing niet per toeval kan vinden."
       },
       de: {
          version: "Version",
