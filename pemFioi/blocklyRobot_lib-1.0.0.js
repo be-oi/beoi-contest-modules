@@ -2134,6 +2134,21 @@ var getContext = function(display, infos, curLevel) {
                      label: "casilla pintada",
                      code: "casillaPintada",
                      description: "casillaPintada(): ¿El robot se encuentra sobre una casilla pintada?"
+                  },
+                  nl: {
+                     label: "op geverfd vakje",
+                     code: "kleurOpVakje",
+                     description: "kleurOpVakje() : staat de robot op een ingekleurd vakje?"
+                  },
+                  en: {
+                     label: "paint on cell",
+                     code: "paintOnCell",
+                     description: "paintOnCell() : whether the robot is a painted cell"
+                  },
+                  de: {
+                     label: "Farbe auf Feld",
+                     code: "farbeAufFeld",
+                     description: "farbeAufFeld(): Le robot est-il sur une case déjà peinte ?"
                   }
                },
                category: "robot",
