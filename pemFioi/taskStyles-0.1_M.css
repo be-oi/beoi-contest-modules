@@ -195,6 +195,9 @@ textarea {
    border-radius: 6px 6px 0 0;
    text-align: center;
 }
+#tabsMenu.moreTabs .li {
+   margin: 0 10px;
+}
 #tabsMenu .li.lockedLevel {
    background: #404040;
 }
@@ -297,6 +300,13 @@ h1 .stars {
    border-radius: 8px;
    text-align: justify;
 }
+#popupMessage.noAvatar img.beaver, #popupMessage.noAvatar img.messageArrow {
+   display: none;
+}
+#popupMessage.noAvatar .message {
+   margin-left: 0px;
+   border: none;
+}
 #popupMessage p {
    margin: .5em 0 0;
 }
@@ -330,10 +340,13 @@ h1 .stars {
 #displayHelper_validate > input,
 #displayHelper_cancel > input {
    margin: 0 20px;
-   /* width: 9em; */
+   width: 9em;
 }
 #displayHelper_saved {
    margin: .6em;
+}
+#displayHelper_graderMessage {
+   margin: 16px 0px;
 }
 #choose-view {
    margin-bottom: 1em;
@@ -344,11 +357,11 @@ h1 .stars {
 }
 
 
-#task {
+#task, #solution {
 	width: 770px;
 	margin: 0 auto;
 }
-#task.largeScreen {
+#task.largeScreen, #solution.largeScreen {
 	width: 1200px;
 }
 #taskContent:after {

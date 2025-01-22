@@ -175,6 +175,55 @@ Blockly.Block.prototype.getVariableField = function () {
   return null;
 };
 
+// Modify updateColour to leave placeholders alone
+Blockly.BlockSvg.prototype.updateColour = function() {
+  var strokeColour = this.getColourTertiary();
+  if (this.isShadow() && this.parentBlock_) {
+    // Pull shadow block stroke colour from parent block's tertiary if possible.
+    strokeColour = this.parentBlock_.getColourTertiary();
+    // Special case: if we contain a colour field, set to a special stroke colour.
+    if (this.inputList[0] &&
+        this.inputList[0].fieldRow[0] &&
+        this.inputList[0].fieldRow[0] instanceof Blockly.FieldColour) {
+      strokeColour = Blockly.Colours.colourPickerStroke;
+    }
+  }
+
+  // Use main colour for placeholder strokes
+  if(this.type.substring(0, 12) == 'placeholder_') {
+    strokeColour = this.getColour();
+  }
+
+  // Render block stroke
+  this.svgPath_.setAttribute('stroke', strokeColour);
+
+  // Render block fill
+  var fillColour = (this.isGlowingBlock_) ? this.getColourSecondary() : this.getColour();
+  this.svgPath_.setAttribute('fill', fillColour);
+
+  // Render opacity
+  this.svgPath_.setAttribute('fill-opacity', this.getOpacity());
+
+  // Update colours of input shapes.
+  for (var shape in this.inputShapes_) {
+    this.inputShapes_[shape].setAttribute('fill', this.getColourTertiary());
+  }
+
+  // Render icon(s) if applicable
+  var icons = this.getIcons();
+  for (var i = 0; i < icons.length; i++) {
+    icons[i].updateColour();
+  }
+
+  // Bump every dropdown to change its colour.
+  for (var x = 0, input; input = this.inputList[x]; x++) {
+    for (var y = 0, field; field = input.fieldRow[y]; y++) {
+      field.setText(null);
+    }
+  }
+};
+
+
 // Add a border when a block is glowing to make it more obvious
 Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
   var blockSvg = this.getSvgRoot();
@@ -187,6 +236,90 @@ Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
   blockSvg.style.strokeWidth = isGlowingBlock ? '4px' : '';
   this.isGlowingBlock_ = isGlowingBlock;
   this.updateColour();
+};
+
+Blockly.BlockSvg.prototype.handleDragFree_ = function(oldXY, newXY, e) {
+  // Fix : move the drag surface to the right workspace position when moving a block from a sub-workspace
+  if(!Blockly.dragMutatorStyle) {
+     Blockly.dragMutatorStyle = document.createElement('style');
+     document.head.appendChild(Blockly.dragMutatorStyle);
+  }
+  if(this.workspace !== Blockly.mainWorkspace) {
+     // This is done through CSS because Scratch computations get wrong if you
+     // translate the SVG differently
+     var transformData = (
+        $(this.workspace.getParentSvg())
+        .closest('.blocklyBubbleCanvas').children()
+        .attr('transform').match(/translate\(([.0-9-]+),([.0-9-]+)\)/));
+     var transformStr = 'translate3d(' + transformData[1] + 'px, ' + transformData[2] + 'px, 0px)';
+     Blockly.dragMutatorStyle.innerText = (
+        '.blocklyDraggable.blocklyDragging.blocklySelected { transform: '+transformStr+'; }');
+  } else {
+     Blockly.dragMutatorStyle.innerText = '';
+  }
+
+  var dxy = goog.math.Coordinate.difference(oldXY, this.dragStartXY_);
+  this.workspace.dragSurface.translateSurface(newXY.x, newXY.y);
+  // Drag all the nested bubbles.
+  for (var i = 0; i < this.draggedBubbles_.length; i++) {
+    var commentData = this.draggedBubbles_[i];
+    commentData.bubble.setIconLocation(
+        goog.math.Coordinate.sum(commentData, dxy));
+  }
+
+  // Check to see if any of this block's connections are within range of
+  // another block's connection.
+  var myConnections = this.getConnections_(false);
+  // Also check the last connection on this stack
+  var lastOnStack = this.lastConnectionInStack();
+  if (lastOnStack && lastOnStack != this.nextConnection) {
+    myConnections.push(lastOnStack);
+  }
+  var closestConnection = null;
+  var localConnection = null;
+  var radiusConnection = Blockly.SNAP_RADIUS;
+  // If there is already a connection highlighted,
+  // increase the radius we check for making new connections.
+  // Why? When a connection is highlighted, blocks move around when the insertion
+  // marker is created, which could cause the connection became out of range.
+  // By increasing radiusConnection when a connection already exists,
+  // we never "lose" the connection from the offset.
+  if (Blockly.localConnection_ && Blockly.highlightedConnection_) {
+    radiusConnection = Blockly.CONNECTING_SNAP_RADIUS;
+  }
+  for (i = 0; i < myConnections.length; i++) {
+    var myConnection = myConnections[i];
+    var neighbour = myConnection.closest(radiusConnection, dxy);
+    if (neighbour.connection) {
+      closestConnection = neighbour.connection;
+      localConnection = myConnection;
+      radiusConnection = neighbour.radius;
+    }
+  }
+
+  var updatePreviews = true;
+  if (localConnection && localConnection.type == Blockly.OUTPUT_VALUE) {
+    updatePreviews = true; // Always update previews for output connections.
+  } else if (Blockly.localConnection_ && Blockly.highlightedConnection_) {
+    var xDiff = Blockly.localConnection_.x_ + dxy.x -
+        Blockly.highlightedConnection_.x_;
+    var yDiff = Blockly.localConnection_.y_ + dxy.y -
+        Blockly.highlightedConnection_.y_;
+    var curDistance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    // Slightly prefer the existing preview over a new preview.
+    if (closestConnection && radiusConnection > curDistance -
+        Blockly.CURRENT_CONNECTION_PREFERENCE) {
+      updatePreviews = false;
+    }
+  }
+
+  if (updatePreviews) {
+    var candidateIsLast = (localConnection == lastOnStack);
+    this.updatePreviews(closestConnection, localConnection, radiusConnection,
+        e, newXY.x - this.dragStartXY_.x, newXY.y - this.dragStartXY_.y,
+        candidateIsLast);
+  }
 };
 
 // Change behavior when we attach a data_variable along a data_variablemenu
@@ -323,6 +456,14 @@ Blockly.Workspace.prototype.remainingCapacity = function(maxBlocks) {
   var blockCount = 0;
   for (var b = 0; b < blocks.length; b++) {
     var block = blocks[b];
+    // Don't count insertion markers (shadows when moving a block)
+    if(block.isInsertionMarker_) {
+      continue;
+    }
+    // Don't count placeholders
+    if(block.type.substring(0, 12) == 'placeholder_') {
+      continue;
+    }
     // Counting is tricky because some blocks in Scratch don't count in Blockly
     if(block.parentBlock_) {
       // There's a parent (container) block
@@ -436,11 +577,6 @@ Blockly.is3dSupported = function() {
   return Blockly.cache3dSupported_;
 };
 
-// Remove the numpad as it doesn't really work
-Blockly.FieldNumber.prototype.showEditor_ = function() {
-  Blockly.FieldNumber.superClass_.showEditor_.call(this, arguments);
-};
-
 Blockly.FieldTextInput.prototype.oldShowEditor_ = Blockly.FieldTextInput.prototype.showEditor_;
 Blockly.FieldTextInput.prototype.showEditor_ = function() {
   var mobile =
@@ -457,6 +593,13 @@ Blockly.FieldTextInput.prototype.showEditor_ = function() {
      Blockly.FieldTextInput.prototype.oldShowEditor_.apply(this, arguments);
   }
 }
+
+Blockly.WidgetDiv.hideAndClearDom_ = function() {
+  // Properly clean the widget div
+  Blockly.WidgetDiv.DIV.style = 'display: none;';
+  Blockly.WidgetDiv.DIV.className = "blocklyWidgetDiv";
+  goog.dom.removeChildren(Blockly.WidgetDiv.DIV);
+};
 
 
 Blockly.Colours['input'] = {
@@ -627,6 +770,46 @@ Blockly.Blocks['control_repeat_until'] = {
       "inputsInline": true,
       "previousStatement": null,
       "nextStatement": null,
+      "category": Blockly.Categories.control,
+      "colour": Blockly.Colours.control.primary,
+      "colourSecondary": Blockly.Colours.control.secondary,
+      "colourTertiary": Blockly.Colours.control.tertiary
+    });
+  }
+};
+
+// Fix image path
+Blockly.Blocks['control_forever'] = {
+  /**
+   * Block for repeat n times (external number).
+   * https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#5eke39
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "id": "control_forever",
+      "message0": "forever",
+      "message1": "%1", // Statement
+      "message2": "%1", // Icon
+      "lastDummyAlign2": "RIGHT",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "c_arrow.svg",
+          "width": 16,
+          "height": 16,
+          "alt": "*",
+          "flip_rtl": true
+        }
+      ],
+      "inputsInline": true,
+      "previousStatement": null,
       "category": Blockly.Categories.control,
       "colour": Blockly.Colours.control.primary,
       "colourSecondary": Blockly.Colours.control.secondary,
@@ -895,6 +1078,95 @@ Blockly.Blocks['operator_join'] = {
   }
 };
 
+Blockly.Blocks['operator_dividefloor'] = {
+  /**
+   * Block for getting the whole part of dividing two numbers.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit(
+      {
+        "message0": "%1 // %2",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "NUM1"
+          },
+          {
+            "type": "input_value",
+            "name": "NUM2"
+          }
+        ],
+        "inputsInline": true,
+        "output": "Number",
+        "category": Blockly.Categories.operators,
+        "colour": Blockly.Colours.operators.primary,
+        "colourSecondary": Blockly.Colours.operators.secondary,
+        "colourTertiary": Blockly.Colours.operators.tertiary,
+        "outputShape": Blockly.OUTPUT_SHAPE_ROUND
+      });
+  }
+};
+
+Blockly.Blocks['operator_lte'] = {
+  /**
+   * Block for less than or equal comparator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 ≤ %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OPERAND1"
+        },
+        {
+          "type": "input_value",
+          "name": "OPERAND2"
+        }
+      ],
+      "inputsInline": true,
+      "output": "Boolean",
+      "category": Blockly.Categories.operators,
+      "colour": Blockly.Colours.operators.primary,
+      "colourSecondary": Blockly.Colours.operators.secondary,
+      "colourTertiary": Blockly.Colours.operators.tertiary,
+      "outputShape": Blockly.OUTPUT_SHAPE_HEXAGONAL
+    });
+  }
+};
+
+Blockly.Blocks['operator_gte'] = {
+  /**
+   * Block for greater than or equal comparator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 ≥ %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OPERAND1"
+        },
+        {
+          "type": "input_value",
+          "name": "OPERAND2"
+        }
+      ],
+      "inputsInline": true,
+      "output": "Boolean",
+      "category": Blockly.Categories.operators,
+      "colour": Blockly.Colours.operators.primary,
+      "colourSecondary": Blockly.Colours.operators.secondary,
+      "colourTertiary": Blockly.Colours.operators.tertiary,
+      "outputShape": Blockly.OUTPUT_SHAPE_HEXAGONAL
+    });
+  }
+};
+
+
 Blockly.Blocks['text_print'] = {
   /**
    * Block for print statement.
@@ -964,6 +1236,7 @@ Blockly.JavaScript['control_repeat'] = function(block) {
   code += 'for (var ' + loopVar + ' = 0; ' +
       loopVar + ' < ' + endVar + '; ' +
       loopVar + '++) {\n' +
+      "reportBlockValue('" + block.id + "', " + loopVar + "+1, '@@LOOP_ITERATION@@');\n" +
       branch + '}\n';
   return code;
 };
@@ -1010,7 +1283,7 @@ Blockly.JavaScript['data_listrepeat'] = function(block) {
   var assignCode = 'var ' + varName + ' = ' + code + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return assignCode + reportCode;
 };
@@ -1074,7 +1347,7 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   var assignCode = 'var ' + varName + ' = ' + argument0 + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return assignCode + reportCode;
 };
@@ -1092,7 +1365,7 @@ Blockly.JavaScript['data_changevariableby'] = function(block) {
   var incrCode = varName + ' += ' + argument0 + ';\n';
 
   // Report value if available
-  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+  var reportCode = "reportBlockValue('" + block.id + "', " + varName + ", '" + varName + "');\n";
 
   return incrCode + reportCode;
 };
@@ -1106,7 +1379,9 @@ Blockly.JavaScript['operators'] = function(block) {
     'operator_divide': {op: '/', varname: 'NUM', order: Blockly.JavaScript.ORDER_DIVISION},
     'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_EQUALITY},
     'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_RELATIONAL},
+    'operator_gte': {op: '>=', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_RELATIONAL},
     'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_RELATIONAL},
+    'operator_lte': {op: '<=', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_RELATIONAL},
     'operator_and': {op: '&&', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_LOGICAL_AND},
     'operator_or': {op: '||', varname: 'OPERAND', order: Blockly.JavaScript.ORDER_LOGICAL_OR}
   };
@@ -1117,6 +1392,36 @@ Blockly.JavaScript['operators'] = function(block) {
   if(argument1 == 'NaN') { argument1 = '0'; };
   var code = argument0 + ' ' + opInfo.op + ' ' + argument1;
   return [code, opInfo.order];
+}
+
+Blockly.JavaScript['operator_add'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_subtract'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_multiply'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_divide'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_equals'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_gt'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_gte'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_lt'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_lte'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_and'] = Blockly.JavaScript['operators'];
+Blockly.JavaScript['operator_or'] = Blockly.JavaScript['operators'];
+
+Blockly.JavaScript['operator_dividefloor'] = function(block) {
+  var argument0 = Blockly.JavaScript.valueToCode(block, 'NUM1', Blockly.JavaScript.ORDER_DIVISION) || '0';
+  if(argument0 == 'NaN') { argument0 = '0'; };
+  var argument1 = Blockly.JavaScript.valueToCode(block, 'NUM2', Blockly.JavaScript.ORDER_DIVISION) || '0';
+  if(argument1 == 'NaN') { argument1 = '0'; };
+  var code = 'Math.floor(' + argument0 + ' / ' + argument1 + ')';
+  return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+}
+
+Blockly.JavaScript['operator_join'] = function(block) {
+  var argument0 = Blockly.JavaScript.valueToCode(block, 'STRING1', Blockly.JavaScript.ORDER_NONE) || '';
+  if(argument0 == 'NaN') { argument0 = ''; };
+  var argument1 = Blockly.JavaScript.valueToCode(block, 'STRING2', Blockly.JavaScript.ORDER_NONE) || '';
+  if(argument1 == 'NaN') { argument1 = ''; };
+  var code = 'String(' + argument0 + ') + String(' + argument1 + ')';
+  return [code, Blockly.JavaScript.ORDER_ADDITION];
 }
 
 Blockly.JavaScript['text'] = function(block) {
@@ -1132,25 +1437,6 @@ Blockly.JavaScript['text'] = function(block) {
   }
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
-
-Blockly.JavaScript['operator_add'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_subtract'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_multiply'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_divide'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_equals'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_gt'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_lt'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_and'] = Blockly.JavaScript['operators'];
-Blockly.JavaScript['operator_or'] = Blockly.JavaScript['operators'];
-
-Blockly.JavaScript['operator_join'] = function(block) {
-  var argument0 = Blockly.JavaScript.valueToCode(block, 'STRING1', Blockly.JavaScript.ORDER_NONE) || '';
-  if(argument0 == 'NaN') { argument0 = ''; };
-  var argument1 = Blockly.JavaScript.valueToCode(block, 'STRING2', Blockly.JavaScript.ORDER_NONE) || '';
-  if(argument1 == 'NaN') { argument1 = ''; };
-  var code = 'String(' + argument0 + ') + String(' + argument1 + ')';
-  return [code, Blockly.JavaScript.ORDER_ADDITION];
-}
 
 
 Blockly.Python['control_if'] = function(block) {
@@ -1222,7 +1508,7 @@ Blockly.Python['data_listrepeat'] = function(block) {
 
   var blockVarName = block.getFieldValue('LIST');
   if(blockVarName) {
-    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
@@ -1322,9 +1608,12 @@ Blockly.Python['operators'] = function(block) {
     'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_ADDITIVE},
     'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
     'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
+    'operator_dividefloor': {op: '//', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
     'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_gte': {op: '>=', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_lte': {op: '<=', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_and': {op: 'and', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_AND},
     'operator_or': {op: 'or', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_OR}
   };
@@ -1341,9 +1630,12 @@ Blockly.Python['operator_add'] = Blockly.Python['operators'];
 Blockly.Python['operator_subtract'] = Blockly.Python['operators'];
 Blockly.Python['operator_multiply'] = Blockly.Python['operators'];
 Blockly.Python['operator_divide'] = Blockly.Python['operators'];
+Blockly.Python['operator_dividefloor'] = Blockly.Python['operators'];
 Blockly.Python['operator_equals'] = Blockly.Python['operators'];
 Blockly.Python['operator_gt'] = Blockly.Python['operators'];
+Blockly.Python['operator_gte'] = Blockly.Python['operators'];
 Blockly.Python['operator_lt'] = Blockly.Python['operators'];
+Blockly.Python['operator_lte'] = Blockly.Python['operators'];
 Blockly.Python['operator_and'] = Blockly.Python['operators'];
 Blockly.Python['operator_or'] = Blockly.Python['operators'];
 

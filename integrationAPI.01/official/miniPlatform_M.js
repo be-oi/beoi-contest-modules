@@ -17,6 +17,17 @@
 
 
    var languageStrings = {
+      ar: {
+         'task': 'Task',
+         'submission': 'Submission',
+         'solution': 'Solution',
+         'editor': 'Edit',
+         'hints': 'Hints',
+         'showSolution': 'Show solution',
+         'yourScore': "Your score:",
+         'canReadSolution': "You can now read the solution at the bottom of this page.",
+         'gradeAnswer': 'Test grader'
+      },
       fr: {
          'task': 'Exercice',
          'submission': 'Soumission',
@@ -72,17 +83,6 @@
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
          'gradeAnswer': 'Test grader'
       },
-      nl: {
-         'task': 'Vraag',
-         'submission': 'Indiening',
-         'solution': 'Oplossing',
-         'editor': 'Bewerken',
-         'hints': 'Hints',
-         'showSolution': 'Toon de oplossing',
-         'yourScore': "Jouw score:",
-         'canReadSolution': "Je kan de oplossing nu zien onderaan deze pagina.",
-         'gradeAnswer': 'Test de evaluator'
-      },
       es: {
          'task': 'Problema',
          'submission': 'Sumisión',
@@ -102,9 +102,9 @@
    var miniPlatformWrapping = {
       beaver: {
          'header' : '\
-            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
+            <div id="main_header" style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:100%;margin: 10px auto;">\
-                  <td><img src="../../modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span style="font-size:32px;">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -112,23 +112,16 @@
       },
       laptop: {
          'header' : '\
-            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
+            <div id="main_header" style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="../../modules/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/alkindi-logo.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span style="font-size:32px;">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
             </div>'
       },
-      beoi: {
-         'header' : '\
-             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
-             <table style="width:770px;margin: 10px auto;">\
-             <td><img src="../../modules/img/beoi.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
-             <td><span style="font-size:32px;">beOI</span></td>\
-             <td><a href="http://www.be-oi.be/" style="display:inline-block;text-align:right;">beOI contest</a></td>\
-             </table>\
-         </div>'
+      none: {
+          'header' : '<span></span>'
       }
    };
 
@@ -237,27 +230,27 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
-   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate') {
-      return;
-   }
-   if (mode == 'stay') {
-      if (alreadyStayed) {
-         platform.trigger('validate', [mode]);
-         if (success) {
-            success();
-         }
-      } else {
-         alreadyStayed = true;
-      }
-   }
-   if (mode == 'cancel') {
-      alreadyStayed = false;
-   }
-   platform.trigger('validate', [mode]);
-   if (success) {
-      success();
-   }
+  if (!success) { success = function () { }; }
+  if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
+    return;
+  }
+  if (mode == 'cancel') {
+    alreadyStayed = false;
+  }
+  if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
+    platform.trigger('validate', [mode]);
+    success();
+  } else {
+    // Try to validate
+    task.getAnswer(function (answer) {
+      task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
+        success();
+      })
+    });
+  }
+  if (mode == 'stay') {
+    alreadyStayed = true;
+  }
 };
 
 function getUrlParameter(sParam)
@@ -482,10 +475,12 @@ $(document).ready(function() {
 
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
-                if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                  $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                } else {
-                  $('body').prepend(miniPlatformWrapping[beaver].header);
+                if(window.displayHelper) {
+                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                  } else {
+                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                  }
                 }
              },
              function(error) {

@@ -121,7 +121,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    var internalClickHandler = function(event) {
       var that = event.data.thisGrid;
       var paperPosition = that.getPaperMouse(event);
-
+      
       if(!that.isPaperPosOnGrid(paperPosition)) {
          return;
       }
@@ -204,7 +204,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
       return true;
    };
-
+   
    this.paperPosToGridPos = function(paperPosition) {
       var result = {};
       if(this.constWidth) {
@@ -269,7 +269,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var pos = this.getCellPos(row, col);
       data.xPos = pos.x;
       data.yPos = pos.y;
-
+      
       if(this.constWidth) {
          data.cellWidth = this.cellWidth;
       }
@@ -418,7 +418,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this._cellToHighlightID = function(row, col) {
       return row + "," + col;
    };
-
+   
    this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins, dragThreshold) {
       if(this.overlay) {
          return;
@@ -496,12 +496,12 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
             }
          }
       }
-
+      
       var left = this.gridLeft - selectionMargins.left;
       var width = this.gridRight - this.gridLeft + selectionMargins.left + selectionMargins.right;
       var top = this.gridTop - selectionMargins.top;
       var height = this.gridBottom - this.gridTop + selectionMargins.top + selectionMargins.bottom;
-
+      
       this.overlay = this.paper.rect(left, top, width, height).attr({
          fill: "green",
          opacity: 0

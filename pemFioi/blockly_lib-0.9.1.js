@@ -73,7 +73,7 @@ var localLanguageStrings = {
       ludicrousSpeed: ">|",
       stopProgramDesc: "Repartir du début",
       stepProgramDesc: "Exécution pas-à-pas",
-      slowSpeedDesc: "Exécuter sur ce test",		/* TODO is this a correct label? */
+      slowSpeedDesc: "Exécuter sur ce test",
       mediumSpeedDesc: "Vitesse moyenne",
       fastSpeedDesc: "Vitesse rapide",
       ludicrousSpeedDesc: "Vitesse très rapide",
@@ -320,78 +320,77 @@ var localLanguageStrings = {
       textVariable: "besedilo",
       listVariable: "tabela"
    },
-   nl: {
+   es: {
       categories: {
-         actions: "Acties",
-         sensors: "Sensoren",
-         debug: "Debuggen",
-         colour: "Kleuren",
-         dicts: "Mapping",
-         input: "Input",
-         lists: "Lijsten",
+         actions: "Acciones",
+         sensors: "Sensores",
+         debug: "Depurar",
+         colour: "Colores",
+         dicts: "Diccionarios",
+         input: "Entradas",
+         lists: "Listas",
          logic: "Logica",
-         loops: "Lussen",
-         control: "Controle",
-         operator: "Operatoren",
-         math: "Wiskunde",
-         texts: "Tekst",
-         variables: "Variabelen",
-         functions: "Functies",
-         read: "Lezen",
-         print: "Schrijven",
-         turtle: "Schildpad"
+         loops: "Bucles",
+         control: "Control",
+         operator: "Operadores",
+         math: "Matemáticas",
+         texts: "Texto",
+         variables: "Variables",
+         functions: "Funciones",
+         read: "Leyendo",
+         print: "Escribiendo",
+         turtle: "Tortuga"
       },
-      invalidContent: "Ongeldige inhoud",
-      unknownFileType: "Bestandstype onbekend",
-      download: "downloaden",
-      smallestOfTwoNumbers: "Kleinste van twee getallen",
-      greatestOfTwoNumbers: "Grootste van twee getallen",
-      flagClicked: "Wanneer %1 aangeklikt",
-      tooManyIterations: "Jouw programma heeft teveel tijd nodig om te eindigen!",
-      tooManyIterationsWithoutAction: "Jouw programma blijft te lang actief zonder een actie uit te voeren!",
-      submitProgram: "Valideer het programma",
-      runProgram: "Uitvoeren op deze test",
+      invalidContent: "Contenido inválido",
+      unknownFileType: "Tipo de archivo no reconocido",
+      download: "descargar",
+      smallestOfTwoNumbers: "El más pequeño de los dos números",
+      greatestOfTwoNumbers: "El mas grande de los dos numeros",
+      flagClicked: "Al hace clic en %1",
+      tooManyIterations: "¡Demasiadas iteraciones!",
+      tooManyIterationsWithoutAction: "¡Demasiadas iteraciones sin una acción!",
+      submitProgram: "Validar este programa",
+      runProgram: "Ejecutar este programa",
       stopProgram: "|<",
-      speed: "Snelheid:",
+      speed: "Velocidad:",
       stepProgram: "|>",
       slowSpeed: ">",
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Stop en Reset",
-      stepProgramDesc: "Stap voor stap uitvoeren",
-      slowSpeedDesc: "Traag",
-      mediumSpeedDesc: "Gemiddeld",
-      fastSpeedDesc: "Snel",
-      ludicrousSpeedDesc: "Razendsnel",
-      selectLanguage: "Taal:",
+      stopProgramDesc: "Reiniciar desde el principio",
+      stepProgramDesc: "Ejecución paso a paso",
+      slowSpeedDesc: "Ejecutar en esta prueba",
+      mediumSpeedDesc: "Velocidad media",
+      fastSpeedDesc: "Velocidad rápido",
+      ludicrousSpeedDesc: "Velocidad ridícula",
+      selectLanguage: "Lenguaje :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
-      importFromBlockly: "Importeer uit Blockly",
-      saveOrLoadProgram: "Bewaar of herlaad jouw programma:",
-      avoidReloadingOtherTask: "Let op: laad geen programma van een andere vraag!",
-      files: "Bestanden",
-      reloadProgram: "Herladen:",
-      saveProgram: "Bewaren",
-      limitBlocks: "{remainingBlocks} blokken resterend van {maxBlocks} maximaal.",
-      limitBlocksOver: "{remainingBlocks} blokken over de limiet van {maxBlocks} maximaal.",
-      previousTestcase: "Vorige",
-      nextTestcase: "Volgende",
-      allTests: "Alle testen: ",
-      errorEmptyProgram: "Het programma is leeg! Maak er blokken aan vast.",
-      tooManyBlocks: "Je gebruikt teveel blokken!",
-      uninitializedVar: "Niet geïnitialiseerde variabele:",
-      valueTrue: 'waar',
-      valueFalse: 'onwaar',
-      correctAnswer: 'Correct antwoord',
-      partialAnswer: 'Deels correct antwoord',
-      wrongAnswer: 'Fout antwoord',
-      resultsNoSuccess: "Geen enkele test was succesvol.",
-      resultsPartialSuccess: "Je was enkel succesvol op {nbSuccess} van de {nbTests} tests.",
-      gradingInProgress: "Bezig met evalueren",
-      textVariable: "tekst",
-      listVariable: "lijst"
-   }
+      importFromBlockly: "Generar desde blockly",
+      saveOrLoadProgram: "Guarda o recarga tu código:",
+      avoidReloadingOtherTask: "!Advertencia: no recargue el código para otra tarea!",
+      reloadProgram: "Recarga:",
+      saveProgram: "Guardar",
+      limitBlocks: "{remainingBlocks} bloques restantes de {maxBlocks} disponible.",
+      limitBlocksOver: "{remainingBlocks} bloques por encima del limite de {maxBlocks} disponibles.",
+      previousTestcase: "Previo",
+      nextTestcase: "Siguiente",
+      allTests: "Todas las pruebas: ",
+      errorEmptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
+      tooManyBlocks: "¡Usaste demasiados bloques!",
+      uninitializedVar: "Variable no inicializada:",
+      valueTrue: 'verdadero',
+      valueFalse: 'false',
+      correctAnswer: 'Respuesta correcta',
+      partialAnswer: 'Respuesta parcial',
+      wrongAnswer: 'Respuesta incorrecta',
+      resultsNoSuccess: "No aprobaste ninguna de las pruebas.",
+      resultsPartialSuccess: "Aprobaste solo {nbSuccess} prueba(s) de {nbTests}.",
+      gradingInProgress: "Calificación en proceso",
+      textVariable: "texto",
+      listVariable: "lista"
+   },
 };
 
 // Blockly to Scratch translations
@@ -455,7 +454,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "https://manage-static.be-oi.be/contestAssets/blockly/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
       glowingBlock: null,
 
@@ -1054,7 +1053,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                       || block.blocklyJson.args0[iArgs0].type == "field_number"
                       || block.blocklyJson.args0[iArgs0].type == "field_angle"
                       || block.blocklyJson.args0[iArgs0].type == "field_colour"
-                      || block.blocklyJson.args0[iArgs0].type == "field_dropdown") {
+                      || block.blocklyJson.args0[iArgs0].type == "field_dropdown"
+                      || block.blocklyJson.args0[iArgs0].type == "field_input") {
                      block.blocklyJson.message0 += " %" + (iArgs0 + 1);
                   }
                }
@@ -1127,7 +1127,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                         }
                         if (args0[iArgs0].type == "field_number"
                             || args0[iArgs0].type == "field_angle"
-                            || args0[iArgs0].type == "field_dropdown") {
+                            || args0[iArgs0].type == "field_dropdown"
+                            || args0[iArgs0].type == "field_input") {
                            if (iParam) {
                               params += ", ";
                            }
@@ -3025,7 +3026,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
-      displayHelper.timeoutMinutes = 30;
+      displayHelper.timeoutMinutes = subTask.gridInfos.timeoutMinutes ? subTask.gridInfos.timeoutMinutes : 30;
 
       this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
 

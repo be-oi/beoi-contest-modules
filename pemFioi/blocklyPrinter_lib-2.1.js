@@ -29,6 +29,8 @@ var getContext = function(display, infos) {
             eof: "finSaisie"
          },
          description: {
+            print: "print(texte) affiche le texte sur le terminal",
+            read: "input() retourne une chaîne : la prochaîne ligne de l'entrée"
          },
          startingBlockName: "Programme",
          messages: {
@@ -36,8 +38,8 @@ var getContext = function(display, infos) {
             inputEmpty: "Votre programme a essayé de lire l'entrée alors qu'il n'y avait plus aucune ligne à lire !",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
-            tooFewChars: "Ligne trop courte : ligne ",
-            tooManyChars: "Ligne trop longue : ligne ",
+            tooFewChars: "La ligne {0} de la sortie de votre programme est plus courte qu'attendue.",
+            tooManyChars: "La ligne {0} de la sortie de votre programme est plus longue qu'attendue.",
             tooFewLines: "Trop peu de lignes en sortie",
             tooManyLines: "Trop de lignes en sortie",
             correctOutput: "La sortie est correcte !",
@@ -85,8 +87,8 @@ var getContext = function(display, infos) {
             inputEmpty: "Your program tried to read the input while there is no line left to read!",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
-            tooFewChars: "Zeile zu kurz: Zeile ",
-            tooManyChars: "Zeile zu lang: Zeile ",
+            tooFewChars: "Zeile zu kurz: Zeile {0}",
+            tooManyChars: "Zeile zu lang: Zeile {0}",
             tooFewLines: "Zu wenig Zeilen ausgegeben",
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
@@ -110,6 +112,16 @@ var getContext = function(display, infos) {
    var context = quickAlgoContext(display, infos);
 
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
+
+   var conceptBaseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
+        + 'static4.castor-informatique.fr/help/printer.html';
+
+   context.conceptList = [
+      {id: 'printer_introduction', name: 'Les entrées/sorties', url: conceptBaseUrl+'#printer_introduction', isBase: true},
+      {id: 'printer_print', name: 'Afficher une ligne', url: conceptBaseUrl+'#printer_print', isBase: true},
+      {id: 'printer_read', name: 'Lire une ligne', url: conceptBaseUrl+'#printer_read', isBase: true}
+   ];
+
    
    var cells = [];
    var texts = [];
@@ -174,6 +186,21 @@ var getContext = function(display, infos) {
       context.updateScale();
    };
 
+   context.getCurrentState = function () {
+      return {
+         input_text: context.printer.input_text,
+         output_text: context.printer.output_text,
+         input_reset: context.printer.input_reset,
+      };
+   };
+
+   context.reloadState = function (data) {
+      context.printer.input_text = data.input_text;
+      context.printer.output_text = data.output_text;
+      context.printer.input_reset = data.input_reset;
+      context.updateScale();
+   };
+
    context.resetDisplay = function() {
       this.delayFactory.destroyAll();
 
@@ -211,15 +238,25 @@ var getContext = function(display, infos) {
 
       // Fix display of arrays
       var valueToStr = function(value) {
-         if(value && value.length && typeof value == 'object') {
-            for(var i=0; i < value.length; i++) {
-               if(value[i] && typeof value[i].v != 'undefined') {
+         if(value && value.length !== undefined && typeof value == 'object') {
+            var oldValue = value;
+            value = [];
+            for(var i=0; i < oldValue.length; i++) {
+               if(oldValue[i] && typeof oldValue[i].v != 'undefined') {
                    // When used inside Skulpt (Python mode)
-                   value[i] = value[i].v;
+                   value.push(oldValue[i].v);
+               } else {
+                   value.push(oldValue[i]);
                }
                value[i] = valueToStr(value[i]);
             }
             return '[' + value.join(', ') + ']';
+         } else if(value && value.isFloat && Math.floor(value) == value) {
+            return value + '.0';
+         } else if(value === true) {
+            return 'True';
+         } else if(value === false) {
+            return 'False';
          }
          return value;
       }
@@ -389,12 +426,12 @@ var getContext = function(display, infos) {
 
          if (actualLine.length < expectedLine.length) {
             this.success = false;
-            throw(strings.messages.tooFewChars + (iLine + 1)); // add line info iLine + 1
+            throw(strings.messages.tooFewChars.format(iLine + 1)); // add line info iLine + 1
          }
          
          if (actualLine.length > expectedLine.length) {
             this.success = false;
-            throw(strings.messages.tooManyChars + (iLine + 1)); // add line info iLine + 1
+            throw(strings.messages.tooManyChars.format(iLine + 1)); // add line info iLine + 1
          }
       }
 

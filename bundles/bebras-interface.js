@@ -300,7 +300,7 @@ window.displayHelper = {
    thresholdMedium: 120,
 
    timeoutMinutes: 5,
-   avatarType: "beoi",
+   avatarType: "beaver",
    bUseFullWidth: false,
 
    hasLevels: false,
@@ -634,7 +634,7 @@ window.displayHelper = {
          scoreStays2: "Dein Punktestand bleibt gleich.",
          reloadBestAnswer: "Deine beste Antwort wieder laden.",
          noAnswerSaved: "Bisher noch keine Antwort für diese Version gespeichert.",
-         validate: "Überprüfen",
+         validate: "Erstellen",
          restart: "Neustarten",
          harderLevelSolved: "Achtung: Du hast schon eine schwerere Version gelöst. Du kannst mit dieser Version keine zusätzlichen Punkte bekommen.",
          showLevelAnyway: "Trotzdem anzeigen",
@@ -667,7 +667,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht. Du kannst {0}.",
          reloadSubmittedAnswer: "Lade die Lösung, die du eingereicht hast",
          difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen.",
-         enemyWarning: "<strong>Achtung:</strong> in dieser Herausforderung wird der Computer, den Sie von der Suche nach der Lösung zufällig verhindern."
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       ar: {
          version: "المستوى",
@@ -2942,7 +2942,7 @@ function getLanguageString(key) {
          'header' : '\
             <div id="miniPlatformHeader">\
                <table>\
-                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -2952,7 +2952,7 @@ function getLanguageString(key) {
          'header' : '\
             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
@@ -3112,35 +3112,26 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(task) { return function(mode, success, error) {
-   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate' || mode == 'log') {
+   if (!success) { success = function () { }; }
+   if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
       return;
-   }
-   if (mode == 'stay') {
-      if (alreadyStayed) {
-         platform.trigger('validate', [mode]);
-         if (success) {
-            success();
-         }
-      } else {
-         alreadyStayed = true;
-      }
    }
    if (mode == 'cancel') {
       alreadyStayed = false;
    }
-   if(platform.registered_objects && platform.registered_objects.length > 0) {
-       platform.trigger('validate', [mode]);
-   } else {
-        // Try to validate
-        task.getAnswer(function(answer) {
-            task.gradeAnswer(answer, task_token.getAnswerToken(answer), function(score, message) {
-                if(success) { success(); }
-                })
-            });
-   }
-   if (success) {
+   if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
+      platform.trigger('validate', [mode]);
       success();
+   } else {
+      // Try to validate
+      task.getAnswer(function (answer) {
+         task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
+            success();
+         })
+      });
+   }
+   if (mode == 'stay') {
+      alreadyStayed = true;
    }
 }};
 
@@ -3280,7 +3271,7 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
-      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../modules') + '/integrationAPI.01/official/miniPlatform.css">');
+      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
          window.task_token.update({id: taskMetaData.id});
          window.answer_token = new AnswerToken(demo_key)

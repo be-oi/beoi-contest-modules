@@ -55,121 +55,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          codeRow: "ligne",
          labelAlert: "alerte",
          codeAlert: "alerte",
-         obstacle: "Le robot essaie de se déplacer sur un obstacle !" 
-      },
-      nl: {
-         labelWait: "wachten",
-         codeWait: "wachten",
-         labelRight: "draai naar rechts",
-         codeRight: "rechts",
-         labelLeft: "draai naar links",
-         codeLeft: "links",
-         labelForward: "ga vooruit",
-         codeForward: "vooruit",
-         labelEast: "ga naar rechts",
-         codeEast: "rechts",
-         labelSouth: "ga naar onder",
-         codeSouth: "onder",
-         labelWest: "ga naar links",
-         codeWest: "links",
-         labelNorth: "ga naar boven",
-         codeNorth: "boven",
-         labelPaint: "kleur het vakje",
-         codePaint: "kleurVakje",
-         labelGridEdgeInFront: "rand van het rooster recht voor",
-         codeGridEdgeInFront: "randRoosterRechtvoor",
-         labelObstacleInFront: "obstakel recht voor",
-         codeObstacleInFront: "obstakelRechtVoor",
-         labelObstacleRight: "obstakel rechts",
-         codeObstacleRight: "obstakelRechts",
-         labelObstacleLeft: "obstakel links",
-         codeObstacleLeft: "obstakelLinks",
-         labelObstacleEast: "obstakel rechts",
-         codeObstacleEast: "obstakelRechts",
-         labelObstacleWest: "obstakel links",
-         codeObstacleWest: "obstakelLinks",
-         labelObstacleNorth: "obstakel boven",
-         codeObstacleNorth: "obstakelBoven",
-         labelObstacleSouth: "obstakel onder",
-         codeObstacleSouth: "obstakelOnder",
-         labelCellGreen: "groen vakje",
-         labelCellBrown: "bruin vakje",
-         labelCellMarked: "gemarkeerd vakje",
-         codeCellGreen: "groenVakje",
-         codeCellBrown: "bruinVakje",
-         codeCellMarked: "gemarkeerdVakje",
-         labelPaintInFront: "kleur recht voor",
-         codePaintInFront: "kleurRechtvoor",
-         codeColorUnder: "kleurVakje",
-         codeNumberUnder: "nummerVakje",
-         labelColorUnder: "kleur van het vakje",
-         labelNumberUnder: "nummer van het vakje",
-         labelDir: "richting van de robot",
-         codeDir: "richting",
-         labelCol: "kolom van de robot",
-         codeCol: "kolom",
-         labelRow: "rij van de robot",
-         codeRow: "rij",
-         labelAlert: "let op",
-         codeAlert: "letOp",
-         obstacle: "De robot probeert zich te verplaatsen op een obstakel!" 
-      },
-      de: {
-         labelWait: "warten",
-         codeWait: "warten",
-         labelRight: "nach rechts drehen",
-         codeRight: "rechts",
-         labelLeft: "nach links drehen",
-         codeLeft: "links",
-         labelForward: "vorrücken",
-         codeForward: "vorrücken",
-         labelEast: "nach rechts gehen",
-         codeEast: "rechts",
-         labelSouth: "nach unten gehen",
-         codeSouth: "unten",
-         labelWest: "nach links gehen",
-         codeWest: "links",
-         labelNorth: "nach oben gehen",
-         codeNorth: "oben",
-         labelPaint: "das Feld anmalen",
-         codePaint: "feldAnmalen",
-         labelGridEdgeInFront: "Gitterrand voraus",
-         codeGridEdgeInFront: "gitterrandVoraus",
-         labelObstacleInFront: "Hindernis voraus",
-         codeObstacleInFront: "hindernisVoraus",
-         labelObstacleRight: "Hindernis rechts",
-         codeObstacleRight: "hindernisRechts",
-         labelObstacleLeft: "Hindernis links",
-         codeObstacleLeft: "hindernisLinks",
-         labelObstacleEast: "Hindernis rechts",
-         codeObstacleEast: "hindernisRechts",
-         labelObstacleWest: "Hindernis links",
-         codeObstacleWest: "hindernisLinks",
-         labelObstacleNorth: "Hindernis oben",
-         codeObstacleNorth: "hindernisOben",
-         labelObstacleSouth: "Hindernis unten",
-         codeObstacleSouth: "hindernisUnten",
-         labelCellGreen: "grünes Feld",
-         labelCellBrown: "braunes Feld",
-         labelCellMarked: "markiertes Feld",
-         codeCellGreen: "grunesFeld",
-         codeCellBrown: "braunesFeld",
-         codeCellMarked: "markiertesFeld",
-         labelPaintInFront: "Farbe voraus",
-         codePaintInFront: "farbeVoraus",
-         codeColorUnder: "farbeFeld",
-         codeNumberUnder: "nummerFeld",
-         labelColorUnder: "Farbe des Feldes",
-         labelNumberUnder: "Nummer des Feldes",
-         labelDir: "Richtung des Roboters",
-         codeDir: "richtung",
-         labelCol: "Spalte des Roboters",
-         codeCol: "spalte",
-         labelRow: "Zeile des Roboters",
-         codeRow: "zeile",
-         labelAlert: "Alarm",
-         codeAlert: "alarm",
-         obstacle: "Der Roboter versucht sich auf einem Hindernis zu bewegen!" 
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !"
       },
       es: {
          labelWait: "esperar",
@@ -252,8 +138,6 @@ var getRobotGridContext = function(display, infos, curLevel) {
    context.callCallback = function(callback, value) { // Default implementation
       context.runner.noDelay(callback, value);
    }
-
-   context.nbRobots = 1;
 
    context.getRobotItem = function(iRobot) {
       var items = context.getItems(undefined, undefined, {category: "robot"});
@@ -780,15 +664,6 @@ var getRobotGridContext = function(display, infos, curLevel) {
    context.robot_dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, dirNames[item.dir]);
-   };
-
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
    };
 
    context.reset = function(gridInfos) {

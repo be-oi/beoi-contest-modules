@@ -13,7 +13,7 @@ Beav.Object.eq = function eq(x, y) {
       return (x == null && y == null);
    }
    var tx = typeof(x);
-   var ty = typeof(y);
+   var ty = typeof(y); 
    if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
    }
@@ -174,6 +174,7 @@ Beav.Array.pickRandomNTimes = function (t, rng, n, diffN) {
    }
    return t[index];
 }
+
 
 /**********************************************************************************/
 /* Matrix */
@@ -353,9 +354,8 @@ Beav.Navigator.isIE8 = function() {
   return navigator.appVersion.indexOf("MSIE 8.") != -1;
 }
 
-
 Beav.Navigator.getVersion = function(){
-   var ua= navigator.userAgent, tem,
+   var ua= navigator.userAgent, tem, 
    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
    if(/trident/i.test(M[1])){
       tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
@@ -393,11 +393,12 @@ Beav.Navigator.supportsResponsive = function() {
    if(navVersion[0].toLowerCase() == 'msie'){
       return false
    }
-   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 5){
+   if(navVersion[0].toLowerCase() == 'firefox' && navVersion[1] < 68){
       return false
    }
    return true
 }
+
 
 /**********************************************************************************/
 /* Dom */
@@ -527,12 +528,16 @@ Beav.Geometry.distance = function(x1,y1,x2,y2) {
    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
 };
 
+Beav.Geometry.distance3D = function(x1,y1,z1,x2,y2,z2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2) + Math.pow(z2 - z1,2));
+};
+
 /*
    This is used to handle drag on devices that have both a touch screen and a mouse.
    Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
    To call instead of element.drag(onMove, onStart, onEnd);
 */
-Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
+Beav.dragWithTouch = function (element, onMove, onStart, onEnd) {
    var touchingX = 0;
    var touchingY = 0;
    var disabled = false;
@@ -544,7 +549,7 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       var touches = evt.changedTouches;
       touchingX = touches[0].pageX;
       touchingY = touches[0].pageY;
-      onStart(touches[0].pageX, touches[0].pageY, evt);
+      onStart(touches[0].pageX, touches[0].pageY, evt);         
    }
 
    function onTouchEnd(evt) {
@@ -553,7 +558,7 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       }
       onEnd(null);
    }
-
+   
    function onTouchMove(evt) {
       if (disabled) {
          return;
@@ -561,19 +566,29 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
       var touches = evt.changedTouches;
       var dx = touches[0].pageX - touchingX;
       var dy = touches[0].pageY - touchingY;
-      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      onMove(dx/scale, dy/scale, touches[0].pageX, touches[0].pageY, evt);
    }
-
+   
    function callOnStart(x,y,event) {
       disabled = true;
       onStart(x,y,event);
    }
-
+   
    function callOnMove(dx,dy,x,y,event) {
       disabled = true;
-      onMove(dx,dy,x,y,event);
+      if (window.displayHelper) {
+         var scale = window.displayHelper.scaleFactor || 1;
+      }else{
+         var scale = 1;
+      }
+      onMove(dx/scale,dy/scale,x,y,event);
    }
-
+   
    function callOnEnd(event) {
       disabled = false;
       onEnd(event);
@@ -582,6 +597,10 @@ Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
    // element.undrag();
    element.drag(callOnMove,callOnStart,callOnEnd);
    if (element.touchstart) {
+      element.untouchstart();
+      element.untouchend();
+      element.untouchmove();
+      element.untouchcancel();
       element.touchstart(onTouchStart);
       element.touchend(onTouchEnd);
       element.touchcancel(onTouchEnd);

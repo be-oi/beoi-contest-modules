@@ -1,7 +1,7 @@
 var getContext = function(display, infos) {
 
     var map_strings = {
-        fr: {
+        en: {
             categories: {
                 map: 'Carte'
             },
@@ -38,7 +38,7 @@ var getContext = function(display, infos) {
                 shortestPath: 'Returns the shortest path between the two cities, using geoDistance',
                 echo: 'Afficher'
             },
-            startingBlockName: "Programme",
+            startingBlockName: "Program",
             constantLabel: {
             },
             messages: {
@@ -55,10 +55,10 @@ var getContext = function(display, infos) {
     var map;
     var logger;
 
-    var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
+    var conceptBaseUrl = (window.location.protocol == 'https' ? 'https' : 'http') + '//'
+        + 'static4.castor-informatique.fr/help/map.html';
     context.conceptList = [
-        {id: 'map_introduction', name: 'La proglet gogleMaps', url: conceptBaseUrl+'#map_introduction'},
+        {id: 'map_introduction', name: 'La proglet googleMaps', url: conceptBaseUrl+'#map_introduction'},
         {id: 'map_clearMap', name: 'Effacer la carte', url: conceptBaseUrl+'#map_mapDisplay'},
         {id: 'map_addLocation', name: 'Mettre en évidence un point de la carte', url: conceptBaseUrl+'#map_mapDisplay'},
         {id: 'map_addRoad', name: 'Tracer une ligne droite', url: conceptBaseUrl+'#map_mapDisplay'},
@@ -74,7 +74,7 @@ var getContext = function(display, infos) {
         if(!context.display) return
         if(!map) {
             var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
-            map = new Map(options);
+            map = new MapItem(options);
             logger = new Logger({
                 parent: $('#gridContainer')
             });
@@ -129,12 +129,13 @@ var getContext = function(display, infos) {
                     params_names: ['cityName']
                 },
                 { name: 'shortestPath',
+                    yieldsValue: true,
                     params: ['String', 'String'],
                     params_names: ['cityName1', 'cityName2']
                 },
                 { name: 'echo',
                     params: ['String'],
-                    params_names: ['longitude', 'latitude', 'label']
+                    params_names: ['value']
                 }
             ]
         }

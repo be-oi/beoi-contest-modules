@@ -33,13 +33,33 @@ var bundles = {
         "pemFioi/quickAlgo/blockly_runner.js", "pemFioi/quickAlgo/subtask.js",
         "pemFioi/quickAlgo/context.js"],
     'quickAlgo-all-python': ["pemFioi/pythonCount-1.0.js", "ext/ace/ace.js",
-        "ext/ace/mode-python.js", "xt/skulpt/skulpt.quickAlgo.min.js",
-        "ext/skulpt/skulpt-stdlib.js", "xt/skulpt/debugger.js",
+        "ext/ace/mode-python.js", "ext/skulpt/skulpt.quickAlgo.min.js",
+        "ext/skulpt/skulpt-stdlib.js", "ext/skulpt/debugger.js",
         "pemFioi/quickAlgo/utils.js", "pemFioi/quickAlgo/i18n.js",
         "pemFioi/quickAlgo/interface.js", "pemFioi/quickAlgo/python_interface.js",
         "pemFioi/quickAlgo/python_runner.js", "pemFioi/quickAlgo/subtask.js",
-        "pemFioi/quickAlgo/context.js"]
-    };
+        "pemFioi/quickAlgo/context.js"],
+    'quickAlgo-all-python-1.5': ["pemFioi/pythonCount-1.0.js", "ext/ace/ace.js",
+        "ext/ace/mode-python.js", "ext/skulpt/skulpt.quickAlgo_1.5.min.js",
+        "ext/skulpt/skulpt-stdlib.js", "ext/skulpt/debugger_1.5.js",
+        "pemFioi/quickAlgo/utils.js", "pemFioi/quickAlgo/i18n.js",
+        "pemFioi/quickAlgo/interface.js", "pemFioi/quickAlgo/python_interface.js",
+        "pemFioi/quickAlgo/python_runner_1.5.js", "pemFioi/quickAlgo/subtask.js",
+        "pemFioi/quickAlgo/context.js"],
+    'python-analysis': [
+        "ext/react/react.production.16.13.1.min.js",
+        "ext/react/react-dom.production.16.13.1.min.js",
+        "ext/immutable/immutable-3.8.2.min.js",
+        "ext/codecast/analysis.js",
+        "ext/codecast/components/PythonStackViewContainer.js",
+        "ext/codecast/components/PythonFunctionHeader.js",
+        "ext/codecast/components/PythonFunctionLocals.js",
+        "ext/codecast/components/PythonFunctionView.js",
+        "ext/codecast/components/PythonStackView.js",
+        "ext/codecast/components/PythonVariable.js",
+        "ext/codecast/components/PythonVariableValue.js"
+    ]
+};
 
 function defineBundleTask(name, srcs) {
     var relativeSrcs = srcs.slice();

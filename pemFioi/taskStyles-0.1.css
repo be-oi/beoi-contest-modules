@@ -1,9 +1,18 @@
-* {
+*:not(.allow-select) {
    -moz-user-select: -moz-none;
    -webkit-user-select: none;
    -o-user-select: none;
    user-select: none;
    -khtml-user-select: none;
+}
+
+.allow-select,
+.allow-select * {
+   -moz-user-select: -moz-text;
+   -webkit-user-select: text;
+   -o-user-select: text;
+   user-select: text;
+   -khtml-user-select: text;
 }
 
 .touch {
@@ -172,7 +181,7 @@ textarea {
    border: 1px solid #8d9daa;
    margin: 10px 0;
    padding: 0 10px;
-   /* font-weight: bold; */
+   font-weight: bold;
 }
 #taskContent {
    text-align: justify;
@@ -208,6 +217,9 @@ textarea {
    border-bottom: 0;
    border-radius: 6px 6px 0 0;
    text-align: center;
+}
+#tabsMenu.moreTabs .li {
+   margin: 0 10px;
 }
 #tabsMenu .li.lockedLevel {
    background: #404040;
@@ -311,6 +323,14 @@ h1 .stars {
    border-radius: 8px;
    text-align: justify;
 }
+#popupMessage.noAvatar img.beaver, #popupMessage.noAvatar img.messageArrow {
+   display: none;
+}
+
+#popupMessage.noAvatar .message {
+   margin-left: 0px;
+   max-width: 615px;
+}
 #popupMessage p {
    margin: .5em 0 0;
 }
@@ -348,6 +368,9 @@ h1 .stars {
 }
 #displayHelper_saved {
    margin: .6em;
+}
+#displayHelper_graderMessage {
+   margin: 16px 0px;
 }
 #choose-view {
    margin-bottom: 1em;

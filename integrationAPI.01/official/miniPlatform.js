@@ -12,9 +12,15 @@
  *   - task.getMetaData(), as documented in the PEM
  */
 
-    // demo platform key
-    var demo_key = 'buddy'
+   // demo platform key
+   var demo_key = 'buddy'
 
+   function getUrlParameterByName(name) {
+     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+       results = regex.exec(location.href);
+     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+   }
 
    var languageStrings = {
       ar: {
@@ -81,18 +87,7 @@
          'showSolution': 'Lösung anzeigen',
          'yourScore': "Dein Punktestand:",
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
-         'gradeAnswer': 'Test grader' /* to be translated */
-      },
-      nl: {
-         'task': 'Vraag',
-         'submission': 'Indiening',
-         'solution': 'Oplossing',
-         'editor': 'Bewerken',
-         'hints': 'Hints',
-         'showSolution': 'Toon de oplossing',
-         'yourScore': "Jouw score:",
-         'canReadSolution': "Je kan de oplossing nu zien onderaan deze pagina.",
-         'gradeAnswer': 'Test de evaluator' 
+         'gradeAnswer': 'Test grader'
       },
       es: {
          'task': 'Problema',
@@ -107,6 +102,13 @@
       }
    };
 
+function getLanguageString(key) {
+   // Default to english strings
+   var ls = languageStrings[window.stringsLanguage] ? languageStrings[window.stringsLanguage] : languageStrings['en'];
+   var str = ls[key];
+   return str ? str : '';
+}
+
    /*
    * Create custom elements for platformless implementation
    */
@@ -115,7 +117,7 @@
          'header' : '\
             <div id="miniPlatformHeader">\
                <table>\
-                  <td><img src="../../modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -125,21 +127,14 @@
          'header' : '\
             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="../../modules/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
             </div>'
       },
-      beoi: {
-        'header' : '\
-            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
-            <table style="width:770px;margin: 10px auto;">\
-            <td><img src="../../modules/img/beoi.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
-            <td><span style="font-size:32px;">beOI</span></td>\
-            <td><a href="http://www.be-oi.be/" style="display:inline-block;text-align:right;">beOI contest</a></td>\
-            </table>\
-        </div>'
+      none: {
+         'header' : '<span></span>'
       }
    };
 
@@ -153,35 +148,76 @@
 
 
 
-    if(typeof window.signJWT == 'undefined') {
-        window.signJWT = function(data, key) {
-            return null
-        }
+    if(typeof window.jwt == 'undefined') {
+        window.jwt = {
+            isDummy: true,
+            sign: function() { return null; },
+            decode: function(token) { return token; }
+            };
     }
 
     function TaskToken(data, key) {
 
         this.data = data
-        this.data.hints_requested = []
+        this.data.sHintsRequested = "[]";
         this.key = key
 
+        var query = document.location.search.replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+        this.queryToken = query.sToken;
+
         this.addHintRequest = function(hint_params, callback) {
-            var jh = JSON.stringify(hint_params)
-            var exists = this.data.hints_requested.find(function(h) {
-                return JSON.stringify(h) === jh
-            })
+            try {
+                hint_params = jwt.decode(hint_params).askedHint;
+            } catch(e) {}
+            var hintsReq = JSON.parse(this.data.sHintsRequested);
+            var exists = hintsReq.find(function(h) {
+                return h == hint_params;
+            });
             if(!exists) {
-                this.data.hints_requested.push(hint_params)
+                hintsReq.push(hint_params);
+                this.data.sHintsRequested = JSON.stringify(hintsReq);
             }
-            this.get(callback)
-        },
+            return this.get(callback);
+        }
+
+        this.update = function(newData, callback) {
+            for(var key in newData) {
+                this.data[key] = newData[key];
+            }
+        }
+
+        this.getToken = function(data, callback) {
+            var res = jwt.sign(data, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0);
+            }
+            return res;
+        }
 
         this.get = function(callback) {
-            var res = signJWT(this.data, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            if(window.jwt.isDummy && this.queryToken) {
+                var token = this.queryToken;
+                if(callback) {
+                    // imitate async req
+                    setTimeout(function() {
+                        callback(token)
+                    }, 0);
+                }
+                return token;
+            }
+            return this.getToken(this.data, callback);
+        }
+
+        this.getAnswerToken = function(answer, callback) {
+            var answerData = {};
+            for(var key in this.data) {
+                answerData[key] = this.data[key];
+            }
+            answerData.sAnswer = answer;
+            return this.getToken(answerData, callback);
         }
     }
 
@@ -189,11 +225,14 @@
     function AnswerToken(key) {
         this.key = key
         this.get = function(answer, callback) {
-            var res = signJWT(answer, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            var res = jwt.sign(answer, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0)
+            }
+            return res;
         }
     }
 
@@ -229,7 +268,7 @@ function miniPlatformPreviewGrade(answer) {
             "<div style='padding:50px'><span id='previewScoreMessage'></span><br/><br/><input type='button' onclick='$(\"#previewScorePopup\").remove()' value='OK' /></div></div></div>").insertBefore("#solution");
       }
       $("#previewScorePopup").show();
-      $("#previewScoreMessage").html("<b>" + languageStrings[window.stringsLanguage].showSolution + " " + score + "/" + maxScore + "</b><br/>" + languageStrings[window.stringsLanguage].showSolution);
+      $("#previewScoreMessage").html("<b>" + getLanguageString('showSolution') + " " + score + "/" + maxScore + "</b><br/>" + getLanguageString('showSolution'));
    };
    // acceptedAnswers is not documented, but necessary for old Bebras tasks
    if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
@@ -247,29 +286,29 @@ function miniPlatformPreviewGrade(answer) {
 
 var alreadyStayed = false;
 
-var miniPlatformValidate = function(mode, success, error) {
-   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate' || mode == 'log') {
-      return;
-   }
-   if (mode == 'stay') {
-      if (alreadyStayed) {
-         platform.trigger('validate', [mode]);
-         if (success) {
-            success();
-         }
-      } else {
-         alreadyStayed = true;
-      }
-   }
-   if (mode == 'cancel') {
-      alreadyStayed = false;
-   }
-   platform.trigger('validate', [mode]);
-   if (success) {
-      success();
-   }
-};
+var miniPlatformValidate = function(task) { return function(mode, success, error) {
+  if (!success) { success = function () { }; }
+  if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
+    return;
+  }
+  if (mode == 'cancel') {
+    alreadyStayed = false;
+  }
+  if (alreadyStayed || (platform.registered_objects && platform.registered_objects.length > 0)) {
+    platform.trigger('validate', [mode]);
+    success();
+  } else {
+    // Try to validate
+    task.getAnswer(function (answer) {
+      task.gradeAnswer(answer, task_token.getAnswerToken(answer), function (score, message) {
+        success();
+      })
+    });
+  }
+  if (mode == 'stay') {
+    alreadyStayed = true;
+  }
+}};
 
 function getUrlParameter(sParam)
 {
@@ -306,22 +345,25 @@ var chooseView = (function () {
       isDouble: false,
       lastShownViews: {},
 
-      init: function(views) {
-         if (! $("#choose-view").length)
-            $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
+      init: function(views, showViews) {
+         if (! $("#choose-view").length) {
+             $(document.body).prepend('<div id="choose-view"></div>');
+         }
          $("#choose-view").html("");
          // Display buttons to select task view or solution view
-         /*
-         for(var viewName in views) {
+
+        if (showViews) {
+          for(var viewName in views) {
             if (!views[viewName].requires) {
-               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>')
-               $("#choose-view").append(btn);
-               btn.click(this.selectFactory(viewName));
+              var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
+              $("#choose-view").append(btn);
+              btn.click(this.selectFactory(viewName));
             }
-         }
-         */
+          }
+        }
+
          $("#grade").remove();
-         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + languageStrings[window.stringsLanguage].gradeAnswer + '</button></center>');
+         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + getLanguageString('gradeAnswer') + '</button></center>');
          // display grader button only if dev mode by adding URL hash 'dev'
          if (getHashParameter('dev')) {
             $(document.body).append(btnGradeAnswer);
@@ -339,8 +381,8 @@ var chooseView = (function () {
          })
       },
 
-      reinit: function(views) {
-         this.init(views);
+      reinit: function(views, showViews) {
+         this.init(views, showViews);
          var newShownViews = {};
          for(var viewName in this.lastShownViews) {
             if(!this.lastShownViews[viewName]) { continue; }
@@ -388,7 +430,10 @@ var chooseView = (function () {
    };
 })();
 
-
+window.task_token = new TaskToken({
+   itemUrl: window.location.href,
+   randomSeed: Math.floor(Math.random() * 10)
+}, demo_key);
 
 
 
@@ -399,26 +444,25 @@ $(document).ready(function() {
        var testEdge = parent.TaskProxyManager; // generates an exception on edge when in a platform (parent not available)
    } catch(ex) {
        // iframe from files:// url are considered cross-domain by Chrome
-       if(location.protocol !== 'file:') {
-         hasPlatform = true;
+       if(location.protocol !== 'file:' && getUrlParameterByName('iframe') !== 'noApi') {
+           hasPlatform = true;
        }
    }
    if (!hasPlatform) {
-    $('head').append('<link rel="stylesheet"type="text/css" \
-    href="../../modules//integrationAPI.01/official/miniPlatform.css">');
+      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
-         window.task_token = new TaskToken({
-            id: taskMetaData.id,
-            random_seed: Math.floor(Math.random() * 10)
-         }, demo_key)
+         window.task_token.update({id: taskMetaData.id});
          window.answer_token = new AnswerToken(demo_key)
 
-         platform.validate = miniPlatformValidate;
+         platform.validate = miniPlatformValidate(task);
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
             if(data.views) {
-               chooseView.reinit(data.views);
+               chooseView.reinit(data.views, taskMetaData.showViews);
             }
+            if (success) {success();}
+         };
+         platform.log = function(data, success, error) {
             if (success) {success();}
          };
          var taskOptions = {};
@@ -435,7 +479,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions, "supportsTabs": true};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
@@ -452,7 +496,6 @@ $(document).ready(function() {
             }
          };
          platform.askHint = function(hint_params, success, error) {
-            success()
              /*
             $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
                if (success) {success();}
@@ -460,6 +503,7 @@ $(document).ready(function() {
             */
             task_token.addHintRequest(hint_params, function(token) {
                 task.updateToken(token, function() {})
+                success(token)
             })
          };
 
@@ -472,6 +516,8 @@ $(document).ready(function() {
          }
          if (!taskOptions.hideTitle) {
             $("#task h1").show();
+            if ($("#task h1").length)
+                document.title = $("#task h1:first").text();
          }
 
          if (taskMetaData.fullFeedback) {
@@ -482,23 +528,26 @@ $(document).ready(function() {
              loadedViews,
              function() {
                 platform.trigger('load', [loadedViews]);
-                task.getViews(function(views) {
-                    chooseView.init(views);
-                });
-                task.showViews(shownViews, function() {
-                    chooseView.update(shownViews);
-                    platform.trigger('showViews', [{"task": true}]);
+                task.getViews(function(views, showViews) {
+                    chooseView.init(views, showViews);
+
+                    task.showViews(shownViews, function() {
+                        chooseView.update(shownViews);
+                        platform.trigger('showViews', [shownViews]);
+                    });
                 });
                 if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
                 }
 
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
-                if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                  $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                } else {
-                  $('body').prepend(miniPlatformWrapping[beaver].header);
+                if(window.displayHelper) {
+                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                  } else {
+                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                  }
                 }
              },
              function(error) {
@@ -528,8 +577,8 @@ $(document).ready(function() {
          }
 
          addEvent('resize', window, function() {
-            task.getViews(function(views) {
-               chooseView.reinit(views);
+            task.getViews(function(views, showViews) {
+               chooseView.reinit(views, showViews);
             });
          });
       };

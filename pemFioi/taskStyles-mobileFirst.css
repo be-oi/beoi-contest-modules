@@ -1,3 +1,6 @@
+html {
+  font-size: 10px;
+}
 body {
   padding: 0;
   margin: 0;
@@ -19,8 +22,16 @@ img {
 #choose-view {
   margin-top: 0 !important;
 }
-
-
+.btn-centered {
+  margin: 10px auto 0;
+  display: block;
+}
+.flex-container {
+  display: flex;
+}
+.flex-container .flex-col.half {
+  flex: 1 0 0;
+}
 /*****************
   LEVEL SELECTOR
 *****************/
@@ -36,7 +47,7 @@ img {
   align-items: center;
   margin-right: 10px;
 }
-#tabsMenu a {
+#tabsMenu a, .tabs-area a {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -47,13 +58,13 @@ img {
 #tabsMenu .stars {
   margin-left: 5px;
 }
-#tabsMenu .li {
+#tabsMenu .li, .tabs-area a {
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
   font-size: 12px;
 }
-#tabsMenu .li:not(.current) a {
+#tabsMenu .li:not(.current) a, .tabs-area .li:not(.current) a {
   color: #9b9b9b;
 }
 
@@ -123,13 +134,14 @@ img {
 @media /* all but portrait mobiles */
     screen and (min-width: 481px) and (orientation: landscape),
     screen and (min-width: 601px) and (orientation: portrait) {
-  #tabsMenu a {
+  #tabsMenu a, .tabs-area a {
     padding: 10px 0;
   }
-  #tabsMenu .li {
+  #tabsMenu .li, .tabs-area .li {
     padding: 0 20px;
   }
-  #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
+  #tabsMenu .li:not(.current):not(.prev):not(:last-child),
+  .tabs-area .li:not(.current):not(.prev):not(:last-child) {
     border-right-width: 2px;
     border-right-style: solid;
     -webkit-border-image:
@@ -141,26 +153,30 @@ img {
     border-image:
       linear-gradient(to bottom, rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
   }
-  #tabsMenu .li.current {
+  #tabsMenu .li.current, .tabs-area .li.current {
     background-color: #fff;
     border-radius: 5px 5px 0 0;
     position: relative;
   }
   #tabsMenu .li.current::before,
-  #tabsMenu .li.current::after {
+  #tabsMenu .li.current::after,
+  .tabs-area .li.current::before,
+  .tabs-area .li.current::after {
     content: " ";
     position: absolute;
     width: 20px;
     height: 20px;
     background: transparent;
   }
-  #tabsMenu .li.current::before {
+  #tabsMenu .li.current::before,
+  .tabs-area .li.current::before {
     border-radius: 50% 0;
     box-shadow: 10px 0px 0 #fff;
     bottom: 0;
     left: -20px;
   }
-  #tabsMenu .li.current::after {
+  #tabsMenu .li.current::after,
+  .tabs-area .li.current::after {
     border-radius: 0 50%;
     box-shadow: -10px 0px 0 #fff;
     bottom: 0;
@@ -171,7 +187,7 @@ img {
   screen and (min-width: 768px) and (max-width: 1024.9999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
-  #tabsMenu .li {
+  #tabsMenu .li, .tabs-area .li {
     padding: 0 40px;
   }
 }
@@ -189,6 +205,10 @@ img {
    margin: .5em 0;
    padding: 8px;
 }
+#popupMessage:not(.floatingMessage) {
+   background: white;
+   text-align: center;
+}
 #popupMessage.floatingMessage {
    position: absolute;
    z-index: 100;
@@ -202,7 +222,7 @@ img {
 #popupMessage.floatingMessage .container {
    min-height: 100px;
    width: 94%;
-   max-width: 1000px;
+   max-width: 680px;
    margin-left: auto;
    margin-right: auto;
    border-radius: 5px;
@@ -212,7 +232,10 @@ img {
    top: 50%;
    transform: translate(0,-50%);
 }
-#popupMessage.floatingMessage .container img {
+#popupMessage .container img.messageArrow {
+   display: none;
+}
+#popupMessage.floatingMessage .container img.beaver {
    display: none;
 }
 #popupMessage .message {
@@ -250,6 +273,179 @@ img {
   font-weight: 900;
   margin-right: 10px;
 }
+
+/* QuickPi connexion popup */
+
+#popupMessage .qpi .panel-heading {
+  margin: -20px -20px 0;
+  padding: 20px
+}
+#popupMessage .qpi .sectionTitle {
+  color: inherit;
+}
+#popupMessage .qpi .sectionTitle .iconTag {
+  margin-left: -20px; /* panel-heading padding */
+  margin-right: 14px;
+  padding-left: 24px;
+  padding-right: 12px;
+  background-color: #4a90e2;
+  border-left: 2px solid rgba(0,0,0,0.8);
+  border-radius: 0 50px 50px 0;
+}
+#popupMessage .qpi .sectionTitle .iconTag .icon {
+  width: auto;
+  background-color: transparent;
+  margin-right: 0;
+  line-height: 31px;
+  font-size: 12px;
+}
+#popupMessage .qpi .panel-body {
+  margin-left: 44px; /* Align left to .sectionTitle text left */
+  font-size: 12px;
+}
+#popupMessage .qpi .panel-body label {
+  display: block;
+  margin-top: 2em;
+}
+#popupMessage .qpi .form-group {
+  position: relative;
+}
+#popupMessage .qpi .form-control,
+#popupMessage .qpi select {
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  height: 36px;
+  line-height: 1.6;
+  color: #555555;
+  border-radius: 5px; 
+}
+#popupMessage .qpi .form-control {
+  flex-grow: 1;
+  margin: 0;
+  padding: 6px 12px;
+}
+#popupMessage .qpi input {
+  margin-left: 0;
+}
+#popupMessage .qpi select {
+  padding: 6px 12px;
+}
+#popupMessage .qpi .input-group {
+  position: relative;
+  width: 100%;
+  margin: 10px 0 0;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+#popupMessage .qpi .input-group .input-group-prepend {
+  border-radius: 5px 0 0 5px;
+  line-height: 2.4rem;
+  padding: 6px 12px;
+  border: none;
+  color: #c5c4c4;
+  padding: 6px 9px;
+  font-weight: bold;
+}
+#popupMessage .qpi .input-group button.input-group-prepend {
+  color: #fff;
+}
+#popupMessage .qpi .input-group .custom-select {
+  position: relative;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  margin-bottom: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+#popupMessage .qpi .btn {
+  margin: 10px auto 0;
+  border-radius: 50px;
+  padding: 6px 50px;
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 1.5;
+  border: none;
+  font-size: 1.2rem;
+  position: relative;
+}
+#popupMessage .qpi .btn .icon {
+  position: absolute;
+  left: 16px;
+  top: 7px;
+  top: calc(50% - 0.5em);
+}
+#popupMessage .qpi .btn-group.switchRadio {
+  display: flex;
+  background-color: #e5e5e5;
+  border-radius: 50px;
+  margin: 2em 0;
+  box-shadow: 1px 1px 0 0 #ccc inset;
+}
+#popupMessage .qpi .btn-group.switchRadio .btn {
+  flex: 1 1 auto;
+  margin: 0;
+  border-left: 1px solid #d3d3d3;
+  transition: all ease 250ms;
+}
+#popupMessage .qpi .btn-group.switchRadio .btn:not(.active) {
+  background-color: transparent;
+  border-radius: 0;
+  color: #bbbbbb;
+}
+#popupMessage .qpi .btn-group.switchRadio .btn:first-child,
+#popupMessage .qpi .btn-group.switchRadio .btn.active + .btn {
+  border-left: 0;
+}
+#popupMessage .qpi .btn-group.switchRadio .btn .icon {
+  position: static;
+  padding-right: 10px;
+}
+#popupMessage .qpi #sensorPicker .flex-container {
+  align-items: center;
+  margin: 2em 0 4em;
+}
+#popupMessage .qpi #selector-image-container {
+  text-align: center;
+  position: relative;
+  height: 70px;
+}
+#popupMessage .qpi #selector-image-container img {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, 0);
+}
+#popupMessage .qpi #sensorPicker #selector-label {
+  position: absolute;
+  top: 15px;
+  left: 3px;
+  font-style: italic;
+}
+.qpi .inlineButtons {
+  text-align: center;
+  margin: 2em 0;
+  display: flex;
+}
+.qpi .inlineButtons button {
+  flex: 1 0 0;
+}
+.qpi .singleButton {
+  margin: 2em 0;
+  text-align: center;
+}
+#popupMessage .qpi .inlineButtons button + button {
+  margin-left: 10px;
+}
+
+/* Python */
 .pythonIntroSimple code, .pythonIntroFull code {
   cursor: pointer;
   color: #4D87CE;

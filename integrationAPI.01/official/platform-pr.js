@@ -25,7 +25,7 @@ function isCrossDomain() {
       } catch(e){
           res = false;
       }
-      return res;
+      return res && !getUrlParameterByName('xd');
    }
    return isInIframe() && !isSameDomain();
 }
@@ -87,6 +87,9 @@ if (!isCrossDomain()) {
       openUrl: function(url, success, error) {
          return platform.parent_platform.openUrl(url, success, error);
       },
+      log: function(data, success, error) {
+         return platform.parent_platform.log(data, success, error);
+      },
       initCallback: function(callback) {
          this.initCallbackFun = callback;
          if (platform.initDone) {
@@ -125,6 +128,27 @@ if (!isCrossDomain()) {
          console.error('cannot init task if jschannel is not present');
          return;
       }
+
+      var previousHeights = [];
+      var getHeightFiltered = function(success, error) {
+         // If the new height has already been returned just before the current
+         // height, we're in a loop between two heights, possibly because of a
+         // scrollbar.
+         // In that case we want to keep the largest of the two heights.
+         if(!task.getHeight) { error('task.getHeight not defined yet'); }
+         task.getHeight(function(h) {
+            if((previousHeights.length == 2) &&
+               (previousHeights[0] == h) &&
+               (previousHeights[1] >= h)) {
+                  success(previousHeights[1]);
+                  return;
+            }
+            previousHeights.push(h);
+            previousHeights = previousHeights.slice(-2);
+            success(h);
+         }, error);
+      }
+
       var gradeAnswer = function(params, success, error) {
          var newSuccess = function(score, message, scoreToken) {
             success([score, message, scoreToken]);
@@ -142,7 +166,7 @@ if (!isCrossDomain()) {
       platform.channelId = channelId;
       chan.bind('task.load', function(trans, views) {task.load(views, callAndTrigger(trans.complete, 'load', trans.error, [views]), trans.error);trans.delayReturn(true);});
       chan.bind('task.unload', function(trans) {task.unload(callAndTrigger(trans.complete, 'unload', trans.error, null), trans.error);trans.delayReturn(true);});
-      chan.bind('task.getHeight', function(trans) {task.getHeight(trans.complete, trans.error);trans.delayReturn(true);});
+      chan.bind('task.getHeight', function(trans) {getHeightFiltered(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getMetaData', function(trans) {task.getMetaData(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getViews', function(trans) {task.getViews(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.showViews', function(trans, views) {task.showViews(views, callAndTrigger(trans.complete, 'showViews', trans.error, [views]), trans.error);trans.delayReturn(true);});
@@ -231,6 +255,15 @@ if (!isCrossDomain()) {
       if (!error) error = function() {console.error(arguments);};
       platform.chan.call({method: "platform.openUrl",
          params: url,
+         error: error,
+         success: success
+      });
+   };
+   platform.log = function(data, success, error) {
+      if (!success) success = function(){};
+      if (!error) error = function() {console.error(arguments);};
+      platform.chan.call({method: "platform.log",
+         params: data,
          error: error,
          success: success
       });

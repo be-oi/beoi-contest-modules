@@ -60,8 +60,6 @@ var languageStrings = {
       programOfRobot: "Programme du robot",
       flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
-      previous: "Précédent",
-      next: "Suivant",
       tooManyIterationsWithoutAction: "Votre programme s'est exécuté trop longtemps sans effectuer d'action !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
@@ -197,11 +195,9 @@ var languageStrings = {
       smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
-      flagClicked: "Wenn %1 geklickt wurde",
-      tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
+      flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
+      tooManyIterations: "Zu viele Iterationen!",
       tooManyIterationsWithoutAction: "Zu viele Iterationen vor einer Aktion!",
-      previous: "Zurück",
-      next: "Weiter",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
       speed: "Ablaufgeschwindigkeit:",
@@ -226,69 +222,21 @@ var languageStrings = {
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
-      limitBlocksOver: "{remainingBlocks} Blöcke zuviel benutzt von maximal {maxBlocks} möglichen Blöcken.",
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
       previousTestcase: "Vorheriger",
       nextTestcase: "Nächster",
-      allTests: "Alle Tests : ",
-   },
-   nl: {
-      categories: {
-        actions: "Acties",
-        sensors: "Sensoren",
-        debug: "Debuggen",
-        colour: "Kleuren",
-        dicts: "Woordenboeken",
-        input: "Input",
-        lists: "Lijsten",
-        logic: "Logica",
-        loops: "Loops",
-        math: "Wiskunde",
-        text: "Tekst",
-        variables: "Variabelen",
-        functions: "Functies"
-      },
-      invalidContent: "Ongeldige inhoud",
-      unknownFileType: "Bestandstype onbekend",
-      download: "downloaden",
-      smallestOfTwoNumbers: "Kleinste van twee getallen",
-      greatestOfTwoNumbers: "Grootste van twee getallen",
-      programOfRobot: "Programma van de robot",
-      flagClicked: "Wanneer %1 aangeklikt",
-      tooManyIterations: "Jouw programma heeft teveel tijd nodig om te eindigen!",
-      previous: "Vorige",
-      next: "Volgende",
-      submitProgram: "Valideer het programma",
-      runProgram: "Uitvoeren op deze test",
-      stopProgram: "Stop en Reset",
-      speed: "Snelheid:",
-      slowSpeed: "Traag",
-      mediumSpeed: "Gemiddeld",
-      fastSpeed: "Snel",
-      ludicrousSpeed: "Razendsnel",
-      selectLanguage: "Taal:",
-      blocklyLanguage: "Blockly",
-      javascriptLanguage: "Javascript",
-      importFromBlockly: "Importeer blockly-bestand",
-      saveOrLoadProgram: "Bewaar of herlaad jouw programma:",
-      avoidReloadingOtherTask: "Let op: herlaad niet het programma van een andere vraag!",
-      reloadProgram: "Herladen:",
-      saveProgram: "Bewaren",
-      limitBlocks: "{remainingBlocks} blokken resterend van {maxBlocks} in totaal.",
-      limitBlocksOver: "{remainingBlocks} blokken teveel gebruikt na de maximale {maxBlocks}.",
-      previousTestcase: "Vorige",
-      nextTestcase: "Volgende",
-      allTests: "Alle tests: ",
-      emptyProgram: "Le programme est vide ! Connectez des blocs.",  /* to be translated */
-      tooManyBlocks: "You use too many blocks!", /* to be translated */
-      uninitializedVar: "Uninitialized variable:", /* to be translated */
-      valueTrue: 'true', /* to be translated */
-      valueFalse: 'false', /* to be translated */
-      correctAnswer: 'Correct answer', /* to be translated */
-      partialAnswer: 'Partial answer', /* to be translated */
-      wrongAnswer: 'Wrong answer', /* to be translated */
-      resultsNoSuccess: "You passed none of the tests.", /* to be translated */
-      resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.", /* to be translated */
-      gradingInProgress: "Das Ergebnis wird ausgewertet …" /* to be translated */
+      allTests: "Tous le tests :",
+      emptyProgram: "Le programme est vide ! Connectez des blocs.", // TODO :: translate this one and next 9
+      tooManyBlocks: "You use too many blocks!",
+      uninitializedVar: "Uninitialized variable:",
+      valueTrue: 'true',
+      valueFalse: 'false',
+      correctAnswer: 'Correct answer',
+      partialAnswer: 'Partial answer',
+      wrongAnswer: 'Wrong answer',
+      resultsNoSuccess: "You passed none of the tests.",
+      resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
+      gradingInProgress: "Das Ergebnis wird ausgewertet …"
    },
    es: {
       categories: {
@@ -300,7 +248,7 @@ var languageStrings = {
          input: "Entradas",
          lists: "Listas",
          logic: "Lógica",
-         loops: "Búcles",
+         loops: "Bucles",
          control: "Control",
          operator: "Operadores",
          math: "Mate",
@@ -346,7 +294,7 @@ var languageStrings = {
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
-      emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
+      emptyProgram: "¡El programa está vacio! Conecta algunos bloques",
       emptyProgram: "Le programme est vide ! Connectez des blocs.", // TODO :: translate this one and next 6
       uninitializedVar: "Uninitialized variable:",
       valueTrue: 'true',
@@ -419,7 +367,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       trashInToolbox: false,
       languageStrings: languageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "https://manage-static.be-oi.be/contestAssets/blockly/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
       // Scratch specific
       glowingBlock: null,
@@ -2791,7 +2739,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
-      displayHelper.timeoutMinutes = 30;
+      displayHelper.timeoutMinutes = subTask.gridInfos.timeoutMinutes ? subTask.gridInfos.timeoutMinutes : 30;
 
       this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
 

@@ -65,8 +65,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if: "si",
             do: "faire",
             else: "sinon",
-            previous: "Précédent",
-            next: "Suivant",
+
             submitProgram: "Valider le programme",
             runProgram: "Exécuter sur ce test",
             stopProgram: "Recommencer",
@@ -84,8 +83,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Recharger :",
             saveProgram: "Enregistrer",
             limitBlocks1: " blocs restants sur ",
-            limitBlocks2: " autorisés.",
-            allTests: "Tous les tests : "
+            limitBlocks2: " autorisés."
          },
          en: {
             actions: "Actions",
@@ -110,9 +108,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             tooManyIterations: "Too many iterations before an action!",
             if: "if",
             do: "do",
-            else: "else",	
-            previous: "Previous",
-            next: "Next",	
+            else: "else",
             submitProgram: "Validate this program",
             runProgram: "Run this program",
             stopProgram: "Stop",
@@ -130,8 +126,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Reload:",
             saveProgram: "Save",
             limitBlocks1: " blocks remaining out of ",
-            limitBlocks2: " available.",
-            allTests: "All tests : "
+            limitBlocks2: " available."
          },
          de: {
             actions: "Aktionen",
@@ -157,8 +152,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if: "wenn",
             do: "mache",
             else: "sonst",
-            previous: "Zurück",
-            next: "Weiter",
             submitProgram: "Programm überprüfen lassen",
             runProgram: "Programm ausführen",
             stopProgram: "Stop",
@@ -176,51 +169,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             reloadProgram: "Laden:",
             saveProgram: "Speichern",
             limitBlocks1: " Blöcke von ",
-            limitBlocks2: " noch verfügbar.",
-            allTests: "Alle Tests : "
-         },
-         nl: {
-            actions: "Acties",
-            sensors: "Sensoren",
-            debug: "Debuggen",
-            logic: "Logica",
-            loops: "Loops",
-            math: "Wiskunde",
-            text: "Tekst",
-            variables: "Variabelen",
-            functions: "Functies",
-            invalidContent: "Ongeldige inhoud",
-            unknownFileType: "Bestandstype onbekend",
-            download: "downloaden",
-            smallestOfTwoNumbers: "Kleinste van twee getallen",
-            greatestOfTwoNumbers: "Grootste van twee getallen",
-            programOfRobot: "Programma van de robot",
-            tooManyIterations: "Jouw programma heeft teveel tijd nodig om te eindigen!",
-            if: "als",
-            do: "doe",
-            else: "anders",
-            previous: "Vorige",
-            next: "Volgende",
-            submitProgram: "Valideer het programma",
-            runProgram: "Uitvoeren op deze test",
-            stopProgram: "Stop en Reset",
-            speed: "Snelheid:",
-            slowSpeed: "Traag",
-            mediumSpeed: "Gemiddeld",
-            fastSpeed: "Snel",
-            ludicrousSpeed: "Razendsnel",
-            selectLanguage: "Taal:",
-            blocklyLanguage: "Blockly",
-            javascriptLanguage: "Javascript",
-            importFromBlockly: "Genereer vanuit blockly",
-            saveOrLoadProgram: "Bewaar of herlaad jouw programma:",
-            avoidReloadingOtherTask: "Let op: herlaad niet het programma van een andere vraag!",
-            reloadProgram: "Herladen:",
-            saveProgram: "Bewaren",
-            limitBlocks1: " blokken resterend van ",
-            limitBlocks2: " in totaal.",
-            allTests: "Alle tests: "
-         },
+            limitBlocks2: " noch verfügbar."
+         }
       },
       loadHtml: function(nbTestCases) {
          var strMaxBlocks = "";
@@ -256,9 +206,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
               gridButtonsBefore += "<div>" +
-                 "<input type='button' value='" + this.strings.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
+                 "<input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>" +
                  "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
-                 "<input type='button' value='" + this.strings.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
+                 "<input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>" +
                  "</div>";
          }
          $("#gridButtonsBefore").html(gridButtonsBefore);
@@ -298,7 +248,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
-               media: "https://manage-static.be-oi.be/contestAssets/blockly/"
+               media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
             };
             if (!this.groupByCategory) {
                wsConfig.comments = true;
@@ -1810,7 +1760,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = "Tous les tests / Alle Tests : ";
+         subTask.context.messagePrefixSuccess = "Tous les tests : ";
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -1901,7 +1851,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests / Alle Tests : ";
+      subTask.context.messagePrefixSuccess = "Tous les tests : ";
       subTask.context.runner.runCodes(codes);
    };
 }

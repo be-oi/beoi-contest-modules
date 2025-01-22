@@ -27,6 +27,13 @@
     padding: 15px;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+#conceptViewer .section-external-exit {
+    display: inline-flex;
+}
+#conceptViewer .exit {
+    cursor: pointer;
+    margin: 0 3px 0 16px;
+}
 #conceptViewer .exit .icon {
     font-size: 18px;
     color: #4a90e2;
@@ -35,9 +42,19 @@
     display: flex;
     justify-content: stretch;
     height: 100%;
+    min-height: 0;
+}
+@media screen and (min-width: 481px){
+    #conceptViewer .navigationContent {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 100%;
+    }
 }
 #conceptViewer .navigation {
     border-right: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
 }
 
 #conceptViewer .navigationLanguage {
@@ -198,4 +215,14 @@
     width: 100%;
     height: 100%;
     border: none;
+}
+#conceptViewer.conceptViewer-fullscreen .content {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+#conceptViewer.conceptViewer-fullscreen .section-external-exit {
+    display: none;
 }

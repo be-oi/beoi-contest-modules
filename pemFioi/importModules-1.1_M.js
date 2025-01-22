@@ -8,10 +8,10 @@ var importableModules = function () {
       'jquery-1.7.1': {src: modulesPath+"/ext/jquery/1.7/jquery.min.js", id: "http://code.jquery.com/jquery-1.7.1.min.js"},
       'jquery-ui.touch-punch': {src: modulesPath+"/ext/jquery-ui/jquery.ui.touch-punch.min.js", id: "jquery.ui.touch-punch.min.js"},
       'jquery-ui-1.10.3': {src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js", id: "https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"},
-      'jquery-ui-1.10.3-styles': {type: "stylesheet", src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui.css", id: "https://code.jquery.com/ui/1.10/jquery-ui.css"},
+      'jquery-ui-1.10.3-styles': {type: "stylesheet", src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui.css", id: "https://code.jquery.com/ui/1.10/jquery-ui.css"},      
       'JSON-js': {src: modulesPath+"/ext/json/json2.min.js", id: "https://github.com/douglascrockford/JSON-js"},
       'raphael-2.2.1': {src: modulesPath+"/ext/raphael/2.2.1/raphael.min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1/raphael.min.js"},
-      'raphael-2.2.1b': {src: modulesPath+"/ext/raphael/2.2.1b/raphael.min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1b/raphael.min.js"},
+      'raphael-2.2.1b': {src: modulesPath+"/ext/raphael/2.2.1b/raphael.min.js", id: "raphael-2.2.1b"},
       'beaver-task-2.0': {src: modulesPath+"/pemFioi/beaver-task-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beaver-task-2.0.js"},
       'jschannel': {src: modulesPath+"/ext/jschannel/jschannel.js", id: "http://www.france-ioi.org/modules/ext/jschannel/jschannel.js"},
       'raphaelFactory-1.0': {src: modulesPath+"/pemFioi/raphaelFactory-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelFactory-1.0.js"},
@@ -19,6 +19,7 @@ var importableModules = function () {
       'simulationFactory-1.0': {src: modulesPath+"/pemFioi/simulationFactory-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulationFactory-1.0.js"},
       'beav-1.0': {src: modulesPath+"/pemFioi/beav-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beav-1.0.js"},
       'raphael-2.1': {src: modulesPath+"/ext/raphael/2.1/raphael-min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"},
+      'simulation-1.0': {src: modulesPath+"/pemFioi/simulation-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-1.0.js"},
       'simulation-2.0': {src: modulesPath+"/pemFioi/simulation-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-2.0.js"},
       'simulation-3.0': {src: modulesPath+"/pemFioi/simulation-3.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-3.0.js"},
       'raphaelButton-1.0': {src: modulesPath+"/pemFioi/raphaelButton-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-1.0.js"},
@@ -29,6 +30,7 @@ var importableModules = function () {
       'graph-mouse-1.0': {src: modulesPath+"/pemFioi/graph-mouse-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.0.js"},
       'graph-mouse-1.1': {src: modulesPath+"/pemFioi/graph-mouse-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.1.js"},
       'graph-mouse-1.2': {src: modulesPath+"/pemFioi/graph-mouse-1.2.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.2.js"},
+      'graph-mouse-1.3': {src: modulesPath+"/pemFioi/graph-mouse-1.3.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.3.js"},
       'graph-mouse-1.4': {src: modulesPath+"/pemFioi/graph-mouse-1.4.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.4.js"},
       'crane-1.0': {src: modulesPath+"/pemFioi/crane-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/crane-1.0.js"},
       'grid-1.0': {src: modulesPath+"/pemFioi/grid-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.0.js"},
@@ -39,16 +41,21 @@ var importableModules = function () {
       'simpleKeyboard-1.0': {src: modulesPath+"/pemFioi/simpleKeyboard-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simpleKeyboard-1.0.js"},
       'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
       'shape-paths': {src: modulesPath+"/pemFioi/shape-paths.js", id: "shape-paths"},
-      'button-1.0': {src: modulesPath+"/pemFioi/button-1.0.js", id: "button-1.0"},
       'shape-paths-1.1': {src: modulesPath+"/pemFioi/shape-paths-1.1.js", id: "shape-paths-1.1"},
+      'gauge-1.0': {src: modulesPath+"/pemFioi/gauge-1.0.js", id: "gauge-1.0"},
+      'button-1.0': {src: modulesPath+"/pemFioi/button-1.0.js", id: "button-1.0"},
+      'assortElements-1.0': {src: modulesPath+"/pemFioi/assortElements-1.0.js", id: "assortElements-1.0"},
+      'sketchpad': {src: modulesPath+"/ext/sketchpad/raphael.sketchpad.js", id: "sketchpad"},
 
       'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
       'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
+      'buttonsAndMessages_resp': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages_resp.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages_resp.js"},
+      'buttonsAndMessages_resp-1.0': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages_resp-1.0.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages_resp-1.0.js"},
       'installationAPI.01': {classStr: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
       'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform_M.js"},
       'static-task': {src: modulesPath+"/pemFioi/static-task.js"},
       'fonts-loader-1.0': {src: modulesPath+"/pemFioi/fontsLoader-1.0.js", id: "fonts-loader"},
-      'responsiveDOMConverter': { src: modulesPath + "/pemFioi/responsiveDOMConverter.js" },
+      'responsiveDOMConverter': {src: modulesPath+"/pemFioi/responsiveDOMConverter.js" },
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'acorn-walk': {src: modulesPath+"/ext/acorn/walk.js", id: "acorn-walk"},
@@ -62,6 +69,7 @@ var importableModules = function () {
       'taskStyles-0.2': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.2_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.2_M.css"},
       'taskStyles-0.3': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.3.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.3.css"},
       'taskStyles-0.3_M': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.3_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.3_M.css"},
+      'taskStyles-mobileFirst': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-mobileFirst.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-mobileFirst.css"},
 
       'conceptDisplay-1.0': {src: modulesPath+"/pemFioi/conceptDisplay-1.0.js", id: "concept_display"},
       'conceptViewer-1.0': {src: modulesPath+"/pemFioi/conceptViewer-1.0.js", id: "concept_viewer"},
@@ -113,7 +121,6 @@ var importableModules = function () {
       'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
-      'sketchpad': {src: modulesPath+"/ext/sketchpad/raphael.sketchpad.js", id: "sketchpad"},
 
       'simple_draw': {src: modulesPath+"/pemFioi/javascool/simple_draw.js", id: "simple_draw"},
       'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"},
@@ -145,16 +152,17 @@ var importableModules = function () {
       // gaps table
       'gaps_table': {src: modulesPath+"/pemFioi/components/gaps-table/component.js", id: "gaps_table"},
       'gaps_table_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/gaps-table/styles.css", id: "gaps_table_styles"},
-      'gaps_table_task': {src: modulesPath+"/pemFioi/components/gaps-table/task.js", id: "gaps_table_task"},
+      'gaps_table_task': {src: modulesPath+"/pemFioi/components/gaps-table/task.js", id: "gaps_table_task"},         
 
       // csv editor
       'csv_editor': {src: modulesPath+"/pemFioi/components/csv-text-editor/editor.js", id: "csv_editor"},
       'csv_editor_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/csv-text-editor/styles.css", id: "csv_editor_styles"},
-      'csv_editor_task': {src: modulesPath+"/pemFioi/components/csv-text-editor/task.js", id: "csv_editor_task"},
+      'csv_editor_task': {src: modulesPath+"/pemFioi/components/csv-text-editor/task.js", id: "csv_editor_task"},      
 
-      // LR_parser
+      // Language theory
+      'automata-1.0': {src: modulesPath+"/pemFioi/automata-1.0.js", id: "automata-1.0"},
       'lr_parser-1.0': {src: modulesPath+"/pemFioi/LR_parser-1.0.js", id: "lr_parser-1.0"},
-      'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
+      // 'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
       'machines-grammar': {src: modulesPath+"/ext/machines/js/grammar.js", id: "machines-grammar"},
       'machines-lrclosuretable': {src: modulesPath+"/ext/machines/js/lrclosuretable.js", id: "machines-lrclosuretable"},
       'machines-lrtable': {src: modulesPath+"/ext/machines/js/lrtable.js", id: "machines-lrtable"},
@@ -173,7 +181,6 @@ var importableModules = function () {
 
       // Loaders
       'loader-buttonsAndMessages': {src: modulesPath+'/loaders/loader-buttonsAndMessages.js', id: 'loader-buttonsAndMessages'}
-
    }
 }
 
