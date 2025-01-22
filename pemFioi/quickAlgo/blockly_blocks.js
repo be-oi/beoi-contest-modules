@@ -3,11 +3,24 @@
         Block generation and configuration logic for the Blockly mode
 */
 
+// Sets of blocks
+var blocklySets = {
+   allDefault: {
+      wholeCategories: ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"]
+      },
+   allJls: {
+      wholeCategories: ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"],
+      excludedBlocks: ['text_eval', 'text_print', 'text_print_noend']
+      }
+   };
+
+
 // Blockly to Scratch translations
 var blocklyToScratch = {
    singleBlocks: {
       'controls_if': ['control_if'],
       'controls_if_else': ['control_if_else'],
+      'controls_infiniteloop': ['control_forever'],
       'controls_repeat': ['control_repeat'],
       'controls_repeat_ext': ['control_repeat'],
       'controls_whileUntil': ['control_repeat_until'],
@@ -18,14 +31,14 @@ var blocklyToScratch = {
       'lists_setIndex': ['data_replaceitemoflist'],
       'logic_negate': ['operator_not'],
       'logic_boolean': [],
-      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt', 'operator_not'],
+      'logic_compare': ['operator_equals', 'operator_gt', 'operator_gte', 'operator_lt', 'operator_lte', 'operator_not'],
       'logic_operation': ['operator_and', 'operator_or'],
       'text': [],
       'text_append': [],
       'text_join': ['operator_join'],
-      'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+      'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide', 'operator_dividefloor'],
       'math_change': ['data_changevariableby'],
-      'math_number': [],
+      'math_number': ['math_number'],
       'variables_get': ['data_variable'],
       'variables_set': ['data_setvariableto']
    },
@@ -36,22 +49,78 @@ var blocklyToScratch = {
    }
 };
 
+// Allowed blocks that make another block allowed as well
+var blocklyAllowedSiblings = {
+   'controls_repeat_ext_noShadow': ['controls_repeat_ext'],
+   'controls_whileUntil': ['controls_untilWhile'],
+   'controls_untilWhile': ['controls_whileUntil'],
+   'controls_if_else': ['controls_if'],
+   'lists_create_with_empty': ['lists_create_with']
+}
+
+
 function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    // TODO :: completely split the logic so it can be a separate object
 
    return {
       allBlocksAllowed: [],
+      blockCounts: {},
 
-      getBlockLabel: function(type) {
+      addBlocksAllowed: function(blocks) {
+         for(var i=0; i < blocks.length; i++) {
+            var name = blocks[i];
+            if(arrayContains(this.allBlocksAllowed, name)) { continue; }
+            this.allBlocksAllowed.push(name);
+            if(blocklyAllowedSiblings[name]) {
+               this.addBlocksAllowed(blocklyAllowedSiblings[name]);
+            }
+         }
+      },
+
+      getBlocksAllowed: function() {
+         return this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
+      },
+
+      getBlockLabel: function(type, addQuotes) {
          // Fetch user-friendly name for the block
-         var msg = this.mainContext.strings.label[type];
          // TODO :: Names for Blockly/Scratch blocks
-         return msg ? msg : type;
+
+         if(typeof type != 'string' && type.length > 1) {
+            var res = [];
+            for(var i = 0; i < type.length; i++) {
+               res.push(this.getBlockLabel(type[i], addQuotes));
+            }
+            return res.join(', ');
+         }
+
+         var msg = this.mainContext.strings.label[type];
+         msg = msg ? msg : type;
+         try {
+            msg = msg.toString();
+         } catch (e) {
+         }
+         if (msg.replace) {
+            // No idea in which case there would be no msg.replace
+            msg = msg.replace(/%\d/g, '_');
+         }
+         if(addQuotes) {
+            msg = '"' + msg + '"';
+         }
+         return msg;
       },
 
       checkConstraints: function(workspace) {
          // Check we satisfy constraints
          return this.getRemainingCapacity(workspace) >= 0 && !this.findLimited(workspace);
+      },
+
+      normalizeType: function(type) {
+         // Clean up type
+         var res = type;
+         if(res.substr(res.length - 9) == '_noShadow') {
+            res = res.substr(0, res.length - 9);
+         }
+         return res;
       },
 
       makeLimitedUsesPointers: function() {
@@ -72,10 +141,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                     var convBlockList = blocklyToScratch.singleBlocks[curBlock];
                     if(convBlockList) {
                         for(var k=0; k < convBlockList.length; k++) {
-                            addInSet(blocks, convBlockList[k]);
+                            addInSet(blocks, this.normalizeType(convBlockList[k]));
                         }
                     } else {
-                        addInSet(blocks, curBlock);
+                        addInSet(blocks, this.normalizeType(curBlock));
                     }
                 }
             } else {
@@ -104,6 +173,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          for(var i = 0; i < workspaceBlocks.length; i++) {
             var blockType = workspaceBlocks[i].type;
+            blockType = this.normalizeType(blockType);
             if(!this.limitedPointers[blockType]) { continue; }
             for(var j = 0; j < this.limitedPointers[blockType].length; j++) {
                 // Each pointer is a position in the limitedUses array that
@@ -113,8 +183,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 usesCount[pointer]++;
 
                 // Exceeded the number of uses
-                if(usesCount[pointer] > this.mainContext.infos.limitedUses[pointer].nbUses) {
-                    return blockType;
+                var limits = this.mainContext.infos.limitedUses[pointer];
+                if(usesCount[pointer] > limits.nbUses) {
+                    return limits.blocks;
                 }
             }
          }
@@ -127,9 +198,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          // Get the number of blocks allowed
          if(!this.maxBlocks) { return Infinity; }
          var remaining = workspace.remainingCapacity(this.maxBlocks+1);
+         var allBlocks = workspace.getAllBlocks();
          if(this.maxBlocks && remaining == Infinity) {
             // Blockly won't return anything as we didn't set a limit
-            remaining = this.maxBlocks+1 - workspace.getAllBlocks().length;
+            remaining = this.maxBlocks + 1 - allBlocks.length;
+         }
+         for (var i = 0; i < allBlocks.length; i++) {
+            var block = allBlocks[i];
+            if (typeof this.blockCounts[block.type] != 'undefined') {
+               remaining -= this.blockCounts[block.type] - 1;
+            }
          }
          return remaining;
       },
@@ -143,6 +221,32 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          } else {
             return blocks.length == 0;
          }
+      },
+
+      getAllCodes: function(answer) {
+         // Generate codes for each node
+         var codes = [];
+         for (var iNode = 0; iNode < this.mainContext.nbNodes; iNode++) {
+            if(this.mainContext.codeIdForNode) {
+               var iCode = this.mainContext.codeIdForNode(iNode);
+            } else {
+               var iCode = Math.min(iNode, this.mainContext.nbCodes-1);
+            }
+            var language = this.languages[iCode];
+            if (language == "blockly") {
+               language = "blocklyJS";
+            }
+            if(answer) {
+               // Generate codes for specified answer
+               var code = this.getCodeFromXml(answer[iCode].blockly, "javascript");
+               codes[iNode] = this.getFullCode(code);
+            } else {
+               // Generate codes for current program
+               codes[iNode] = this.getFullCode(this.programs[iCode][language]);
+            }
+         }
+
+         return codes;
       },
 
       getCodeFromXml: function(xmlText, language) {
@@ -171,11 +275,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return code;
       },
 
-      getCode: function(language, codeWorkspace) {
+      getCode: function(language, codeWorkspace, noReportValue, noConstraintCheck) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(!this.checkConstraints(codeWorkspace)) {
+         if(!this.checkConstraints(codeWorkspace) && !noConstraintCheck) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }
@@ -188,6 +292,19 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             languageObj = Blockly.Python;
          }
          languageObj.init(codeWorkspace);
+
+         var oldReportValues = this.reportValues;
+         if(noReportValue) {
+            this.reportValues = false;
+         }
+
+         // Put other blocks than robot_start first so that they execute before the main loop
+         var blockPriority = function (a) {
+             return a.type === 'robot_start' ? -1 : 1;
+         };
+         blocks.sort(function (a, b) {
+             return blockPriority(b) - blockPriority(a);
+         });
 
          var code = [];
          var comments = [];
@@ -210,7 +327,17 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var code = code.join("\n");
          code += "\n";
          code += comments.join("\n");
+
+         this.reportValues = oldReportValues;
+
          return code;
+      },
+
+      getPyfeCode: function() {
+         var that = this;
+         return Blockly.Python.blocksToCommentedCode(function() {
+            return that.getCode('python');
+            });
       },
 
       completeBlockHandler: function(block, objectName, context) {
@@ -250,18 +377,24 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                    } else {
                        block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
                    }
-                   block.blocklyJson.colour = Blockly.Colours.sensing.primary;
-                   block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
-                   block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+
+                   if(typeof block.blocklyJson.colour == "undefined") {
+                      block.blocklyJson.colour = Blockly.Colours.sensing.primary;
+                      block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
+                      block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+                   }
                }
             }
             else {
                block.blocklyJson.previousStatement = null;
                block.blocklyJson.nextStatement = null;
+
                if(this.scratchMode) {
-                   block.blocklyJson.colour = Blockly.Colours.motion.primary;
-                   block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
-                   block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+                   if(typeof block.blocklyJson.colour == "undefined") {
+                      block.blocklyJson.colour = Blockly.Colours.motion.primary;
+                      block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+                      block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+                   }
                }
             }
          }
@@ -286,8 +419,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
-            block.blocklyJson.message0 = context.strings.label[block.name];
-
+            block.blocklyJson.message0 = context.strings.label[objectName + '.' + block.name] ? context.strings.label[objectName + '.' + block.name] : context.strings.label[block.name];
+// TODO: Load default colours + custom styles
             if (typeof block.blocklyJson.message0 == "undefined") {
                block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
             }
@@ -300,7 +433,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                       || block.blocklyJson.args0[iArgs0].type == "field_number"
                       || block.blocklyJson.args0[iArgs0].type == "field_angle"
                       || block.blocklyJson.args0[iArgs0].type == "field_colour"
-                      || block.blocklyJson.args0[iArgs0].type == "field_dropdown") {
+                      || block.blocklyJson.args0[iArgs0].type == "field_dropdown"
+                      || block.blocklyJson.args0[iArgs0].type == "field_input") {
                      block.blocklyJson.message0 += " %" + (iArgs0 + 1);
                   }
                }
@@ -320,7 +454,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
-               if ("blocks" in colours &&  block.name in colours.blocks) {
+               if ("blocks" in colours && block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];
                }
                else if ("categories" in colours) {
@@ -344,10 +478,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             blockInfo.codeGenerators = {};
          }
 
+         var that = this;
+
          // for closure:
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
          var output = blockInfo.blocklyJson.output;
+         var blockParams = blockInfo.params;
 
          for (var language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {
@@ -368,16 +505,27 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+
+                           if (blockParams && blockParams[iArgs0] == 'Statement') {
+                               params += "function () {\n  " + Blockly.JavaScript.statementToCode(block, 'PARAM_' + iParam) + "}";
+                           } else {
+                               params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                           }
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_number"
                             || args0[iArgs0].type == "field_angle"
-                            || args0[iArgs0].type == "field_dropdown") {
+                            || args0[iArgs0].type == "field_dropdown"
+                            || args0[iArgs0].type == "field_input") {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += JSON.stringify(block.getFieldValue('PARAM_' + iParam));
+                           var fieldValue = block.getFieldValue('PARAM_' + iParam);
+                           if(blockParams && blockParams[iArgs0] == 'Number') {
+                              params += parseInt(fieldValue);
+                           } else {
+                              params += JSON.stringify(fieldValue);
+                           }
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_colour") {
@@ -391,7 +539,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
                      var callCode = code + '(' + params + ')';
                      // Add reportValue to show the value in step-by-step mode
-                     var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
+                     if(that.reportValues) {
+                        var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
+                     } else {
+                        var reportedCode = callCode;
+                     }
 
                      if (typeof output == "undefined") {
                         return callCode + ";\n";
@@ -518,7 +670,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
       },
 
+      applyBlockOptions: function (block) {
+         if (typeof block.countAs != 'undefined') {
+            this.blockCounts[block.name] = block.countAs;
+         }
+      },
+
       createGeneratorsAndBlocks: function() {
+         this.blockCounts = {};
          var customGenerators = this.mainContext.customBlocks;
          for (var objectName in customGenerators) {
             for (var categoryName in customGenerators[objectName]) {
@@ -533,6 +692,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   this.completeCodeGenerators(block, objectName);
                   this.applyCodeGenerators(block);
                   this.createBlock(block);
+                  this.applyBlockOptions(block);
                }
                // TODO: Anything of this still needs to be done?
                //this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
@@ -575,19 +735,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
 
       getDefaultColours: function() {
+         Blockly.HSV_SATURATION = 0.65;
+         Blockly.HSV_VALUE = 0.80;
          var colours = {
             categories: {
-               logic: 210,
-               loops: 120,
-               control: 120,
-               math: 230,
-               operator: 230,
-               texts: 160,
-               lists: 260,
-               colour: 20,
-               variables: 330,
-               functions: 290,
-               _default: 65
+                 actuator: 212,
+                 sensors: 95,
+                 internet: 200,
+                 display: 300,
+                 input: 50,
+                 inputs: 50,
+                 lists: 353,
+                 logic: 298,
+                 math: 176,
+                 loops: 200,
+                 texts: 312,
+                 dicts: 52,
+                 tables: 212,
+                 variables: 30,
+                 procedures: 180,
+                 _default: 65
             },
             blocks: {}
          };
@@ -621,6 +788,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return colours;
       },
 
+      getPlaceholderBlock: function(name) {
+         return this.placeholderBlocks ? "<statement name='" + name + "'><shadow type='placeholder_statement'></shadow></statement>" : '';
+      },
 
       getStdBlocks: function() {
          return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
@@ -657,11 +827,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             logic: [
                {
                   name: "controls_if",
-                  blocklyXml: "<block type='controls_if'></block>"
+                  blocklyXml: "<block type='controls_if'>" +
+                              this.getPlaceholderBlock('DO0') +
+                              "</block>"
                },
                {
                   name: "controls_if_else",
-                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
+                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation>" +
+                              this.getPlaceholderBlock('DO0') +
+                              this.getPlaceholderBlock('ELSE') +
+                              "</block>",
                   excludedByDefault: this.mainContext ? this.mainContext.showIfMutator : false
                },
                {
@@ -699,7 +874,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "controls_repeat",
-                  blocklyXml: "<block type='controls_repeat'></block>",
+                  blocklyXml: "<block type='controls_repeat'>" +
+                              this.getPlaceholderBlock('DO') +
+                              "</block>",
                   excludedByDefault: true
                },
                {
@@ -710,6 +887,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "      <field name='NUM'>10</field>" +
                               "    </shadow>" +
                               "  </value>" +
+                              this.getPlaceholderBlock('DO') +
                               "</block>"
                },
                {
@@ -780,7 +958,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                {
                   name: "controls_flow_statements",
                   blocklyXml: "<block type='controls_flow_statements'></block>"
-               }
+               },
+               {
+                  name: "controls_infiniteloop",
+                  blocklyXml: "<block type='controls_infiniteloop'></block>",
+                  excludedByDefault: true
+               },
             ],
             math: [
                {
@@ -1086,7 +1269,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_charAt_noShado",
+                  name: "text_charAt_noShadow",
                   blocklyXml: "<block type='text_charAt'></block>",
                   excludedByDefault: true
 
@@ -1156,6 +1339,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   name: "text_prompt_ext_noShadow",
                   blocklyXml: "<block type='text_prompt_ext'></block>",
                   excludedByDefault: true
+               },
+
+               {
+                  name: "text_str",
+                  blocklyXml: "<block type='text_str'></block>"
                }
             ],
             lists: [
@@ -1229,7 +1417,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "lists_sort_place",
-                  blocklyXml: "<block type='lists_sort_place'></block>"
+                  blocklyXml: "<block type='lists_sort_place'><field name='VAR'>{listVariable}</field></block>"
                },
                {
                   name: "lists_sort",
@@ -1247,7 +1435,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "lists_append",
-                  blocklyXml: "<block type='lists_append'></block>"
+                  blocklyXml: "<block type='lists_append'><field name='VAR'>{listVariable}</field></block>"
                }
             ],
             tables: [
@@ -1467,11 +1655,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             control: [
                   {
                      name: "control_if",
-                     blocklyXml: "<block type='control_if'></block>"
+                     blocklyXml: "<block type='control_if'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
                   },
                   {
                      name: "control_if_else",
-                     blocklyXml: "<block type='control_if_else'></block>"
+                     blocklyXml: "<block type='control_if_else'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 this.getPlaceholderBlock('SUBSTACK2') +
+                                 "</block>"
                   },
                   {
                      name: "control_repeat",
@@ -1481,11 +1674,19 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "      <field name='NUM'>10</field>" +
                                  "    </shadow>" +
                                  "  </value>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
                                  "</block>"
                   },
                   {
                      name: "control_repeat_until",
-                     blocklyXml: "<block type='control_repeat_until'></block>"
+                     blocklyXml: "<block type='control_repeat_until'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
+                  },
+                  {
+                     name: "control_forever",
+                     blocklyXml: "<block type='control_forever'></block>",
+                     excludedByDefault: true
                   }
                ],
             input: [
@@ -1560,7 +1761,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   },
                   {
                      name: "lists_sort_place",
-                     blocklyXml: "<block type='lists_sort_place'></block>"
+                     blocklyXml: "<block type='lists_sort_place'><field name='VAR'>{listVariable}</field></block>"
                   }
                ],
             math: [
@@ -1599,6 +1800,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   },
                   {
+                     name: "operator_dividefloor",
+                     blocklyXml: "<block type='operator_dividefloor'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
                      name: "operator_equals",
                      blocklyXml: "<block type='operator_equals'>" +
                                  "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
@@ -1613,8 +1821,22 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   },
                   {
+                     name: "operator_gte",
+                     blocklyXml: "<block type='operator_gte'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
                      name: "operator_lt",
                      blocklyXml: "<block type='operator_lt'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_lte",
+                     blocklyXml: "<block type='operator_lte'>" +
                                  "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
                                  "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
                                  "</block>"
@@ -1833,7 +2055,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(categoriesInfos[categoryName].blocksXml.indexOf(blockXml) == -1) {
                categoriesInfos[categoryName].blocksXml.push(blockXml);
             }
-            this.allBlocksAllowed.push(blockName);
+            this.addBlocksAllowed([blockName]);
          }
 
          // by the way, just change the defaul colours of the blockly blocks:
@@ -1850,25 +2072,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var colours = this.getDefaultColours();
 
          // Reset the flyoutOptions for the variables and the procedures
-         Blockly.Variables.flyoutOptions = {
-            any: false,
-            anyButton: !!this.includeBlocks.groupByCategory,
-            fixed: [],
-            includedBlocks: {get: true, set: true, incr: true},
-            shortList: true
-         };
-
-         Blockly.Procedures.flyoutOptions = {
-            includedBlocks: {noret: false, ret: false, ifret: false}
-         };
+         Blockly.Variables.resetFlyoutOptions();
+         Blockly.Procedures.resetFlyoutOptions();
 
          // Initialize allBlocksAllowed
-         this.allBlocksAllowed = ['robot_start'];
+         this.allBlocksAllowed = [];
+         this.addBlocksAllowed(['robot_start', 'placeholder_statement']);
          if(this.scratchMode) {
-            this.allBlocksAllowed = this.allBlocksAllowed.concat(['math_number', 'text']);
+            this.addBlocksAllowed(['math_number', 'text']);
          }
 
 
+         // *** Blocks from the lib
          if(this.includeBlocks.generatedBlocks && 'wholeCategories' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.wholeCategories) {
               var categories = this.includeBlocks.generatedBlocks.wholeCategories[blockType];
@@ -1921,24 +2136,59 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
 
+
+         // *** Standard blocks
          var stdBlocks = this.getStdBlocks();
 
-         if (this.includeBlocks.standardBlocks.includeAll) {
+         // It is normally executed during load, but for 
+         var taskStdInclude = (this.includeBlocks && this.includeBlocks.standardBlocks) || {};
+         var tsiSingleBlocks = taskStdInclude.singleBlocks || [];
+         if (this.scratchMode) {
+            tsiSingleBlocks = this.blocksToScratch(tsiSingleBlocks);
+         }
+         var stdInclude = {
+            wholeCategories: [],
+            singleBlocks: [],
+            excludedBlocks: []
+         };
+
+         // Merge all lists into stdInclude
+         if (taskStdInclude.includeAll) {
             if(this.scratchMode) {
-               this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "tables", "texts", "variables", "functions"];
+               stdInclude.wholeCategories = ["control", "input", "lists", "operator", "tables", "texts", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"];
+               stdInclude.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"];
             }
          }
-         var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
+         mergeIntoArray(stdInclude.wholeCategories, taskStdInclude.wholeCategories || []);
+         mergeIntoArray(stdInclude.singleBlocks, tsiSingleBlocks || []);
+         mergeIntoArray(stdInclude.excludedBlocks, taskStdInclude.excludedBlocks || []);
+         // Add block sets
+         if(taskStdInclude.blockSets) {
+            for(var iSet in taskStdInclude.blockSets) {
+               mergeIntoObject(stdInclude, blocklySets[taskStdInclude.blockSets[iSet]]);
+            }
+         }
+
+         // Prevent from using excludedBlocks if includeAll is set
+         if(taskStdInclude.includeAll) { stdInclude.excludedBlocks = []; }
+
+         // Remove excludedBlocks from singleBlocks
+         for(var iBlock=0; iBlock < stdInclude.singleBlocks; iBlock++) {
+            if(arrayContains(stdInclude.excludedBlocks, stdInclude.singleBlocks[iBlock])) {
+               stdInclude.singleBlocks.splice(iBlock, 1);
+               iBlock--;
+            }
+         }
+
          var handledCategories = [];
-         for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
-            var categoryName = wholeCategories[iCategory];
-            if(this.scratchMode && !this.includeBlocks.standardBlocks.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
+         for (var iCategory = 0; iCategory < stdInclude.wholeCategories.length; iCategory++) {
+            var categoryName = stdInclude.wholeCategories[iCategory];
+            if(this.scratchMode && !taskStdInclude.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
                categoryName = blocklyToScratch.wholeCategories[categoryName];
             }
 
-            if(handledCategories.indexOf(categoryName) != -1) { continue; }
+            if(arrayContains(handledCategories, categoryName)) { continue; }
             handledCategories.push(categoryName);
 
             if (!(categoryName in categoriesInfos)) {
@@ -1950,7 +2200,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                Blockly.Variables.flyoutOptions.any = true;
                continue;
             } else if (categoryName == 'functions') {
-               Blockly.Procedures.flyoutOptions.includedBlocks = {noret: true, ret: true, ifret: true};
+               Blockly.Procedures.flyoutOptions.includedBlocks = {noret: true, ret: true, ifret: true, noifret: true};
                continue;
             }
             var blocks = stdBlocks[categoryName];
@@ -1959,15 +2209,27 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 blocks = blocks.blocks;
               }
 
+             var blockNames = [];
              for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-                if (!(blocks[iBlock].excludedByDefault)) {
+                if (!(blocks[iBlock].excludedByDefault) && !arrayContains(stdInclude.excludedBlocks, blocks[iBlock].name)) {
+                   blockNames.push(blocks[iBlock].name);
                    categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
                 }
               }
+              this.addBlocksAllowed(blockNames);
             }
          }
 
-         var singleBlocks = this.includeBlocks.standardBlocks.singleBlocks || [];
+         var proceduresOptions = this.includeBlocks.procedures;
+         if (typeof proceduresOptions !== 'undefined') {
+            if(proceduresOptions.noret) { Blockly.Procedures.flyoutOptions.includedBlocks['noret'] = true; }
+            if(proceduresOptions.ret) { Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true; }
+            if(proceduresOptions.ifret) { Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true; }
+            if(proceduresOptions.noifret) { Blockly.Procedures.flyoutOptions.includedBlocks['noifret'] = true; }
+            Blockly.Procedures.flyoutOptions.disableArgs = !!proceduresOptions.disableArgs;
+         }
+
+         var singleBlocks = stdInclude.singleBlocks;
          for(var iBlock = 0; iBlock < singleBlocks.length; iBlock++) {
             var blockName = singleBlocks[iBlock];
             if(blockName == 'procedures_defnoreturn') {
@@ -1976,39 +2238,47 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true;
             } else if(blockName == 'procedures_ifreturn') {
                Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true;
+            } else if(blockName == 'procedures_return') {
+               Blockly.Procedures.flyoutOptions.includedBlocks['noifret'] = true;
             } else {
                continue;
             }
             // If we're here, a block has been found
-            this.allBlocksAllowed = this.allBlocksAllowed.concat([blockName, 'procedures_callnoreturn', 'procedures_callreturn']);
+            this.addBlocksAllowed([blockName, 'procedures_callnoreturn', 'procedures_callreturn']);
             singleBlocks.splice(iBlock, 1);
             iBlock--;
          }
          if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ret']
-               || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+               || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']
+               || Blockly.Procedures.flyoutOptions.includedBlocks['noifret']) {
             if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']) {
-               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defnoreturn', 'procedures_callnoreturn']);
-            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
-               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defreturn', 'procedures_callnoreturn']);
-            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
-               this.allBlocksAllowed.push('procedures_ifreturn');
+               this.addBlocksAllowed(['procedures_defnoreturn', 'procedures_callnoreturn']);
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
+               this.addBlocksAllowed(['procedures_defreturn', 'procedures_callreturn']);
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+               this.addBlocksAllowed(['procedures_ifreturn', 'procedures_return']);
+            }
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['noifret']) {
+               this.addBlocksAllowed(['procedures_return']);
             }
             categoriesInfos['functions'] = {
                blocksXml: []
             };
-            if(this.scratchMode && singleBlocks.indexOf('math_number') == -1) {
+            if(this.scratchMode && !arrayContains(singleBlocks, 'math_number')) {
                singleBlocks.push('math_number'); // TODO :: temporary
             }
             if(!this.includeBlocks.groupByCategory) {
                console.error('Task configuration error: groupByCategory must be activated for functions.');
             }
          }
-
          this.addBlocksAndCategories(singleBlocks, stdBlocks, categoriesInfos);
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
+         Blockly.Variables.flyoutOptions.anyButton = !!this.includeBlocks.groupByCategory;
          if (typeof this.includeBlocks.variables !== 'undefined') {
             Blockly.Variables.flyoutOptions.fixed = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : [];
             if (typeof this.includeBlocks.variablesOnlyBlocks !== 'undefined') {
@@ -2037,17 +2307,68 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
          if(Blockly.Variables.flyoutOptions.includedBlocks['get']) {
-            this.allBlocksAllowed.push('variables_get');
+            this.addBlocksAllowed(['variables_get']);
          }
          if(Blockly.Variables.flyoutOptions.includedBlocks['set']) {
-            this.allBlocksAllowed.push('variables_set');
+            this.addBlocksAllowed(['variables_set']);
          }
          if(Blockly.Variables.flyoutOptions.includedBlocks['incr']) {
-            this.allBlocksAllowed.push('math_change');
+            this.addBlocksAllowed(['math_change']);
+         }
+
+         // Disable arguments in procedures if variables are not allowed
+         if (!Blockly.Variables.flyoutOptions.any && proceduresOptions && typeof proceduresOptions.disableArgs == 'undefined') {
+            Blockly.Procedures.flyoutOptions.disableArgs = true;
+         }
+
+         var orderedCategories = [];
+         if (this.includeBlocks.blocksOrder) {
+            var blocksOrder = this.includeBlocks.blocksOrder;
+            if(this.scratchMode) {
+               blocksOrder = this.blocksToScratch(blocksOrder);
+            }
+
+            function getBlockIdx(blockXml) {
+               var blockType = Blockly.Xml.textToDom(blockXml, "text/xml").getAttribute('type');
+               var blockIdx = blocksOrder.indexOf(blockType);
+               return blockIdx == -1 ? 10000 : blockIdx;
+            }
+
+            function getCategoryIdx(categoryName) {
+               var categoryIdx = blocksOrder.indexOf(categoryName);
+               if(categoryIdx != -1) { return categoryIdx; }
+               for(var iBlock = 0; iBlock < categoriesInfos[categoryName].blocksXml.length; iBlock++) {
+                  var blockXml = categoriesInfos[categoryName].blocksXml[iBlock];
+                  var blockIdx = getBlockIdx(blockXml);
+                  if(blockIdx != 10000) {
+                     return blockIdx;
+                  }
+               }
+               return 10000;
+            }
+
+            for (var categoryName in categoriesInfos) {
+               orderedCategories.push(categoryName);
+               categoriesInfos[categoryName].blocksXml.sort(function(a, b) {
+                  var indexA = getBlockIdx(a);
+                  var indexB = getBlockIdx(b);
+                  return indexA - indexB;
+               });
+            }
+            orderedCategories.sort(function(a, b) {
+               var indexA = getCategoryIdx(a);
+               var indexB = getCategoryIdx(b);
+               return indexA - indexB;
+            });
+         } else {
+            for (var categoryName in categoriesInfos) {
+               orderedCategories.push(categoryName);
+            }
          }
 
          var xmlString = "";
-         for (var categoryName in categoriesInfos) {
+         for (var iCategory = 0; iCategory < orderedCategories.length; iCategory++) {
+            var categoryName = orderedCategories[iCategory];
             var categoryInfo = categoriesInfos[categoryName];
             if (this.includeBlocks.groupByCategory) {
                var colour = categoryInfo.colour;
@@ -2220,12 +2541,40 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          };
 
 
+         Blockly.Blocks['controls_infiniteloop'] = {
+           init: function() {
+             this.appendStatementInput("inner_blocks")
+             .setCheck(null)
+             .appendField(that.strings.infiniteLoop);
+             this.setPreviousStatement(true, null);
+             this.setNextStatement(false, null);
+             this.setColour(that.getDefaultColours().categories["loops"])
+             this.setTooltip("");
+             this.setHelpUrl("");
+           }
+         }
+         Blockly.JavaScript['controls_infiniteloop'] = function(block) {
+           var statements = Blockly.JavaScript.statementToCode(block, 'inner_blocks');
+           var code = 'while(true){\n' + statements + '}\n';
+           return code;
+         };
+         Blockly.Python['controls_infiniteloop'] = function(block) {
+            // Do while/until loop.
+            var branch = Blockly.Python.statementToCode(block, 'inner_blocks');
+            branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+                Blockly.Python.PASS;
+
+            return 'while True:\n' + branch;
+          };
+
          if(this.scratchMode) {
             Blockly.Blocks['robot_start'] = {
               init: function() {
                 this.jsonInit({
                   "id": "event_whenflagclicked",
-                  "message0": that.strings.flagClicked,
+                  "message0": that.strings.startingBlockName,
+                  // former Scratch-like display
+                  /*"message0": that.strings.flagClicked,
                   "args0": [
                     {
                       "type": "field_image",
@@ -2235,7 +2584,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                       "alt": "flag",
                       "flip_rtl": true
                     }
-                  ],
+                  ],*/
                   "inputsInline": true,
                   "nextStatement": null,
                   "category": Blockly.Categories.event,
@@ -2246,8 +2595,39 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               }
             };
 
+            Blockly.Blocks['placeholder_statement'] = {
+              init: function() {
+                this.jsonInit({
+                  "id": "placeholder_statement",
+                  "message0": "",
+                  "inputsInline": true,
+                  "previousStatement": null,
+                  "nextStatement": null,
+                  "category": Blockly.Categories.event,
+                  "colour": "#BDCCDB",
+                  "colourSecondary": "#BDCCDB",
+                  "colourTertiary": "#BDCCDB"
+                });
+                this.appendDummyInput().appendField("                    ");
+              }
+            };
+
+            Blockly.JavaScript['control_forever'] = function(block) {
+              var statements = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
+              var code = 'while(true){\n' + statements + '}\n';
+              return code;
+            };
+            Blockly.Python['control_forever'] = function(block) {
+              // Do while/until loop.
+              var branch = Blockly.Python.statementToCode(block, 'SUBSTACK');
+              branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+                  Blockly.Python.PASS;
+
+              return 'while True:\n' + branch;
+           };
+
          } else {
-            if (!(this.mainContext.showIfMutator)) {
+            if (!this.mainContext.infos || !this.mainContext.infos.showIfMutator) {
                var old = Blockly.Blocks.controls_if.init;
                Blockly.Blocks.controls_if.init = function() {
                   old.call(this);
@@ -2268,6 +2648,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             //    this.setHelpUrl('http://www.example.com/');
               }
             };
+
+            Blockly.Blocks['placeholder_statement'] = {
+              init: function() {
+                this.appendDummyInput()
+                    .appendField("                    ");
+                this.setPreviousStatement(true);
+                this.setNextStatement(true);
+                this.setColour(210);
+                this.setTooltip('');
+            //    this.setHelpUrl('http://www.example.com/');
+              }
+            };
          }
 
          Blockly.JavaScript['robot_start'] = function(block) {
@@ -2277,6 +2669,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.Python['robot_start'] = function(block) {
            return "";
          };
+
+         Blockly.JavaScript['placeholder_statement'] = function(block) {
+           return "";
+         };
+
+         Blockly.Python['placeholder_statement'] = function(block) {
+           return "pass";
+         }
       },
 
       blocksToScratch: function(blockList) {
@@ -2314,18 +2714,37 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return true;
       },
 
-      checkBlocksAreAllowed: function(xml) {
-         var allowed = this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
+      checkCodes: function(codes, display) {
+         // Check multiple codes
+         for(var i = 0; i < codes.length; i++) {
+            if(!this.checkCode(codes[i], display)) {
+               return false;
+            }
+         }
+         return true;
+      },
+
+      checkBlocksAreAllowed: function(xml, silent) {
+         if(this.includeBlocks && this.includeBlocks.standardBlocks && this.includeBlocks.standardBlocks.includeAll) { return true; }
+         var allowed = this.getBlocksAllowed();
          var blockList = xml.getElementsByTagName('block');
          var notAllowed = [];
-         for(var i=0; i<blockList.length; i++) {
-            var block = blockList[i];
+         var that = this;
+         function checkBlock(block) {
             var blockName = block.getAttribute('type');
-            if(allowed.indexOf(blockName) == -1) {
+            blockName = that.normalizeType(blockName);
+            if(!arrayContains(allowed, blockName)) {
                notAllowed.push(blockName);
             }
          }
-         if(notAllowed.length > 0) {
+         for(var i=0; i<blockList.length; i++) {
+            checkBlock(blockList[i]);
+         }
+         if(xml.localName == 'block') {
+            // Also check the top element
+            checkBlock(xml);
+         }
+         if(!silent && notAllowed.length > 0) {
             console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
          }
          return !(notAllowed.length);
@@ -2340,18 +2759,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var minX = Infinity, minY = Infinity;
          for(var i=0; i<blockList.length; i++) {
             var block = blockList[i];
-
-            // Clean up IDs which contain now forbidden characters
             var blockId = block.getAttribute('id');
-            if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
-               block.setAttribute('id', Blockly.genUid());
-            }
 
             // Clean up read-only attributes
-            if(block.getAttribute('type') != 'robot_start') {
+            if(block.getAttribute('type') != 'robot_start' && this.startingExampleIds.indexOf(blockId) == -1) {
                block.removeAttribute('deletable');
                block.removeAttribute('movable');
                block.removeAttribute('editable');
+            }
+
+            // Clean up IDs which contain now forbidden characters
+            if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
+               block.setAttribute('id', Blockly.genUid());
             }
 
             // Get minimum x and y
@@ -2373,6 +2792,25 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 block.setAttribute('y', parseInt(y) - minY + origin.y);
             }
          }
-      }
+      },
+
+      getStartingExampleIds: function(xml) {
+         this.startingExampleIds = [];
+         var blockList = Blockly.Xml.textToDom(xml).getElementsByTagName('block');
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockId = block.getAttribute('id');
+            if(!blockId) {
+               if(block.getAttribute('type') != 'robot_start' && 
+                     (block.getAttribute('deletable') == 'false' ||
+                     block.getAttribute('movable') == 'false' ||
+                     block.getAttribute('editable') == 'false')) {
+                  console.log('Warning: starting block of type \'' + block.getAttribute('type') + '\' with read-only attributes has no id, these attributes will be removed.');
+               }
+               continue;
+            }
+            this.startingExampleIds.push(blockId);
+         }
+      },
    };
 }

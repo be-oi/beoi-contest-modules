@@ -149,6 +149,31 @@ Beav.Array.shuffle = function(t, randomSeed) {
    }
 };
 
+Beav.Array.pickRandomNTimes = function (t, rng, n, diffN) {
+   // Pick a random index from t, n times, different from at least diffN previous indexes
+   // Useful to have a task which randomly cycles through the elements of t,
+   // without giving the same task instance as the previous diffN ones
+   var previousIndexes = [];
+   var index = 0;
+   if (n < 1) { n += 100; }
+   for (var i = 0; i < n; i++) {
+      index = rng.nextInt(0, Math.max(0, t.length - previousIndexes.length - 1));
+      var sortedPreviousIndexes = previousIndexes.slice();
+      sortedPreviousIndexes.sort();
+      for (var j = 0; j < sortedPreviousIndexes.length; j++) {
+         if (index >= sortedPreviousIndexes[j]) {
+            index++;
+         }
+      }
+      if (index > t.length - 1) {
+         // Happens if we ask for more different indexes than there are items in the list
+         index = t.length - 1;
+      }
+      previousIndexes.push(index);
+      previousIndexes = previousIndexes.slice(-diffN);
+   }
+   return t[index];
+}
 
 /**********************************************************************************/
 /* Matrix */
@@ -343,6 +368,21 @@ Beav.Navigator.getVersion = function(){
    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
    return M
+}
+
+Beav.Navigator.isIE = function () {
+   // case for IE11 which has trident
+   var version = Beav.Navigator.getVersion();
+   if (typeof version == 'string' && version.substring(0, 2).toLowerCase() == 'ie') {
+      return true
+   }
+   return version[0].toLowerCase() == 'msie' || version[0].toLowerCase() == 'ie';
+}
+
+Beav.Navigator.isSafari = function () {
+   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+   // console.log(isSafari)
+   return isSafari
 }
 
 Beav.Navigator.supportsResponsive = function() {

@@ -171,6 +171,16 @@ var conceptViewer = {
     return false;
   },
 
+  hasPythonConcept: function (pythonCode) {
+    for (var i=0; i<this.concepts.length; i++) {
+      var pythonList = this.concepts[i].python;
+      if(pythonList && pythonList.indexOf(pythonCode) > -1) {
+        return this.concepts[i].id;
+      }
+    }
+    return false;
+  },
+
   languageChanged: function () {
     this.loadNavigation();
   },
@@ -181,34 +191,54 @@ var conceptViewer = {
   }
 }
 
-// TODO :: temporary values for now
 
-// Specific configuration to go through the domain itself if there's a 'p=1'
-// argument or we are on concours2.castor-informatique.fr
-var baseUrl = window.location.protocol + '//'
-    + ((window.location.search.indexOf('p=1') > -1
+function getConceptViewerBaseUrl() {
+    // Specific configuration to go through the domain itself if there's a 'p=1'
+    // argument or we are on concours2.castor-informatique.fr
+    var baseUrl = '';
+    baseUrl += (window.location.protocol == 'http:' ? 'http:' : 'https:') + '//';
+    baseUrl += ((window.location.search.indexOf('p=1') > -1
         || window.location.hostname == 'concours2.castor-informatique.fr')
-       ? window.location.host : 'static4.castor-informatique.fr')
-    + '/help/index.html';
+       ? window.location.host : 'static4.castor-informatique.fr');
+    baseUrl += '/help/';
+    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
+        baseUrl += 'index_' + window.stringsLanguage + '.html';
+    } else {
+        baseUrl += 'index.html';
+    }
+    return baseUrl;
+}
 
 
-var testConcepts = [
-    {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
-    {id: 'language', name: "Création d'un programme", url: baseUrl+'#language'},
-    {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
-    {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend'},
-    {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
-    {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if'},
-    {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else'},
-    {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil'},
-    {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
-    {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
-    {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
-    {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list'},
-    {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function'},
-    {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
-    {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
-    ];
+function getConceptViewerBaseConcepts() {
+    // Get base concepts in the default help
+    var baseUrl = getConceptViewerBaseUrl();
+    var baseConcepts = [
+        {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
+        {id: 'language', name: "Création d'un programme", url: baseUrl+'#language'},
+        {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
+        {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if'},
+        {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else'},
+        {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil'},
+        {id: 'blockly_controls_infiniteloop', name: 'Boucle infinie', url: baseUrl+'#blockly_controls_infiniteloop'},
+        {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
+        {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
+        {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
+        {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list'},
+        {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function'},
+        {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
+        {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'},
+        {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
+        {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend'},
+        {id: 'blockly_text_length', name: 'Longueur d\'une chaîne', url: baseUrl+'#blockly_text_length'},
+        {id: 'blockly_text_join', name: 'Concaténer des chaînes', url: baseUrl+'#blockly_text_join'},
+        {id: 'blockly_text_charAt', name: 'Extraire un caractère d\'une chaîne', url: baseUrl+'#blockly_text_charAt'}
+        ];
+    for (var iConcept = 0; iConcept < baseConcepts.length; iConcept++) {
+       baseConcepts[iConcept].order = 100 + iConcept;
+    }
+    return baseConcepts;
+}
 
 
 function conceptsFill(baseConcepts, allConcepts) {
@@ -256,7 +286,7 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
     var concepts = ['language'];
     if(includeBlocks.standardBlocks.includeAll) {
       for(var c = 0; c<allConcepts.length; c++) {
-        if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
+        if(allConcepts[c].id.substr(0, 8) === 'blockly_') {
           concepts.push(allConcepts[c]);
         }
       }

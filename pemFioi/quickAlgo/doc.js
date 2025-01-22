@@ -41,19 +41,19 @@ var docLanguageStrings = {
   de: {
     lang: 'Deutsch',
 
-    title: 'Dokumentation der quickAlgo Libraries',
+    title: 'quickAlgo libraries documentation',
     library: 'Library:',
-    language: 'Sprache:',
-    blocklyTitle: 'Dokumentation der  generischen Blockly-Blocks',
-    scratchTitle: 'Dokumentation der generischen Scratch-Blocks',
-    libTitle: 'Dokumentation der Library',
+    language: 'Language:',
+    blocklyTitle: 'Documentation for generic Blockly blocks',
+    scratchTitle: 'Documentation for generic Scratch blocks',
+    libTitle: 'Documentation for library',
 
-    category: 'Kategorie “{}”',
-    subcategory: 'Unterkategorie “{}”',
-    blocklyColumns: ["Anzeige", "Interner Name", "Kommentar"],
-    columns: ["Blockname", "Python-Name", "Interner Name", "Typ", "Argumente", "Beschreibung", "Kommentar"],
-    nameUndefined: 'nicht definiert!',
-    action: 'Aktion',
+    category: 'Category “{}”',
+    subcategory: 'Subcategory “{}”',
+    blocklyColumns: ["Display", "Internal name", "Comment"],
+    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
+    nameUndefined: 'undefined!',
+    action: 'Action',
     sensor: 'Sensor'
   },
   es: {
@@ -73,25 +73,7 @@ var docLanguageStrings = {
     nameUndefined: 'undefined!',
     action: 'Action',
     sensor: 'Sensor'
-  },
-  nl: {
-    lang: 'Nederlands',
-
-    title: 'Documentatie van de quickAlgo bibliotheken',
-    library: 'Bibliotheek :',
-    language: 'Taal :',
-    blocklyTitle: 'Documentatie voor generieke Blockly blokken',
-    scratchTitle: 'Documentatie voor generieke Scratch blokken',
-    libTitle: 'Documentatie van de bibliotheek',
-
-    category: 'Categorie “{}”',
-    subcategory: 'Subcategorie “{}”',
-    blocklyColumns: ["Afgebeelde naam", "Interne naam", "Commentaar"],
-    columns: ["Naam blok", "Naam Python", "Interne naam", "Type", "Argumenten", "Beschrijving", "Commentaar"],
-    nameUndefined: 'niet gedefinieerd!',
-    action: 'Actie',
-    sensor: 'Sensor'
-  },
+  }
 };
 
 // Comments for each Blockly/Scratch block
@@ -115,7 +97,7 @@ var docBlockly = {
 // Generate the documentation for a specific category
 function generateCategory(context, lang, strings, category) {
   var ctxStr = context.localLanguageStrings[lang];
-  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
+  var globalStr = quickAlgoLanguageStrings[lang] || quickAlgoLanguageStrings['en'];
 
   var html = '';
   html += '<h3>' + strings.category.replace('{}', category) + '</h3>';
@@ -206,7 +188,7 @@ function generateBlocklyDocumentation() {
   var lang = $('#lang').val();
   if(!lang) { lang = 'en'; }
   var strings = docLanguageStrings[lang] ? docLanguageStrings[lang] : docLanguageStrings['en'];
-  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
+  var globalStr = quickAlgoLanguageStrings[lang] || quickAlgoLanguageStrings['en'];
 
   var blocklyBlocks = getBlocklyBlockFunctions(0, 1);
   var scratchMode = $('#blocklySelector').val() == 'scratch';

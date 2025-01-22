@@ -7,12 +7,12 @@ var initBlocklySubTask = function(subTask, language) {
    // Blockly tasks need to always have the level-specific behavior from
    // beaver-task-2.0
    subTask.assumeLevels = true;
-   
+
    if (window.forcedLevel != null) {
       for (var level in subTask.data) {
          if (window.forcedLevel != level) {
             subTask.data[level] = undefined;
-         }            
+         }
       }
       subTask.load = function(views, callback) {
          subTask.loadLevel(window.forcedLevel);
@@ -29,6 +29,10 @@ var initBlocklySubTask = function(subTask, language) {
       language = "fr";
    }
 
+   subTask.getTaskParam = function (name) {
+      return subTask.taskParams && subTask.taskParams.options ? subTask.taskParams.options[name] : null;
+   }
+
    subTask.loadLevel = function(curLevel) {
       var levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
       subTask.levelGridInfos = levelGridInfos;
@@ -38,16 +42,20 @@ var initBlocklySubTask = function(subTask, language) {
       levelGridInfos.hideControls.saveOrLoad = levelGridInfos.hideControls.saveOrLoad || !!levelGridInfos.hideSaveOrLoad;
       levelGridInfos.hideControls.loadBestAnswer = levelGridInfos.hideControls.loadBestAnswer || !!levelGridInfos.hideLoadBestAnswers;
 
-      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
+      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions, subTask);
       subTask.answer = null;
       subTask.state = {};
       subTask.iTestCase = 0;
+      subTask.nbExecutions = 0;
+      subTask.logOption = subTask.getTaskParam('log');
+      subTask.clearWbe();
       if(!window.taskResultsCache) {
          window.taskResultsCache = {};
       }
       if(!window.taskResultsCache[curLevel]) {
          window.taskResultsCache[curLevel] = {};
       }
+      window.modulesLanguage = subTask.blocklyHelper.language;
 
       this.level = curLevel;
 
@@ -67,42 +75,51 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
+      subTask.allowSvgExport = levelGridInfos.allowSvgExport || subTask.getTaskParam('svgexport') || getUrlParameter('svgexport') || false;
+
       if (this.display) {
-        window.quickAlgoInterface.loadInterface(this.context, curLevel);
-        window.quickAlgoInterface.setOptions({
-           hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
-           conceptViewer: levelGridInfos.conceptViewer,
-           conceptViewerLang: this.blocklyHelper.language,
-           hideControls: levelGridInfos.hideControls,
-           introMaxHeight: levelGridInfos.introMaxHeight
-           });
-        window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         if (window.quickAlgoInterface.loadUserTaskData)
+            window.quickAlgoInterface.loadUserTaskData(levelGridInfos.userTaskData);
+         window.quickAlgoInterface.loadInterface(this.context, curLevel);
+         window.quickAlgoInterface.setOptions({
+            hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
+            conceptViewer: levelGridInfos.conceptViewer,
+            conceptViewerLang: this.blocklyHelper.language,
+            hasTestThumbnails: levelGridInfos.hasTestThumbnails,
+            hideControls: levelGridInfos.hideControls,
+            introMaxHeight: levelGridInfos.introMaxHeight,
+            canEditSubject: !!levelGridInfos.canEditSubject,
+            allowSvgExport: !!subTask.allowSvgExport
+         });
+         window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         if (subTask.allowSvgExport) {
+            displayHelper.alwaysAskLevelChange = true;
+         }
       }
 
       this.blocklyHelper.loadContext(this.context);
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
-      displayHelper.timeoutMinutes = 30;
+      displayHelper.timeoutMinutes = subTask.gridInfos.timeoutMinutes ? subTask.gridInfos.timeoutMinutes : 30;
 
       var curIncludeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);
 
       // Load concepts into conceptViewer; must be done before loading
       // Blockly/Scratch, as scratch-mode will modify includeBlocks
       if(this.display && levelGridInfos.conceptViewer) {
-         // TODO :: testConcepts is temporary-ish
-         if(this.context.conceptList) {
-            var allConcepts = testConcepts.concat(this.context.conceptList);
-         } else {
-            var allConcepts = testConcepts;
-         }
+         var allConcepts = this.context.getConceptList();
+         allConcepts = allConcepts.concat(getConceptViewerBaseConcepts());
 
          var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts, this.context);
          if(levelGridInfos.conceptViewer.length) {
             concepts = concepts.concat(levelGridInfos.conceptViewer);
+         } else {
+            concepts.push('base');
          }
          concepts = window.conceptsFill(concepts, allConcepts);
-         window.conceptViewer.loadConcepts(concepts);
+         window.conceptViewer.loadConcepts(concepts, levelGridInfos.conceptViewerMain);
+         window.conceptViewer.contextTitle = this.context.title;
       }
 
       this.blocklyHelper.setIncludeBlocks(curIncludeBlocks);
@@ -110,7 +127,9 @@ var initBlocklySubTask = function(subTask, language) {
       var blocklyOptions = {
          readOnly: !!subTask.taskParams.readOnly,
          defaultCode: subTask.defaultCode,
-         maxListSize: this.context.infos.maxListSize
+         maxListSize: this.context.infos.maxListSize,
+         startingExample: this.context.infos.startingExample,
+         placeholderBlocks: !!(this.context.placeholderBlocks || this.context.infos.placeholderBlocks)
       };
 
       // Handle zoom options
@@ -118,7 +137,7 @@ var initBlocklySubTask = function(subTask, language) {
       var zoomOptions = {
          controls: false,
          scale: maxInstructions > 20 ? 1 : 1.1
-         };
+      };
       if(this.context.infos && this.context.infos.zoom) {
          zoomOptions.controls = !!this.context.infos.zoom.controls;
          zoomOptions.scale = (typeof this.context.infos.zoom.scale != 'undefined') ? this.context.infos.zoom.scale : zoomOptions.scale;
@@ -140,6 +159,19 @@ var initBlocklySubTask = function(subTask, language) {
       }
 
       subTask.changeTest(0);
+
+      // Log the loaded level after a second
+      if(window.levelLogActivityTimeout) { clearTimeout(window.levelLogActivityTimeout); }
+      window.levelLogActivityTimeout = setTimeout(function() {
+         subTask.logActivity('loadLevel;' + curLevel);
+         window.levelLogActivityTimeout = null;
+      }, 1000);
+
+      // Start SRL logging
+      if(subTask.logOption) {
+         SrlLogger.load();
+         SrlLogger.levelLoaded(curLevel);
+      }
    };
 
    subTask.updateScale = function() {
@@ -148,7 +180,7 @@ var initBlocklySubTask = function(subTask, language) {
             subTask.context.updateScale();
             subTask.blocklyHelper.updateSize();
          } catch(e) {}
-         }, 0);
+      }, 0);
    };
 
    var resetScores = function() {
@@ -191,28 +223,82 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    var initContextForLevel = function(iTestCase) {
+      //      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
       subTask.iTestCase = iTestCase;
-      subTask.context.reset(subTask.data[subTask.level][iTestCase]);
       subTask.context.iTestCase = iTestCase;
       subTask.context.nbTestCases = subTask.nbTestCases;
-      //      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
       subTask.context.messagePrefixFailure = '';
       subTask.context.messagePrefixSuccess = '';
       subTask.context.linkBack = false;
+      subTask.context.reset(subTask.data[subTask.level][iTestCase]);
    };
 
-   subTask.logActivity = function() {
-      // Sends a validate("log") to the platform if the log GET parameter is set
-      // Performance note : we don't call getAnswerObject, as it's already
-      // called every second by buttonsAndMessages.
-      var logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
-      if(logOption && JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
-         platform.validate("log");
-         subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);
+   subTask.logActivity = function(details) {
+      if(!subTask.logOption) { return; }
+
+      if(!details) {
+         // Sends a validate("log") to the platform if the log GET parameter is set
+         // Performance note : we don't call getAnswerObject, as it's already
+         // called every second by buttonsAndMessages.
+         if(JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
+            platform.validate("log");
+            subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);
+         }
+         return;
+      }
+
+      platform.log(['activity', details]);
+   };
+
+   subTask.waitBetweenExecutions = function() {
+      // After a user-started execution, wait a few seconds if required by
+      // the task
+      var wbe = subTask.levelGridInfos.waitBetweenExecutions;
+      if(!wbe) { return; }
+
+      subTask.nbExecutions++;
+
+      if(typeof wbe == "number") {
+         var wait = wbe * 1000;
+         var maxExecutions = 0;
+      } else {
+         var wait = wbe.wait * 1000;
+         var maxExecutions = wbe.nbExecutions || 0;
+      }
+
+      if(subTask.nbExecutions < maxExecutions) { return; }
+
+      subTask.waitBetweenExecutionsTimeout = setTimeout(subTask.clearWbe, wait);
+   };
+
+   subTask.onChange = function() {
+      if(subTask.context.runner) {
+         if(subTask.context.display) {
+            subTask.context.runner.reset();
+         } else {
+            subTask.resetRunnerAfterGrading = true;
+         }
+      }
+
+      if(subTask.waitBetweenExecutionsTimeout && window.quickAlgoInterface) {
+         var msg = subTask.levelGridInfos.waitBetweenExecutions.message || window.languageStrings.waitBetweenExecutions;
+         quickAlgoInterface.displayNotification('wait', msg, true);
+      }
+   };
+
+   subTask.clearWbe = function() {
+      subTask.waitBetweenExecutionsTimeout = null;
+      if(window.quickAlgoInterface) {
+         quickAlgoInterface.displayNotification('wait', null, true);
       }
    };
 
    subTask.initRun = function(callback) {
+      var allowInfiniteLoop = !!subTask.context.allowInfiniteLoop;
+
+      if(window.quickAlgoInterface) {
+         quickAlgoInterface.toggleMoreDetails(false);
+      }
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
          if(typeof success == 'undefined') {
@@ -230,21 +316,39 @@ var initBlocklySubTask = function(subTask, language) {
                // Display the execution message as it won't be shown through
                // validate
                window.quickAlgoInterface.displayResults(
-                  {iTestCase: initialTestCase, message: message, successRate: success ? 1 : 0},
-                  results
+                   {iTestCase: initialTestCase, message: message, successRate: success ? 1 : 0},
+                   results
                );
+            }
+
+            if(!allowInfiniteLoop) {
+               SrlLogger.validation(success ? 100 : 0, success ? 'none' : 'execution', 0);
             }
          }
          // Log the attempt
          subTask.logActivity();
+
+         // Wait between attempts
+         subTask.waitBetweenExecutions();
+
          // Launch an evaluation after the execution
-         subTask.context.display = false;
-         subTask.getGrade(handleResults, true, subTask.iTestCase);
+         if (!subTask.context.doNotStartGrade ) {
+            subTask.context.display = false;
+            subTask.getGrade(handleResults, true, subTask.iTestCase);
+         } else {
+            if (!subTask.context.success)
+               window.quickAlgoInterface.displayError(message);
+         }
       });
       initContextForLevel(initialTestCase);
+
+      if(allowInfiniteLoop) {
+         SrlLogger.validation(0, 'none', 1);
+      }
    };
 
    subTask.run = function(callback) {
+      if(subTask.validating) { return; }
       subTask.initRun(callback);
       subTask.blocklyHelper.run(subTask.context);
    };
@@ -272,20 +376,36 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.step = function () {
+      if(subTask.validating) { return; }
+      subTask.srlStepByStepLog('step');
       subTask.context.changeDelay(200);
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
-        this.initRun();
+         this.initRun();
       }
       subTask.blocklyHelper.step(subTask.context);
    };
 
    subTask.stop = function() {
+      if(subTask.validating) { return; }
+      this.clearAnalysis();
+
       if(this.context.runner) {
          this.context.runner.stop();
       }
-      subTask.blocklyHelper.resetDisplay();
-      window.quickAlgoInterface.displayError(null);
-      this.context.reset();
+
+      // Reset everything through changeTest
+      subTask.changeTest(0);
+
+      subTask.srlStepByStepLog('stop');
+   };
+
+   /**
+    * Clears the analysis container.
+    */
+   subTask.clearAnalysis = function() {
+      if (this.blocklyHelper.clearSkulptAnalysis) {
+         this.blocklyHelper.clearSkulptAnalysis();
+      }
    };
 
    subTask.reloadStateObject = function(stateObj) {
@@ -321,23 +441,28 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.setStepDelay = function(delay) {
-    this.context.changeDelay(delay);
+      this.context.changeDelay(delay);
    };
 
    // used in new playback controls with speed slider
    subTask.pause = function() {
-    if(this.context.runner) {
-      this.context.runner.stepMode = true;
-    }
+      if(subTask.validating) { return; }
+      if(this.context.runner) {
+         this.context.runner.stepMode = true;
+      }
    };
 
    // used in new playback controls with speed slider
    subTask.play = function() {
-    if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
-      this.run();
-    } else if (this.context.runner.stepMode) {
-      this.context.runner.run();
-    }
+      if(subTask.validating) { return; }
+      this.clearAnalysis();
+      subTask.srlStepByStepLog('play');
+
+      if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
+         this.run();
+      } else if (this.context.runner.stepMode) {
+         this.context.runner.run();
+      }
    };
 
    subTask.getAnswerObject = function() {
@@ -349,9 +474,9 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.reloadAnswerObject = function(answerObj) {
       if(typeof answerObj == "undefined") {
-        this.answer = this.getDefaultAnswerObject();
+         this.answer = this.getDefaultAnswerObject();
       } else {
-        this.answer = answerObj;
+         this.answer = answerObj;
       }
       this.blocklyHelper.programs = this.answer;
       if (this.answer != undefined) {
@@ -371,10 +496,12 @@ var initBlocklySubTask = function(subTask, language) {
          if(this.context.runner) {
             this.context.runner.stop();
          }
-         window.quickAlgoInterface.displayError(null);
          initContextForLevel(newTest);
-         if(subTask.context.display) {
-            window.quickAlgoInterface.updateTestSelector(newTest);
+         if(window.quickAlgoInterface) {
+            window.quickAlgoInterface.displayError(null);
+            if(subTask.context.display) {
+               window.quickAlgoInterface.updateTestSelector(newTest);
+            }
          }
       }
    };
@@ -388,47 +515,62 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.getGrade = function(callback, display, mainTestCase) {
       // mainTest : set to indicate the first iTestCase to test (typically,
-      // current iTestCase) before others; test will then stop if the 
+      // current iTestCase) before others; test will then stop if the
       if(subTask.context.infos && subTask.context.infos.hideValidate) {
          // There's no validation
          callback({
             message: '',
             successRate: 1,
             iTestCase: 0
-            });
+         });
          return;
+      }
+
+      // XXX :: Related to platform-pr.js#L67 : why does it start two
+      // evaluations at the same time? This can cause serious issues with the
+      // Python runner, and on some contexts such as quick-pi
+      if(window.subTaskValidating && window.subTaskValidationAttempts < 5) {
+         setTimeout(function() { subTask.getGrade(callback, display, mainTestCase); }, 1000);
+         window.subTaskValidationAttempts += 1;
+         console.log("Queueing validation... (attempt " + window.subTaskValidationAttempts + ")");
+         return;
+      }
+      window.subTaskValidationAttempts = 0;
+      window.subTaskValidating = true;
+      subTask.validating = true;
+      if(display) {
+        quickAlgoInterface.setValidating(true);
       }
 
       var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
-      var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
-      code = subTask.blocklyHelper.getFullCode(code);
+      var codes = subTask.blocklyHelper.getAllCodes(subTask.answer);
 
       var checkError = '';
       var checkDisplay = function(err) { checkError = err; }
-      if(!subTask.blocklyHelper.checkCode(code, checkDisplay)) {
+      if(!subTask.blocklyHelper.checkCodes(codes, checkDisplay)) {
          var results = {
             message: checkError,
             successRate: 0,
             iTestCase: 0
          };
          subTask.context.changeDelay(oldDelay);
+         subTask.postGrading();
          callback(results);
          return;
       }
 
-      var codes = [code]; // We only ever send one code to grade
       var oldTestCase = subTask.iTestCase;
 
-/*      var levelResultsCache = window.taskResultsCache[this.level];
+      /*      var levelResultsCache = window.taskResultsCache[this.level];
 
-      if(levelResultsCache[code]) {
-         // We already have a cached result for that
-         window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
-         subTask.context.changeDelay(oldDelay);
-         callback(levelResultsCache[code].results);
-         return;
-      }*/
+            if(levelResultsCache[code]) {
+               // We already have a cached result for that
+               window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
+               subTask.context.changeDelay(oldDelay);
+               callback(levelResultsCache[code].results);
+               return;
+            }*/
 
       function startEval() {
          // Start evaluation on iTestCase
@@ -437,6 +579,7 @@ var initBlocklySubTask = function(subTask, language) {
          if(display) {
             window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
          }
+         var codes = subTask.blocklyHelper.getAllCodes(subTask.answer);
          subTask.context.runner.runCodes(codes);
       }
 
@@ -498,7 +641,7 @@ var initBlocklySubTask = function(subTask, language) {
                var msg = languageStrings.resultsPartialSuccess.format({
                   nbSuccess: nbSuccess,
                   nbTests: subTask.nbTestCases
-                  });
+               });
             } else {
                var msg = languageStrings.resultsNoSuccess;
             }
@@ -515,6 +658,7 @@ var initBlocklySubTask = function(subTask, language) {
             fullResults: subTask.testCaseResults
             };*/
          subTask.context.changeDelay(oldDelay);
+         subTask.postGrading();
          callback(results);
          window.quickAlgoInterface.updateBestAnswerStatus();
       }
@@ -549,4 +693,92 @@ var initBlocklySubTask = function(subTask, language) {
 
       startEval();
    };
+
+   subTask.postGrading = function() {
+      window.subTaskValidating = false;
+      if(subTask.resetRunnerAfterGrading && subTask.context.runner) {
+         subTask.context.runner.reset();
+         subTask.resetRunnerAfterGrading = false;
+      }
+      setTimeout(function() {
+         subTask.validating = false;
+         quickAlgoInterface.setValidating(false);
+         }, 1000);
+   };
+
+   subTask.srlStepByStepLog = function(type) {
+      SrlLogger.stepByStep(subTask, type);
+   };
+
+   subTask.exportGridAsSvg = function (name) {
+      // Exports the current grid as a SVG file
+      // We need to embed all images
+      if (!name) name = 'export';
+
+      if (subTask.context.exportGridAsSvg) {
+         // Use the library's function if exists
+         var svgSource = subTask.context.exportGridAsSvg(subTask.allowSvgExport);
+         if (!svgSource) { return; }
+      } else {
+         var svgSource = $('#grid svg');
+         if (!svgSource.length) { return; }
+         svgSource = svgSource[0];
+      }
+      var svg = $(svgSource.outerHTML);
+
+      var imagesToFetch = [];
+      var hrefsToReplace = {};
+      var svgImages = svg.find('image');
+      for (var i = 0; i < svgImages.length; i++) {
+         var image = $(svgImages[i]);
+         var url = image.attr('xlink:href');
+         if (url && url.substr(0, 5) != 'data:') {
+            if (arrayContains(imagesToFetch, url)) {
+               hrefsToReplace[url].push(image);
+            } else {
+               imagesToFetch.push(url);
+               hrefsToReplace[url] = [image];
+            }
+         }
+      }
+
+      function finalizeExport() {
+         var data = svg[0].outerHTML;
+         data = new Blob([data], { type: 'image/svg+xml' });
+         var objectURL = window.URL.createObjectURL(data);
+
+         var anchor = $("<a href='" + objectURL + "' download='" + name + "'.svg'>&nbsp;</a>");
+         anchor[0].click();
+      }
+
+      if (!imagesToFetch.length) {
+         finalizeExport();
+         return;
+      }
+
+      function fetchImage(url) {
+         var xhr = new XMLHttpRequest();
+         xhr.responseType = 'arraybuffer';
+         xhr.open('GET', url);
+         xhr.onload = function () {
+            var mime = xhr.getResponseHeader('Content-Type');
+            var codes = new Uint8Array(xhr.response);
+            var bin = String.fromCharCode.apply(null, codes);
+            var encodedData = 'data:' + mime + ';base64,' + btoa(bin);
+            for (var j = 0; j < hrefsToReplace[url].length; j++) {
+               hrefsToReplace[url][j].attr('xlink:href', encodedData);
+            }
+            imagesDone++;
+            if (imagesDone >= imagesToFetch.length) {
+               setTimeout(finalizeExport, 0);
+            }
+         };
+         xhr.send();
+      }
+
+      var imagesDone = 0;
+      for (var i = 0; i < imagesToFetch.length; i++) {
+         fetchImage(imagesToFetch[i]);
+      }
+   }
 }
