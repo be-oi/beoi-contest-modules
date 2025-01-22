@@ -1609,7 +1609,7 @@ var getContext = function(display, infos, curLevel) {
    };
    function getImgPath(url) {
       if(window.contestsRoot ) {
-         return window.contestsRoot + '../modules/img/algorea/'+url;
+         return window.contestsRoot + '/../modules/img/algorea/'+url;
       }
       if(modulesPath != undefined){
          return modulesPath+"img/algorea/"+url
