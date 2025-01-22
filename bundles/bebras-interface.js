@@ -1150,7 +1150,7 @@ window.displayHelper = {
 
    // Deprecated: use directly levelsMaxScores instead
    getLevelsMaxScores: function() {
-      return this.levelsMaxScores;
+      return this.levelsMaxScores || { basic: 10, easy: 20, medium: 30, hard: 40 };
    },
 
    displayLevel: function(newLevel) {
