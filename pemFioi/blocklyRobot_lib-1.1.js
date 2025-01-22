@@ -1608,6 +1608,9 @@ var getContext = function(display, infos, curLevel) {
       return /^https?:\/\//.exec(url) ? url : imgPrefix + url;
    };
    function getImgPath(url) {
+      if(window.contestsRoot ) {
+         return window.contestsRoot + '../modules/img/algorea/'+url;
+      }
       if(modulesPath != undefined){
          return modulesPath+"img/algorea/"+url
       }
