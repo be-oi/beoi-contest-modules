@@ -53,7 +53,7 @@ var importableModules = function () {
 
       'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},
       'quickAlgo_i18n': {src: modulesPath+"/pemFioi/quickAlgo/i18n.js", id: "quickAlgo_i18n"},
-      'quickAlgo_interface': {src: modulesPath+"/pemFioi/quickAlgo/interface-mobileFirst.js", id: "quickAlgo_interface"},
+      'quickAlgo_interface': {src: modulesPath+"/pemFioi/quickAlgo/interface-mobileFirst.js", id: "quickAlgo_interface-mobileFirst"},
       'quickAlgo_blockly_blocks': {src: modulesPath+"/pemFioi/quickAlgo/blockly_blocks.js", id: "quickAlgo_blockly_blocks"},
       'quickAlgo_blockly_interface': {src: modulesPath+"/pemFioi/quickAlgo/blockly_interface.js", id: "quickAlgo_blockly_interface"},
       'quickAlgo_blockly_runner': {src: modulesPath+"/pemFioi/quickAlgo/blockly_runner.js", id: "quickAlgo_blockly_runner"},
