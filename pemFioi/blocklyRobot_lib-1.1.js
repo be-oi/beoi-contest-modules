@@ -1462,6 +1462,18 @@ var getContext = function(display, infos, curLevel) {
             }
          },
 
+         nl: {
+            label: {
+               obstacleInFront: "asteroïde vooruit"
+            },
+            code: {
+               obstacleInFront: "asteroideVooruit"
+            },
+            messages: {
+               obstacle: "Opgepast voor de asteroïde !"
+            }
+         },
+
          es: {
             label: {
                obstacleInFront: "asteroide adelante"
