@@ -1461,6 +1461,28 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Attention à l'astéroïde !"
             }
          },
+         en: {
+            label: {
+               obstacleInFront: "asteroid ahead"
+            },
+            code: {
+               obstacleInFront: "asteroidAhead"
+            },
+            messages: {
+               obstacle: "Watch out for the asteroid!"
+            }
+         },
+         de: {
+            label: {
+               obstacleInFront: "Asteroid voraus"
+            },
+            code: {
+               obstacleInFront: "asteroidVoraus"
+            },
+            messages: {
+               obstacle: "Achtung, Asteroid!"
+            }
+         },
 
          nl: {
             label: {
@@ -1612,18 +1634,39 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Attention à l'astéroïde !"
             }
          },
-         nl: {
+         en: {
             label: {
-               obstacleRight: "asteroïde à droite",
-               obstacleInFront: "asteroïde devant",
+               obstacleRight: "asteroid on the right",
+               obstacleInFront: "asteroid ahead",
             },
             messages: {
-               successReachExit: "Bravo, le robot a rejoint la fusée !",
-               failureReachExit: "Le robot est perdu dans l'espace. Recommencez pour l'aider à rejoindre la fusée.",
-               obstacle: "Attention à l'astéroïde !"
+               successReachExit: "Well done, the robot has reached the rocket!",
+               failureReachExit: "The robot is lost in space. Try again to help it reach the rocket.",
+               obstacle: "Watch out for the asteroid!"
             }
          },
-
+         nl: {
+            label: {
+               obstacleRight: "asteroïde rechts",
+               obstacleInFront: "asteroïde vooruit",
+            },
+            messages: {
+               successReachExit: "Goed gedaan, de robot heeft de raket bereikt!",
+               failureReachExit: "De robot is verdwaald in de ruimte. Probeer opnieuw om hem te helpen de raket te bereiken.",
+               obstacle: "Pas op voor de asteroïde!"
+            }
+         },
+         de: {
+            label: {
+               obstacleRight: "Asteroid rechts",
+               obstacleInFront: "Asteroid voraus",
+            },
+            messages: {
+               successReachExit: "Gut gemacht, der Roboter hat die Rakete erreicht!",
+               failureReachExit: "Der Roboter ist im Weltraum verloren. Versuchen Sie es erneut, um ihm zu helfen, die Rakete zu erreichen.",
+               obstacle: "Achtung, Asteroid!"
+            }
+         },
          es: {
             label: {
                obstacleRight: "asteroide a la derecha",
