@@ -1759,7 +1759,7 @@ window.displayHelper = {
          var modulesPath = window.modulesPath[window.modulesPath.length-1] == '/' ? window.modulesPath : window.modulesPath + '/';
          return modulesPath + 'img/';
       } else {
-         return '../../../_common/modules/img/';
+         return '../../modules/img/';
       }
    },
 
@@ -2512,7 +2512,7 @@ window.displayHelper = {
             this.levelsScores[this.taskLevel] / this.levelsMaxScores[this.taskLevel], 'normal');
       }
       window.task.getHeight(function(height) {
-         if (height != self.lastSentHeight) {
+         if (Math.abs(height - self.lastSentHeight) > 30) { // fix on 2/2025 to prevent window to infinitely extend by jump of 25px
             self.lastSentHeight = height;
             window.platform.updateDisplay({height: height}, function(){});
          }
