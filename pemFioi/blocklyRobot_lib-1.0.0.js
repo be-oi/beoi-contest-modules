@@ -2196,6 +2196,7 @@ var getContext = function(display, infos, curLevel) {
       sokoban: {
          backgroundColor: "#ffeead",
          itemTypes: {
+            robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
