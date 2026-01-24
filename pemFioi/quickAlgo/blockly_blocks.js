@@ -925,6 +925,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "pixelart26structure",
+                  blocklyXml: '<block type="controls_repeat" editable="false"><field name="TIMES">100</field><statement name="DO"><block type="controls_if"><mutation else="1"></mutation><statement name="DO0"><block type="yellow"></block></statement><statement name="ELSE"><block type="red"></block></statement></block></statement></block>'
+               },
+               {
                   name: "controls_for_noShadow",
                   blocklyXml: "<block type='controls_for'></block>",
                   excludedByDefault: true
