@@ -844,6 +844,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='logic_compare'></block>"
                },
                {
+                  name: "logic_compare_row",
+                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="row"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
+               },
+               {
+                  name: "logic_compare_col",
+                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="col"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
+               },
+               {
                   name: "logic_operation",
                   blocklyXml: "<block type='logic_operation' inline='false'></block>"
                },
@@ -926,7 +934,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "pixelart26structure",
-                  blocklyXml: '<block type="controls_repeat" editable="false"><field name="TIMES">100</field><statement name="DO"><block type="controls_if"><mutation else="1"></mutation><statement name="DO0"><block type="yellow"></block></statement><statement name="ELSE"><block type="red"></block></statement></block></statement></block>'
+                  blocklyXml: '<block type="controls_repeat" editable="false"><field name="TIMES">100</field><statement name="DO"><block type="controls_if" movable="false"><mutation else="1"></mutation><statement name="DO0"><block type="yellow" movable="false"></block></statement><statement name="ELSE"><block type="red" movable="false"></block></statement></block></statement></block>'
                },
                {
                   name: "controls_for_noShadow",
