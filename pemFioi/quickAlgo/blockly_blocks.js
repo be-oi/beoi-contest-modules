@@ -845,19 +845,19 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "logic_compare_row",
-                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="row"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
+                  blocklyXml: '<block type="logic_compare"><field name="OP">EQ</field><value name="A"><block movable="false" type="row"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
                },
                {
                   name: "logic_compare_row_3",
-                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="row"></block></value><value name="B"><block type="math_number" movable="false" editable="false"><field name="NUM">3</field></block></value></block>'
+                  blocklyXml: '<block type="logic_compare"><field name="OP">EQ</field><value name="A"><block movable="false" type="row"></block></value><value name="B"><block type="math_number" movable="false" editable="false"><field name="NUM">3</field></block></value></block>'
                },
                {
                   name: "logic_compare_col",
-                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="col"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
+                  blocklyXml: '<block type="logic_compare"><field name="OP">EQ</field><value name="A"><block movable="false" type="col"></block></value><value name="B"><block type="math_number" movable="false"><field name="NUM">1</field></block></value></block>'
                },
                {
                   name: "logic_compare_col_5",
-                  blocklyXml: '<block type="logic_compare" editable="false"><field name="OP">EQ</field><value name="A"><block movable="false" type="col"></block></value><value name="B"><block type="math_number" movable="false" editable="false"><field name="NUM">5</field></block></value></block>'
+                  blocklyXml: '<block type="logic_compare"><field name="OP">EQ</field><value name="A"><block movable="false" type="col"></block></value><value name="B"><block type="math_number" movable="false" editable="false"><field name="NUM">5</field></block></value></block>'
                },
                {
                   name: "logic_operation",
